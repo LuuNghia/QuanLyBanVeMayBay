@@ -1,0 +1,465 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều hành Chuyến bay - SkyBooking Admin</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580;
+            --navy-gradient: linear-gradient(90deg, #00265c 0%, #003580 100%);
+            --secondary-gold: #feba02;
+            --sidebar-width: 280px;
+            --bg-light: #f4f7fe;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); margin: 0; }
+
+        /* --- SIDEBAR & TOPBAR --- */
+        #sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-navy); position: fixed; left: 0; top: 0; z-index: 1001; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; color: white; font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 25px; margin: 4px 15px; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { font-size: 1.2rem; margin-right: 15px; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.active { background: var(--secondary-gold) !important; color: var(--primary-navy) !important; font-weight: 600; }
+
+        .topbar { margin-left: var(--sidebar-width); background: var(--navy-gradient); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .search-box { background: var(--glass-white); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 8px 20px; width: 400px; backdrop-filter: blur(10px); }
+        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.5); }
+        .avatar-ad { width: 42px; height: 42px; background: var(--secondary-gold); color: var(--primary-navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { margin-left: var(--sidebar-width); padding: 35px; }
+        .breadcrumb { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .card-custom { background: white; border: none; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); height: 100%; }
+        .stat-label { color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        
+        .table-container { background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
+        .table thead th { background: transparent; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 15px; }
+        .table tbody td { padding: 20px 15px; vertical-align: middle; border-bottom: 1px solid #f8fafc; font-size: 14px; transition: background-color 0.2s;}
+        .table tbody tr:hover { background-color: #f8fafc; }
+
+        .status-pill { padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; }
+        .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; }
+        .status-ontime { background: #ecfdf5; color: #10b981; } .status-ontime::before { background: #10b981; }
+        .status-delay { background: #fff1f2; color: #f43f5e; } .status-delay::before { background: #f43f5e; }
+        .status-completed { background: #fefce8; color: #ca8a04; } .status-completed::before { background: #ca8a04; }
+
+        .btn-add { background: var(--primary-navy); color: white; border-radius: 12px; padding: 12px 24px; font-weight: 700; border: none; transition: 0.3s; }
+        .btn-add:hover { background: #00265c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,53,128,0.2); }
+        .weather-card { background: #001a3d; color: white; border-radius: 25px; padding: 25px; position: relative; overflow: hidden; }
+        .weather-card::after { content: '\f299'; font-family: "bootstrap-icons"; position: absolute; right: -20px; bottom: -20px; font-size: 120px; opacity: 0.05; }
+
+        /* Action Buttons */
+        .btn-action { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: none; transition: 0.2s; }
+        .btn-action:hover { transform: scale(1.1); }
+        .btn-view { background: #eff6ff; color: #3b82f6; }
+        .btn-edit { background: #fef3c7; color: #d97706; }
+        .btn-delete { background: #fee2e2; color: #ef4444; }
+
+        /* Modal Custom Styling */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: 1px solid #f1f5f9; padding: 20px 25px; }
+        .modal-footer { border-top: 1px solid #f1f5f9; padding: 15px 25px; }
+
+        /* Phân trang (Pagination) */
+        .page-link { border: none; margin: 0 3px; border-radius: 8px !important; color: #64748b; font-weight: 500; }
+        .page-link:hover { background-color: #f1f5f9; color: var(--primary-navy); }
+        .page-item.active .page-link { background-color: var(--primary-navy); color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-airplane-engines-fill me-2 text-warning"></i>SkyBooking
+            <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">HỆ THỐNG QUẢN TRỊ</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="../Admin/DashBoard.html" class="nav-link"><i class="bi bi-grid-fill"></i> Tổng quan</a>
+            <a href="../Admin/SanBayVaTuyenBay.html" class="nav-link active"><i class="bi bi-geo-alt-fill"></i> Sân bay & Tuyến bay</a>
+            <a href="../Admin/QuanLyChuyenBay.html" class="nav-link"><i class="bi bi-airplane-fill"></i> Quản lý Chuyến bay</a>
+            <a href="../Admin/SoDoGhe.html" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Máy bay & Sơ đồ ghế</a>
+            <a href="../Admin/QuanLyDatVe.html" class="nav-link"><i class="bi bi-ticket-perforated-fill"></i> Quản lý Đặt vé</a>
+            <a href="../Admin/NhanVienVaKhachHang.html" class="nav-link"><i class="bi bi-people-fill"></i> Nhân viên & Khách hàng</a>
+            <a href="../Admin/CauHinhHeThong.html" class="nav-link"><i class="bi bi-gear-fill"></i> Cấu hình hệ thống</a>
+        </nav>
+    </div>
+
+    <div class="topbar">
+        <div class="search-box d-flex align-items-center">
+            <i class="bi bi-search text-white opacity-50 me-2"></i>
+            <input type="text" placeholder="Tìm kiếm chuyến bay, hành trình...">
+        </div>
+        <div class="d-flex align-items-center text-white">
+            <i class="bi bi-bell-fill me-4 fs-5 cursor-pointer"></i>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
+                    <div class="fw-bold small">Nguyễn Admin</div>
+                    <div class="opacity-75 small text-uppercase" style="font-size: 10px;">Flight Manager</div>
+                </div>
+                <div class="avatar-ad shadow-sm">AD</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-muted">
+                <li class="breadcrumb-item">Hệ thống</li>
+                <li class="breadcrumb-item active text-primary">Quản lý Chuyến bay</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-navy mb-1">Điều hành Chuyến bay</h2>
+                <p class="text-muted small mb-0">Cập nhật và theo dõi lộ trình bay trong thời gian thực.</p>
+            </div>
+            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#modalFlight"><i class="bi bi-plus-lg me-2"></i>Thêm Chuyến bay</button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3"><div class="card-custom d-flex justify-content-between align-items-center"><div><div class="stat-label">Hôm nay</div><h3 class="fw-bold mb-0">42</h3></div><span class="badge bg-primary-subtle text-primary rounded-pill">Chuyến</span></div></div>
+            <div class="col-md-3"><div class="card-custom"><div class="stat-label">Đúng giờ</div><div class="d-flex align-items-center"><h3 class="fw-bold mb-0 me-3">38</h3><span class="text-success small fw-bold">92.4%</span></div></div></div>
+            <div class="col-md-3"><div class="card-custom"><div class="stat-label">Đang Delay</div><div class="d-flex align-items-center"><h3 class="fw-bold mb-0 me-3 text-danger">03</h3><span class="badge bg-danger-subtle text-danger rounded-pill">Chú ý</span></div></div></div>
+            <div class="col-md-3"><div class="card-custom"><div class="stat-label">Loại máy bay</div><div class="d-flex align-items-center"><h3 class="fw-bold mb-0 me-3">A321</h3><span class="badge bg-warning-subtle text-warning rounded-pill">Phổ biến</span></div></div></div>
+        </div>
+
+        <div class="table-container mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Danh sách lộ trình</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light btn-sm rounded-pill px-3 active">Tất cả</button>
+                    <button class="btn btn-light btn-sm rounded-pill px-3">Nội địa</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="flightTable">
+                    <thead>
+                        <tr>
+                            <th>Mã CB</th>
+                            <th>Tuyến bay</th>
+                            <th>Ngày giờ khởi hành</th>
+                            <th>Loại máy bay</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="row-VN123">
+                            <td class="fw-bold text-primary">VN123</td>
+                            <td class="fw-bold">HAN <i class="bi bi-arrow-right mx-2 opacity-25"></i> SGN</td>
+                            <td><div class="fw-bold">15/06/2026</div><div class="small text-muted">08:30 AM</div></td>
+                            <td>Airbus A321</td>
+                            <td><span class="status-pill status-ontime">Đúng giờ</span></td>
+                            <td class="text-end">
+                                <button class="btn-action btn-view" onclick="openViewModal('VN123')"><i class="bi bi-eye"></i></button>
+                                <button class="btn-action btn-edit ms-1" onclick="openEditModal('VN123')"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn-action btn-delete ms-1" onclick="openDeleteModal('VN123')"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr id="row-VJ882">
+                            <td class="fw-bold text-primary">VJ882</td>
+                            <td class="fw-bold">DAD <i class="bi bi-arrow-right mx-2 opacity-25"></i> HAN</td>
+                            <td><div class="fw-bold">15/06/2026</div><div class="small text-danger">10:45 AM (Dự kiến)</div></td>
+                            <td>A321 Neo</td>
+                            <td><span class="status-pill status-delay">Delay</span></td>
+                            <td class="text-end">
+                                <button class="btn-action btn-view" onclick="openViewModal('VJ882')"><i class="bi bi-eye"></i></button>
+                                <button class="btn-action btn-edit ms-1" onclick="openEditModal('VJ882')"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn-action btn-delete ms-1" onclick="openDeleteModal('VJ882')"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="small text-muted fst-italic">Hiển thị 1 - 2 của 42 chuyến bay</div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalFlight" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="fw-bold mb-0" id="modalFlightTitle" style="color: var(--primary-navy);">Thêm Chuyến bay mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="flightForm">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">MÃ CHUYẾN BAY</label>
+                            <input type="text" class="form-control bg-light" id="fCode" placeholder="VD: VN123" required>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">TUYẾN BAY</label>
+                                <select class="form-select bg-light">
+                                    <option>HAN - SGN</option>
+                                    <option>SGN - HAN</option>
+                                    <option>DAD - HAN</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">MÁY BAY</label>
+                                <select class="form-select bg-light">
+                                    <option>Airbus A321</option>
+                                    <option>Boeing 787</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">NGÀY KHỞI HÀNH</label>
+                                <input type="date" class="form-control bg-light" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">GIỜ KHỞI HÀNH</label>
+                                <input type="time" class="form-control bg-light" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">TRẠNG THÁI</label>
+                            <select class="form-select bg-light" id="fStatus">
+                                <option value="ontime">Đúng giờ</option>
+                                <option value="delay">Delay</option>
+                                <option value="cancel">Hủy chuyến</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn text-white px-4" style="background: var(--primary-navy);" onclick="saveFlight()">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalView" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+                
+                <div class="modal-header border-0 text-white" style="background: var(--navy-gradient); padding: 20px 30px;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px;">
+                            <i class="bi bi-airplane-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0" id="viewCode">VN123</h4>
+                            <div class="small opacity-75">Ngày bay: 15/06/2026</div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success text-white px-3 py-2 rounded-pill fs-6 border border-white">ĐANG KHỞI HÀNH</span>
+                    </div>
+                </div>
+
+                <div class="modal-body bg-light p-4">
+                    
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                        <h6 class="fw-bold text-muted text-uppercase small mb-4"><i class="bi bi-clock-history me-2"></i>Chi tiết lịch trình (Scheduled vs Actual)</h6>
+                        
+                        <div class="row position-relative">
+                            <div class="position-absolute top-50 start-50 translate-middle w-50" style="height: 2px; border-top: 2px dashed #cbd5e1; z-index: 1;"></div>
+                            
+                            <div class="col-5 text-center position-relative z-2 bg-white">
+                                <h2 class="fw-bold text-navy mb-0">HAN</h2>
+                                <div class="fw-bold mb-2">Hà Nội (Nội Bài)</div>
+                                <div class="d-inline-block bg-light rounded-3 p-2 text-start small">
+                                    <div class="text-muted">Dự kiến: <span class="fw-bold text-dark">08:30 AM</span></div>
+                                    <div class="text-success">Thực tế: <span class="fw-bold">08:32 AM</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-2 text-center position-relative z-2 bg-white d-flex flex-column justify-content-center">
+                                <i class="bi bi-airplane fs-4 text-primary mb-1"></i>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill small">2h 15m</span>
+                            </div>
+
+                            <div class="col-5 text-center position-relative z-2 bg-white">
+                                <h2 class="fw-bold text-navy mb-0">SGN</h2>
+                                <div class="fw-bold mb-2">TP. Hồ Chí Minh</div>
+                                <div class="d-inline-block bg-light rounded-3 p-2 text-start small">
+                                    <div class="text-muted">Dự kiến: <span class="fw-bold text-dark">10:45 AM</span></div>
+                                    <div class="text-primary">Ước tính: <span class="fw-bold">10:40 AM</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                                <h6 class="fw-bold text-muted text-uppercase small mb-3"><i class="bi bi-gear-fill me-2"></i>Kỹ thuật & Tải trọng</h6>
+                                
+                                <div class="d-flex justify-content-between mb-2 small">
+                                    <span class="text-muted">Tàu bay:</span>
+                                    <span class="fw-bold text-dark">Airbus A321 <span class="text-primary">(VN-A589)</span></span>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between mb-1 small">
+                                        <span class="text-muted">Khách Thương gia (C):</span>
+                                        <span class="fw-bold text-dark">15/16</span>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 6px;">
+                                        <div class="progress-bar bg-warning" style="width: 93%"></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-1 small">
+                                        <span class="text-muted">Khách Phổ thông (Y):</span>
+                                        <span class="fw-bold text-dark">170/194</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-primary" style="width: 87%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-3 pt-3 border-top small">
+                                    <span class="text-muted">Tổng hành lý ký gửi:</span>
+                                    <span class="fw-bold text-danger">3,250 kg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background: #e0e7ff;">
+                                <h6 class="fw-bold text-navy text-uppercase small mb-3"><i class="bi bi-geo-alt-fill me-2"></i>Thông tin nhà ga</h6>
+                                
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="bg-white p-3 rounded-3 text-center shadow-sm">
+                                            <div class="small text-muted mb-1">Cửa ra MB</div>
+                                            <h3 class="fw-bold text-navy mb-0">08</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-white p-3 rounded-3 text-center shadow-sm">
+                                            <div class="small text-muted mb-1">Nhà ga (Terminal)</div>
+                                            <h3 class="fw-bold text-navy mb-0">T1</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-2 rounded-3 mt-3 text-center small fw-bold text-muted shadow-sm">
+                                    Băng chuyền hành lý dự kiến: <span class="text-success fs-6">Số 04</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4 bg-white justify-content-between">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4 fw-bold small"><i class="bi bi-exclamation-triangle me-2"></i>Báo Delay</button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold small border"><i class="bi bi-file-earmark-person me-2"></i>In Manifest</button>
+                        <button type="button" class="btn btn-navy rounded-pill px-4 fw-bold small text-white" style="background: var(--primary-navy);" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDelete" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content shadow-lg text-center p-4">
+                <i class="bi bi-exclamation-circle text-danger display-4 mb-3"></i>
+                <h5 class="fw-bold">Xác nhận xóa?</h5>
+                <p class="text-muted small">Bạn có chắc muốn xóa chuyến bay <strong id="delFlightCode"></strong> không? Hành động này không thể hoàn tác.</p>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger w-50" onclick="confirmDelete()">Xóa bỏ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold" id="toastMessage">
+                    Thao tác thành công!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const modalFlight = new bootstrap.Modal(document.getElementById('modalFlight'));
+        const modalView = new bootstrap.Modal(document.getElementById('modalView'));
+        const modalDelete = new bootstrap.Modal(document.getElementById('modalDelete'));
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+        
+        let currentFlightId = ''; 
+
+        function openEditModal(flightCode) {
+            document.getElementById('modalFlightTitle').innerText = 'Cập nhật Chuyến bay ' + flightCode;
+            document.getElementById('fCode').value = flightCode;
+            document.getElementById('fCode').disabled = true; 
+            modalFlight.show();
+        }
+
+        document.querySelector('.btn-add').addEventListener('click', function() {
+            document.getElementById('modalFlightTitle').innerText = 'Thêm Chuyến bay mới';
+            document.getElementById('flightForm').reset();
+            document.getElementById('fCode').disabled = false;
+        });
+
+        function openViewModal(flightCode) {
+            document.getElementById('viewCode').innerText = flightCode;
+            modalView.show();
+        }
+
+        function openDeleteModal(flightCode) {
+            currentFlightId = flightCode;
+            document.getElementById('delFlightCode').innerText = flightCode;
+            modalDelete.show();
+        }
+
+        function saveFlight() {
+            modalFlight.hide();
+            showToast('Lưu thông tin chuyến bay thành công!', 'bg-success');
+        }
+
+        function confirmDelete() {
+            modalDelete.hide();
+            const row = document.getElementById('row-' + currentFlightId);
+            if(row) {
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
+            }
+            showToast('Đã xóa chuyến bay ' + currentFlightId, 'bg-danger');
+        }
+
+        function showToast(message, colorClass) {
+            const toastEl = document.getElementById('liveToast');
+            document.getElementById('toastMessage').innerText = message;
+            toastEl.className = `toast align-items-center text-white border-0 ${colorClass}`;
+            toast.show();
+        }
+    </script>
+</body>
+</html>

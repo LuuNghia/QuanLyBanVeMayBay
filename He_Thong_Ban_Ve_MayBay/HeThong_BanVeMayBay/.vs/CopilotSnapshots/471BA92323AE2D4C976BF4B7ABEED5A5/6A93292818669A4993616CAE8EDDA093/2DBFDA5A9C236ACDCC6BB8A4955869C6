@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace HeThong_BanVeMayBay.Models.Entities;
+
+public partial class Ve
+{
+    public string MaVe { get; set; } = null!;
+
+    public int? MaDatVe { get; set; }
+
+    public string? MaCb { get; set; }
+
+    public int? MaGhe { get; set; }
+
+    public string TenHanhKhach { get; set; } = null!;
+
+    public string? LoaiHanhKhach { get; set; }
+
+    public DateOnly? NgaySinh { get; set; }
+
+    public string? CccdPassport { get; set; }
+
+    public decimal? GiaVeThucTe { get; set; }
+
+    public bool? DaXoa { get; set; }
+
+    public virtual ChuyenBay? MaCbNavigation { get; set; }
+
+    public virtual DatVe? MaDatVeNavigation { get; set; }
+
+    public virtual DanhMucGhe? MaGheNavigation { get; set; }
+}

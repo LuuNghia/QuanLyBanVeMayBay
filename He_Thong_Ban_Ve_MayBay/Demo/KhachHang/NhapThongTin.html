@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyBooking - Thông Tin Hành Khách</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580; /* Màu xanh đậm SkyBooking */
+            --secondary-gold: #feba02; /* Màu vàng cam SkyBooking */
+            --bg-light: #f4f6f9;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); color: #333; margin: 0; padding: 0; }
+        
+        /* --- NAVBAR (Đã cập nhật theo index) --- */
+        .navbar { background-color: var(--primary-navy) !important; padding: 12px 0; border: none; }
+        .navbar-brand { font-size: 22px; letter-spacing: 1px; color: white !important; display: flex; align-items: center; }
+        .navbar-brand i { color: white; margin-right: 12px; }
+        .nav-link { font-size: 15px; margin: 0 5px; transition: 0.3s; }
+        .nav-link:hover { color: var(--secondary-gold) !important; }
+        
+        /* Avatar Style NA */
+        .user-avatar-circle { 
+            width: 35px; height: 35px; background-color: var(--secondary-gold); 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; color: var(--primary-navy); 
+            font-size: 14px; margin-left: 10px;
+        }
+
+        /* --- STEP HEADER --- */
+        .step-header { background: white; padding: 12px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .back-link { color: #007bff; text-decoration: none; font-weight: 500; font-size: 14px; }
+        .step-text { font-size: 13px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+
+        /* --- CARDS & UI --- */
+        .card-custom { background: white; border-radius: 12px; padding: 25px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header-title { font-size: 18px; font-weight: 700; color: var(--primary-navy); margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
+        .card-header-title i { margin-right: 10px; color: var(--secondary-gold); }
+        
+        .ticket-info-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 20px; }
+        .badge-class { background-color: var(--secondary-gold); color: var(--primary-navy); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        
+        .summary-panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 85px; }
+        .bill-total { border-top: 2px solid #f1f5f9; padding-top: 15px; font-weight: 800; color: var(--primary-navy); font-size: 22px; }
+        
+        .btn-checkout { background-color: var(--secondary-gold); color: var(--primary-navy); border: none; border-radius: 8px; padding: 15px; width: 100%; font-weight: 800; transition: 0.3s; }
+        .btn-checkout:hover { background-color: #eab308; transform: translateY(-1px); }
+        
+        .form-label { font-size: 13px; font-weight: 600; color: #475569; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px; border: 1px solid #d1d5db; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-airplane-engines me-2"></i>SKYBOOKING</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="#">Vé máy bay</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Lịch sử đặt vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Tra cứu vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hỗ trợ</a></li>
+                </ul>
+
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
+                            <span class="me-1">Nguyễn Văn A</span>
+                            <div class="user-avatar-circle">NA</div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Thông tin cá nhân</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="step-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="#" class="back-link"><i class="bi bi-chevron-left"></i> Quay lại chọn ghế</a>
+            <div class="step-text text-uppercase">BƯỚC 3/4: ĐIỀN THÔNG TIN</div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <form class="row g-4" id="bookingForm" onsubmit="goToPayment(event)">
+            <div class="col-lg-8">
+                <div class="card-custom">
+                    <h4 class="card-header-title"><i class="bi bi-ticket-detailed-fill"></i> Tóm tắt chuyến đi</h4>
+                    <div class="ticket-info-box">
+                        <div class="row align-items-center">
+                            <div class="col-md-7">
+                                <div class="small text-muted mb-1">Mã chuyến: VN123 | 07/04/2026</div>
+                                <div class="h5 fw-bold text-navy mb-2">TP. Hồ Chí Minh (SGN) <i class="bi bi-arrow-right mx-1"></i> Hà Nội (HAN)</div>
+                                <span class="badge-class">HẠNG THƯƠNG GIA</span>
+                            </div>
+                            <div class="col-md-5 border-start ps-4">
+                                <div class="mb-1">Ghế chọn: <strong class="text-danger">12A</strong></div>
+                                <div class="small text-muted"><i class="bi bi-briefcase-fill me-1"></i> 12kg Xách tay | 32kg Ký gửi</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-custom">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="card-header-title border-0 mb-0 p-0"><i class="bi bi-person-vcard-fill"></i> Thông tin hành khách</h4>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="useAccount" onchange="fillAccountInfo()">
+                            <label class="form-check-label small fw-bold text-primary" for="useAccount" style="cursor: pointer;">Dùng thông tin tài khoản</label>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">HỌ VÀ TÊN (KHÔNG DẤU) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-uppercase" id="paxName" placeholder="VD: NGUYEN VAN A" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">GIỚI TÍNH <span class="text-danger">*</span></label>
+                            <select class="form-select" id="paxGender" required>
+                                <option value="" selected disabled>Chọn</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">NGÀY SINH <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="paxDob" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">CCCD / HỘ CHIẾU <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="paxId" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">ĐỊA CHỈ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="paxAddress" placeholder="Số nhà, đường, phường, tỉnh..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">SỐ ĐIỆN THOẠI <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="contactPhone" placeholder="0901234567" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">EMAIL <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="contactEmail" placeholder="vana@gmail.com" required>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="summary-panel">
+                    <h5 class="fw-bold text-navy mb-4"><i class="bi bi-cash-stack me-2"></i>Chi tiết thanh toán</h5>
+                    <div class="d-flex justify-content-between mb-2 small text-muted">
+                        <span>Giá vé gốc</span>
+                        <span>1.000.000 đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small text-muted">
+                        <span>Hệ số Thương gia (x2.5)</span>
+                        <span class="text-success">+1.500.000 đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small text-muted">
+                        <span>Thuế & Phí</span>
+                        <span>250.000 đ</span>
+                    </div>
+                    <div class="bill-total d-flex justify-content-between mb-4">
+                        <span>TỔNG TIỀN</span>
+                        <span class="text-primary">2.750.000 đ</span>
+                    </div>
+
+                    <button type="submit" class="btn-checkout d-flex justify-content-between align-items-center">
+                        <span>TIẾP TỤC THANH TOÁN</span>
+                        <i class="bi bi-arrow-right-circle-fill fs-4"></i>
+                    </button>
+                    <p class="text-center mt-3 small text-muted">Bằng cách tiếp tục, bạn đồng ý với Điều khoản dịch vụ của SkyBooking.</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const mockData = {
+            name: "NGUYEN VAN A", gender: "Nam", dob: "1995-01-20", 
+            id: "012345678901", addr: "123 Quận 1, TP.HCM", 
+            phone: "0901234567", email: "vana.nguyen@gmail.com"
+        };
+
+        function fillAccountInfo() {
+            const isChecked = document.getElementById('useAccount').checked;
+            document.getElementById('paxName').value = isChecked ? mockData.name : "";
+            document.getElementById('paxGender').value = isChecked ? mockData.gender : "";
+            document.getElementById('paxDob').value = isChecked ? mockData.dob : "";
+            document.getElementById('paxId').value = isChecked ? mockData.id : "";
+            document.getElementById('paxAddress').value = isChecked ? mockData.addr : "";
+            if(document.getElementById('syncContact').checked) syncWithPax();
+        }
+
+        function syncWithPax() {
+            const isSync = document.getElementById('syncContact').checked;
+            document.getElementById('contactName').value = isSync ? document.getElementById('paxName').value : "";
+            if(isSync && document.getElementById('useAccount').checked) {
+                document.getElementById('contactPhone').value = mockData.phone;
+                document.getElementById('contactEmail').value = mockData.email;
+            }
+        }
+
+        document.getElementById('paxName').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+            if(document.getElementById('syncContact').checked) document.getElementById('contactName').value = this.value;
+        });
+
+        function goToPayment(e) {
+            e.preventDefault();
+            alert("Đã xác nhận thông tin! Hệ thống đang chuyển sang trang Thanh toán QR Code...");
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

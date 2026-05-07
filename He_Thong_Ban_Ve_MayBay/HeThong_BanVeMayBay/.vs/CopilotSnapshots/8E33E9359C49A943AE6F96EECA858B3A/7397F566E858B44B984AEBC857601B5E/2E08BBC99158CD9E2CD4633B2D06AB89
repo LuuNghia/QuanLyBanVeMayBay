@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/user/css/Index.css" asp-append-version="true" />
+}
+
+<section id="search-area" class="hero-section">
+    <div class="container text-center mb-5">
+        <h1 class="fw-bold display-5">Khám Phá Bầu Trời Mới <i class="bi bi-cloud-sun ms-2"></i></h1>
+        <p class="lead opacity-75">Săn vé giá tốt, tận hưởng hành trình 5 sao</p>
+    </div>
+    <div class="container">
+        <div class="card search-card p-4 p-md-5 text-dark">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i>Điểm đi</label>
+                    <select class="form-select"><option>Hồ Chí Minh (SGN)</option></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="bi bi-geo me-1"></i>Điểm đến</label>
+                    <select class="form-select"><option>Hà Nội (HAN)</option></select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i>Ngày đi</label>
+                    <input type="date" class="form-control" value="2026-03-25">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i>Hạng vé</label>
+                    <select class="form-select"><option>Tất cả các hạng</option></select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-search w-100 py-3 fw-bold" onclick="searchFlights()">TÌM KIẾM</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="flight-results-section" class="container">
+    <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-send-check me-2"></i>Lựa chọn chuyến bay tốt nhất</h4>
+    <div id="flight-list">
+        <div class="card flight-card p-4 shadow-sm" onclick="selectFlight('VN123', 'Vietnam Airlines')">
+            <div class="row align-items-center">
+                <div class="col-md-4"><h5 class="fw-bold mb-0">VN123 | Vietnam Airlines</h5><small class="text-muted">Airbus A321 • Bay thẳng</small></div>
+                <div class="col-md-4 text-center"><span class="fs-4 fw-bold">08:00</span> <i class="bi bi-arrow-right mx-3"></i> <span class="fs-4 fw-bold">10:10</span></div>
+                <div class="col-md-4 text-md-end">
+                    <span class="fs-4 fw-bold text-danger">1,250,000đ</span>
+                    <a class="btn btn-primary px-4 rounded-pill ms-2" asp-area="User" asp-controller="Booking" asp-action="ChonCho">
+                        Chọn chuyến
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/user/js/Index.js" asp-append-version="true"></script>
+}

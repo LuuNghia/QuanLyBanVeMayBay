@@ -1,0 +1,51 @@
+/* --- HERO & SEARCH --- */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-navy, #003580) 0%, #0056b3 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: -60px;
+}
+
+.search-card {
+    background: white;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.btn-search {
+    background-color: var(--secondary-gold, #feba02);
+    color: var(--primary-navy, #003580);
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+    .btn-search:hover {
+        background-color: #e2a602;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+/* --- DANH SÁCH CHUY?N BAY --- */
+#flight-results-section {
+    padding-top: 100px;
+    padding-bottom: 50px;
+}
+
+.flight-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+    .flight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        border-left: 6px solid var(--secondary-gold, #feba02);
+    }

@@ -1,0 +1,84 @@
+﻿const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+let currentActiveTab = 'airport';
+let rowToDelete = '';
+
+function toastMessage(msg, colorClass = 'bg-success') {
+    document.getElementById('toastMessage').innerText = msg;
+    toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-4 py-3 ${colorClass}`;
+    bsToast.show();
+}
+
+// Thay đổi Nút Thêm Mới tùy theo Tab đang mở
+function updateAddButton(tab) {
+    currentActiveTab = tab;
+    const btn = document.getElementById('dynamicAddBtn');
+    if (tab === 'airport') {
+        btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới';
+    } else {
+        btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Tuyến bay mới';
+    }
+}
+
+// Bấm nút Thêm Mới
+function openAddModal() {
+    if (currentActiveTab === 'airport') {
+        document.getElementById('titleAirport').innerHTML = '<i class="bi bi-building me-2"></i>Thêm Sân bay mới';
+        document.getElementById('formAirport').reset();
+        document.getElementById('sbMa').disabled = false;
+        new bootstrap.Modal(document.getElementById('modalAirport')).show();
+    } else {
+        document.getElementById('titleRoute').innerHTML = '<i class="bi bi-geo-alt me-2"></i>Thêm Tuyến bay mới';
+        document.getElementById('formRoute').reset();
+        document.getElementById('tbDi').disabled = false;
+        document.getElementById('tbDen').disabled = false;
+        new bootstrap.Modal(document.getElementById('modalRoute')).show();
+    }
+}
+
+// Sửa Sân Bay
+function openEditAirport(ma, ten, thanhpho) {
+    document.getElementById('titleAirport').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Sân bay';
+    document.getElementById('sbMa').value = ma;
+    document.getElementById('sbMa').disabled = true; // Không cho sửa khóa chính
+    document.getElementById('sbTen').value = ten;
+    document.getElementById('sbThanhPho').value = thanhpho;
+    new bootstrap.Modal(document.getElementById('modalAirport')).show();
+}
+
+// Sửa Tuyến Bay
+function openEditRoute(maTuyen) {
+    document.getElementById('titleRoute').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Tuyến bay';
+    const parts = maTuyen.split('-');
+    document.getElementById('tbDi').value = parts[0];
+    document.getElementById('tbDen').value = parts[1];
+    document.getElementById('tbDi').disabled = true;
+    document.getElementById('tbDen').disabled = true;
+    new bootstrap.Modal(document.getElementById('modalRoute')).show();
+}
+
+// Form Submit
+function submitForm(e, modalId) {
+    e.preventDefault();
+    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+    toastMessage('Lưu thông tin thành công!');
+}
+
+// Xác nhận xóa
+function confirmDelete(name, rowId) {
+    document.getElementById('delName').innerText = name;
+    rowToDelete = rowId;
+    new bootstrap.Modal(document.getElementById('modalDelete')).show();
+}
+
+function executeDelete() {
+    bootstrap.Modal.getInstance(document.getElementById('modalDelete')).hide();
+    if (rowToDelete) {
+        const row = document.getElementById(rowToDelete);
+        if (row) {
+            row.style.opacity = '0';
+            setTimeout(() => row.remove(), 300);
+        }
+    }
+    toastMessage('Đã xóa dữ liệu thành công!', 'bg-danger');
+}

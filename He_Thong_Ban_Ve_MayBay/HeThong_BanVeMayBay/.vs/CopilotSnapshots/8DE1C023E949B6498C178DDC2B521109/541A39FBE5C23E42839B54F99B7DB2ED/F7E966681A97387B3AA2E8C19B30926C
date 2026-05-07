@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/user/css/Home.Index.css" />
+}
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-airplane-engines me-2"></i>SKYBOOKING</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="#" onclick="location.reload()"><i class="bi bi-ticket-perforated me-1"></i>Vé máy bay</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-clock-history me-1"></i>Lịch sử đặt vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-search me-1"></i>Tra cứu vé</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <span class="me-2 d-none d-lg-inline text-white">Nguyễn Văn A</span>
+                            <img src="https://ui-avatars.com/api/?name=Nguyen+A&background=feba02&color=003580" class="user-avatar" alt="User">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="search-area" class="hero-section">
+        <div class="container text-center mb-5">
+            <h1 class="fw-bold display-5">Khám Phá Bầu Trời Mới <i class="bi bi-cloud-sun ms-2"></i></h1>
+            <p class="lead opacity-75">Săn vé giá tốt, tận hưởng hành trình 5 sao</p>
+        </div>
+        <div class="container">
+            <div class="card search-card p-4 p-md-5 text-dark">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i>Điểm đi</label>
+                        <select class="form-select"><option>Hồ Chí Minh (SGN)</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo me-1"></i>Điểm đến</label>
+                        <select class="form-select"><option>Hà Nội (HAN)</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i>Ngày đi</label>
+                        <input type="date" class="form-control" value="2026-03-25">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i>Hạng vé</label>
+                        <select class="form-select"><option>Tất cả các hạng</option></select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-search w-100 py-3 fw-bold" onclick="searchFlights()">TÌM KIẾM</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="flight-results-section" class="container">
+        <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-send-check me-2"></i>Lựa chọn chuyến bay tốt nhất</h4>
+        <div id="flight-list">
+            <div class="card flight-card p-4 shadow-sm" onclick="selectFlight('VN123', 'Vietnam Airlines')">
+                <div class="row align-items-center">
+                    <div class="col-md-4"><h5 class="fw-bold mb-0">VN123 | Vietnam Airlines</h5><small class="text-muted">Airbus A321 • Bay thẳng</small></div>
+                    <div class="col-md-4 text-center"><span class="fs-4 fw-bold">08:00</span> <i class="bi bi-arrow-right mx-3"></i> <span class="fs-4 fw-bold">10:10</span></div>
+                    <div class="col-md-4 text-md-end"><span class="fs-4 fw-bold text-danger">1,250,000đ</span><button class="btn btn-primary px-4 rounded-pill ms-2">Chọn chuyến</button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="seat-selection-section" class="container mb-5">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="cabin-wrapper">
+                    <h3 class="fw-bold text-center text-primary mb-4">Sơ đồ chỗ ngồi</h3>
+                    <div class="cabin-block block-first">
+                        <div class="cabin-title"><i class="bi bi-stars me-2 text-danger"></i>Khoang Hạng Nhất</div>
+                        <div class="seat-grid" id="grid-first"></div>
+                    </div>
+                    <div class="cabin-block block-business">
+                        <div class="cabin-title"><i class="bi bi-gem me-2 text-primary"></i>Khoang Thương Gia</div>
+                        <div class="seat-grid" id="grid-business"></div>
+                    </div>
+                    <div class="cabin-block block-economy">
+                        <div class="cabin-title"><i class="bi bi-people-fill me-2 text-secondary"></i>Khoang Phổ Thông</div>
+                        <div class="seat-grid" id="grid-economy"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="detail-card">
+                    <div class="text-center mb-4">
+                        <div class="class-name" id="res-class">Chọn ghế</div>
+                        <div class="small text-muted fw-medium">Mã hiệu: <span class="text-primary" id="res-flight-id">---</span></div>
+                    </div>
+                    <div class="price-block shadow-sm">
+                        <div class="price-tag" id="res-price">0 VNĐ</div>
+                        <div class="text-muted small">Đã bao gồm thuế & phí</div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="info-item shadow-sm"><span><i class="bi bi-briefcase-fill"></i>Xách tay</span><strong id="res-hand">--</strong></div>
+                        <div class="info-item shadow-sm"><span><i class="bi bi-luggage-fill"></i>Ký gửi</span><strong id="res-check">--</strong></div>
+                        <div class="info-item shadow-sm"><span><i class="bi bi-arrow-repeat"></i>Điều kiện</span><span class="badge bg-light text-primary rounded-pill" id="res-refund">--</span></div>
+                    </div>
+                    <div class="mb-4"><div id="res-amenities"></div></div>
+                    <button class="btn btn-confirm text-white" onclick="alert('Xác nhận thành công!')">TIẾN HÀNH XÁC NHẬN <i class="bi bi-arrow-right-short fs-4"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @section Scripts {
+        <script src="/user/js/Home.Index.js"></script>
+    }
+</body>
+</html>

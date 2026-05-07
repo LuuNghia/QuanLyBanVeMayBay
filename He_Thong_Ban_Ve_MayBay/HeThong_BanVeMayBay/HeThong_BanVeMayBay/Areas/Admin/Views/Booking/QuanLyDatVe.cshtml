@@ -1,0 +1,509 @@
+@model IEnumerable<HeThong_BanVeMayBay.Models.Entities.HoaDon>
+@{
+    ViewData["Title"] = "Quản Lý đặt vé";
+}
+
+<link rel="stylesheet" href="~/admin/css/QuanLyDatVe.css" asp-append-version="true" />
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--primary-navy);">Quản Lý đặt vé</h2>
+        <p class="text-muted small mb-0">Theo dõi và xử lý các giao dịch đặt chỗ trên toàn hệ thống.</p>
+    </div>
+    <button class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy); border:none;" data-bs-toggle="modal" data-bs-target="#modalCreateBooking">
+        <i class="bi bi-plus-lg me-2"></i>Tạo đặt chỗ mới
+    </button>
+</div>
+
+<form method="get" action="/Admin/Booking/QuanLyDatVe" id="filterForm">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="filter-card h-100">
+                <div class="row g-3 small">
+                    <div class="col-md-5">
+                        <label class="fw-bold text-muted mb-2 text-uppercase">Lọc theo trạng thái</label>
+                        <input type="hidden" name="filterStatus" id="filterStatus" value="@ViewBag.FilterStatus" />
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-sm status-btn @(string.IsNullOrEmpty(ViewBag.FilterStatus as string) || ViewBag.FilterStatus == "Tất cả" ? "btn-dark" : "btn-outline-secondary") rounded-start-3" data-status="Tất cả">Tất cả</button>
+                            <button type="button" class="btn btn-sm status-btn @(ViewBag.FilterStatus == "Đã thanh toán" ? "btn-dark" : "btn-outline-secondary")" data-status="Đã thanh toán">Đã thanh toán</button>
+                            <button type="button" class="btn btn-sm status-btn @(ViewBag.FilterStatus == "Chờ thanh toán" ? "btn-dark" : "btn-outline-secondary")" data-status="Chờ thanh toán">Chờ thanh toán</button>
+                            <button type="button" class="btn btn-sm status-btn @(ViewBag.FilterStatus == "Đã hủy" ? "btn-dark" : "btn-outline-secondary") rounded-end-3" data-status="Đã hủy">Đã hủy</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold text-muted mb-2 text-uppercase">Lọc Chuyến bay</label>
+                        <select name="filterMaCb" class="form-select form-select-sm bg-light border-0 fw-bold" onchange="document.getElementById('filterForm').submit()">
+                            <option value="">-- Tất cả chuyến --</option>
+                            @if (ViewBag.ChuyenBays != null)
+                            {
+                                foreach (var cb in (IEnumerable<HeThong_BanVeMayBay.Models.Entities.ChuyenBay>)ViewBag.ChuyenBays)
+                                {
+                                    var hang = cb.MaHangNavigation?.TenHang ?? cb.MaHang ?? "";
+                                    var tpDi = cb.MaTuyenNavigation?.MaSbdiNavigation?.ThanhPho ?? cb.MaTuyenNavigation?.MaSbdi ?? "?";
+                                    var tpDen = cb.MaTuyenNavigation?.MaSbdenNavigation?.ThanhPho ?? cb.MaTuyenNavigation?.MaSbden ?? "?";
+                                    <option value="@cb.MaCb" selected="@(ViewBag.FilterMaCb == cb.MaCb)">
+                                        @hang | @cb.MaCb | @tpDi → @tpDen (@cb.NgayGioBay.ToString("dd/MM/yyyy"))
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="fw-bold text-muted mb-2 text-uppercase">Chọn ngày</label>
+                                <input type="date" name="filterDate" class="form-control form-control-sm bg-light border-0 fw-bold" value="@ViewBag.FilterDate" onchange="document.getElementById('filterForm').submit()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="revenue-card shadow-sm">
+                <div class="text-navy opacity-75 small fw-bold mb-1 text-uppercase">Doanh thu tháng này</div>
+                <h3 class="fw-bold text-navy mb-1">@(ViewBag.DoanhThuThangNay?.ToString("N0") ?? "0") </h3>
+                <div class="text-success small fw-bold"><i class="bi bi-graph-up me-1"></i>Tổng hệ thống: @ViewBag.TongSoDatVe vé</div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="mb-4">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var booking in Model)
+        {
+            var mainTicket = booking.Ves?.FirstOrDefault();
+            if (mainTicket == null) continue;
+            var route = mainTicket.MaCbNavigation?.MaTuyenNavigation;
+            var timeStrStart = mainTicket.MaCbNavigation?.NgayGioBay.ToString("HH:mm") ?? "--:--";
+            var timeStrEnd = mainTicket.MaCbNavigation?.NgayGioBay.AddHours(2).ToString("HH:mm") ?? "--:--";
+            var sbDi = route?.MaSbdiNavigation?.MaSb ?? "---";
+            var sbDen = route?.MaSbdenNavigation?.MaSb ?? "---";
+            var hangGhe = mainTicket?.MaGheNavigation?.MaHangGheNavigation?.TenHangGhe ?? "PHO THONG";
+            var soGhe = mainTicket?.MaGheNavigation?.SoGhe ?? "Chưa chọn";
+            var hangBay = mainTicket.MaCbNavigation?.MaHang ?? "VJ-000";
+            var trangThai = booking.TrangThaiThanhToan ?? "Chờ thanh toán";
+            var isPaid = trangThai == "Đã thanh toán" || trangThai == "Thành công";
+            var isCancelled = trangThai == "Đã hủy";
+            
+            var statusClass = isPaid ? "bg-success-subtle text-success"
+                            : isCancelled ? "bg-danger-subtle text-danger"
+                            : "bg-warning-subtle text-warning";
+            <div class="booking-item" id="ticket-@booking.MaHoaDon">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="fw-bold text-primary fs-6">#PNR-@booking.MaHoaDon.ToString("D4")</div>
+                        <div class="fw-bold text-dark customer-name">@mainTicket.TenHanhKhach</div>
+                        <div class="text-muted" style="font-size: 11px;">
+                            <i class="bi bi-clock-history me-1"></i>@booking.NgayLap?.ToString("HH:mm | dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <div><div class="fw-bold">@sbDi</div><div class="small text-muted">@timeStrStart</div></div>
+                            <div class="text-muted small"><i class="bi bi-airplane-fill"></i><br>@hangBay</div>
+                            <div><div class="fw-bold">@sbDen</div><div class="small text-muted">@timeStrEnd</div></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        @{
+                            string badgeStyle = "background-color: #6c757d; color: white;"; 
+                            var hgUpper = hangGhe.ToUpper();
+                            if (hgUpper.Contains("NHẤT")) 
+                                badgeStyle = "border: 1.5px solid #ef4444; color: #ef4444; background-color: #fef2f2; font-weight: 900;"; 
+                            else if (hgUpper.Contains("THƯƠNG GIA")) 
+                                badgeStyle = "background-color: #f59e0b; color: white; font-weight: 700;";
+                            else if (hgUpper.Contains("ĐẶC BIỆT")) 
+                                badgeStyle = "background-color: #10b981; color: white; font-weight: 700;";
+                            else if (hgUpper.Contains("PHỔ THÔNG")) 
+                                badgeStyle = "background-color: #3b82f6; color: white; font-weight: 700;";
+                        }
+                        <span class="badge shadow-sm" style="padding: 6px 14px; font-size: 10px; letter-spacing: 0.8px; border-radius: 6px; @badgeStyle">
+                            @((hangGhe.Length > 20 ? hangGhe.Substring(0, 17) + "..." : hangGhe).ToUpper())
+                        </span>
+                        <div class="small text-muted mt-1 fw-bold" style="font-size: 11px;">Ghế @soGhe</div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="fw-bold text-navy" style="font-size: 1.1rem;">@(booking.TongTien?.ToString("N0") ?? "0") VNĐ</div>
+                        <span id="status-@booking.MaHoaDon" class="status-badge @statusClass mt-1 d-inline-block" style="font-size: 10px;">@(trangThai.ToUpper())</span>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn-action" onclick="viewDetail(@booking.MaHoaDon)" title="Xem chi tiết"><i class="bi bi-eye-fill"></i></button>
+                        
+                        @if (!isCancelled)
+                        {
+                            <button class="btn-action bg-primary-subtle text-primary border-primary border-opacity-10" onclick="printInvoice('@booking.Ves.FirstOrDefault()?.MaVe')" title="In hóa đơn PDF"><i class="bi bi-file-earmark-pdf-fill"></i></button>
+                        }
+
+                        <button id="btnPay-@booking.MaHoaDon" 
+                                class="btn-action @(isPaid || isCancelled ? "opacity-25" : "bg-success-subtle text-success border border-success border-opacity-25")" 
+                                title="@(isPaid ? "Đã thanh toán" : isCancelled ? "Đã hủy" : "Xác nhận thu tiền")" 
+                                @(isPaid || isCancelled ? "disabled" : "")
+                                onclick="openPaymentModal('@booking.MaHoaDon', '@(booking.TongTien?.ToString("N0") ?? "0") VNĐ')">
+                            <i class="bi bi-credit-card-fill"></i>
+                        </button>
+                        
+                        <button class="btn-action bg-danger-subtle text-danger border-danger border-opacity-10" onclick="confirmDelete(@booking.MaHoaDon)" title="Xóa vé"><i class="bi bi-trash3-fill"></i></button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5"><h5 class="text-muted">Hiện tại chưa có lượt đặt vé nào.</h5></div>
+    }
+</div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+        <span class="small text-muted fst-italic">Hiển thị trang @ViewBag.CurrentPageHhk / @ViewBag.TotalPagesHhk</span>
+        <ul class="pagination pagination-sm mb-0 gap-1 border-0">
+            @if (ViewBag.CurrentPageHhk > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link border-0 text-muted page-link-circle" href="@Url.Action("QuanLyDatVe", new { pageHhk = ViewBag.CurrentPageHhk - 1, filterStatus = ViewBag.FilterStatus, filterMonth = ViewBag.FilterMonth, filterDate = ViewBag.FilterDate, filterMaCb = ViewBag.FilterMaCb })">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            }
+            
+            @for (int i = 1; i <= ViewBag.TotalPagesHhk; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPageHhk ? "active" : "")">
+                    <a class="page-link border-0 page-link-circle @(i == ViewBag.CurrentPageHhk ? "text-white" : "text-navy")" 
+                       href="@Url.Action("QuanLyDatVe", new { pageHhk = i, filterStatus = ViewBag.FilterStatus, filterMonth = ViewBag.FilterMonth, filterDate = ViewBag.FilterDate, filterMaCb = ViewBag.FilterMaCb })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPageHhk < ViewBag.TotalPagesHhk)
+            {
+                <li class="page-item">
+                    <a class="page-link border-0 text-muted page-link-circle" href="@Url.Action("QuanLyDatVe", new { pageHhk = ViewBag.CurrentPageHhk + 1, filterStatus = ViewBag.FilterStatus, filterMonth = ViewBag.FilterMonth, filterDate = ViewBag.FilterDate, filterMaCb = ViewBag.FilterMaCb })">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+<!-- MODAL THANH TOÁN -->
+<div class="modal fade" id="modalPayment" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0" style="color:var(--primary-navy)"><i class="bi bi-credit-card-fill me-2"></i>Thanh toán vé</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <p class="text-muted small mb-1 text-uppercase fw-bold">Mã đặt chỗ</p>
+                <h4 class="fw-bold text-primary mb-3" id="payPnrCode">SK-0000</h4>
+                <p class="text-muted small mb-1 text-uppercase fw-bold">Cần thanh toán</p>
+                <h2 class="fw-bold text-danger mb-4" id="payAmount">0 d</h2>
+                <div class="text-start">
+                    <label class="small fw-bold text-muted mb-2">PHƯƠNG THỨC THANH TOÁN</label>
+                    <select class="form-select bg-light border-0 p-3 rounded-3 mb-4 fw-bold" id="payMethod">
+                        <option value="Tiền mặt tại quầy">💵 Tiền mặt tại quầy</option>
+                        <option value="Chuyển khoản">🏦 Chuyển khoản (Banking)</option>
+                        <option value="Quẹt thẻ POS">💳 Quẹt thẻ (POS)</option>
+                        <option value="Ví điện tử">📱 Ví điện tử (Momo/ZaloPay)</option>
+                    </select>
+                </div>
+                <button type="button" class="btn w-100 rounded-pill py-3 fw-bold text-white shadow-sm" style="background: var(--primary-navy);" onclick="confirmPayment()">XÁC NHẬN ĐÃ THU TIỀN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CHI TIẾT VÉ DANG BOARDING PASS -->
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="boarding-pass-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-white opacity-50 small fw-bold mb-1" style="letter-spacing:2px">SKYVIET AIRLINES</div>
+                        <div class="text-white opacity-75 small">Mã vé: <span class="fw-bold text-warning fs-6" id="detail-pnr">---</span></div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="row align-items-center text-white mt-4 pb-2">
+                    <div class="col-4 text-center">
+                        <div class="fw-bold opacity-60 small mb-1">KHỞI HÀNH</div>
+                        <div class="fw-black" style="font-size:2.4rem;line-height:1;letter-spacing:3px" id="detail-sbDiCode">---</div>
+                        <div class="small opacity-75 mt-1" id="detail-sbDiName"></div>
+                        <div class="small fw-bold mt-2" id="detail-thoiGianDi"></div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="flight-track-line"><div class="flight-plane-icon"><i class="bi bi-airplane-fill"></i></div></div>
+                        <div class="text-warning fw-bold small mt-3" id="detail-maCb"></div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="fw-bold opacity-60 small mb-1">HẠ CÁNH</div>
+                        <div class="fw-black" style="font-size:2.4rem;line-height:1;letter-spacing:3px" id="detail-sbDenCode">---</div>
+                        <div class="small opacity-75 mt-1" id="detail-sbDenName"></div>
+                        <div class="small fw-bold mt-2" id="detail-thoiGianDen"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bp-perforation"><div class="bp-perforation-line"></div></div>
+
+            <div class="modal-body p-0">
+                <div class="bp-section">
+                    <div class="row g-4">
+                        <div class="col-md-5">
+                            <div class="bp-label">Hành khách</div>
+                            <div class="bp-value" style="font-size:16px" id="detail-tenKh">---</div>
+                            <div class="bp-label mt-3">CCCD / Passport</div>
+                            <div class="bp-value" id="detail-cccd">---</div>
+                            <div class="bp-label mt-3">Số điện thoại</div>
+                            <div class="bp-value" id="detail-sdt">---</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bp-label">Hành lý xách tay</div>
+                            <div class="bp-value"><i class="bi bi-bag me-1 text-primary"></i><span id="detail-xluat">7 kg</span></div>
+                            <div class="bp-label mt-3">Hành lý ký gửi</div>
+                            <div class="bp-value"><i class="bi bi-luggage me-1 text-primary"></i><span id="detail-xgui">20 kg</span></div>
+                            <div class="bp-label mt-3">Ngày đặt</div>
+                            <div class="bp-value" id="detail-ngayDat">---</div>
+                        </div>
+                        <div class="col-md-3 text-center border-start">
+                            <div class="bp-label">HẠNG GHẾ</div>
+                            <span class="badge mb-3" id="detail-hangGhe-badge" style="font-size:11px;padding:6px 12px">---</span>
+                            <div class="bp-label">SỐ GHẾ</div>
+                            <div class="bp-value bp-seat" id="detail-soGhe">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bp-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><div class="bp-label">Trạng thái</div><span class="bp-status-badge" id="detail-status">---</span></div>
+                    <div class="text-end"><div class="bp-label">Tổng thanh toán</div><div style="font-size:24px;font-weight:900;color:#0f1f4f" id="detail-price">0 d</div></div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 bg-white justify-content-between">
+                <input type="hidden" id="detail-MaHoaDonGoc" value="">
+                <input type="hidden" id="detail-MaVe" value="">
+                <button class="btn btn-danger rounded-pill px-4" id="btnCancelInDetail" onclick="cancelTicket()"><i class="bi bi-x-circle me-2"></i>Hủy vé</button>
+                <button class="btn rounded-pill px-4 fw-bold text-white" id="btnPrintInDetail" style="background: var(--primary-navy);" onclick="printInvoiceFromDetail()"><i class="bi bi-file-earmark-pdf me-2"></i>In hóa đơn PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TAO DAT CHO -->
+<div class="modal fade" id="modalCreateBooking" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="fw-bold mb-0" style="color:var(--primary-navy)"><i class="bi bi-plus-circle me-2"></i>Đặt vé mới tại quầy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="small fw-bold text-muted">CHỌN CHUYẾN BAY</label>
+
+                                <!-- Dropdown chọn chuyến bay -->
+                                <select class="form-select bg-light border-0 p-3 rounded-4 mb-2" id="create-maCb" onchange="onChuyenBayChange()">
+                                    @if (ViewBag.ChuyenBays != null)
+                                    {
+                                        foreach (var cb in ViewBag.ChuyenBays)
+                                        {
+                                            var sbDi   = cb.MaTuyenNavigation?.MaSbdiNavigation?.MaSb  ?? cb.MaTuyenNavigation?.MaSbdi  ?? "?";
+                                            var sbDen  = cb.MaTuyenNavigation?.MaSbdenNavigation?.MaSb ?? cb.MaTuyenNavigation?.MaSbden ?? "?";
+                                            var tenDi  = cb.MaTuyenNavigation?.MaSbdiNavigation?.TenSb  ?? "";
+                                            var tenDen = cb.MaTuyenNavigation?.MaSbdenNavigation?.TenSb ?? "";
+                                            var tpDi   = cb.MaTuyenNavigation?.MaSbdiNavigation?.ThanhPho  ?? "";
+                                            var tpDen  = cb.MaTuyenNavigation?.MaSbdenNavigation?.ThanhPho ?? "";
+                                            var tenMb  = cb.MaLoaiMbNavigation?.TenLoaiMb ?? cb.MaLoaiMb ?? "N/A";
+                                            var gioKh  = cb.NgayGioBay.ToString("HH:mm");
+                                            var ngayKh = cb.NgayGioBay.ToString("dd/MM/yyyy");
+                                            var thoiGianBay = cb.MaTuyenNavigation != null && cb.MaTuyenNavigation.ThoiGianBayDuKien != null
+                                                ? $"{cb.MaTuyenNavigation.ThoiGianBayDuKien}p" : "~120p";
+                                            var tenDiHien  = !string.IsNullOrEmpty(tenDi)  ? tenDi  : sbDi;
+                                            var tenDenHien = !string.IsNullOrEmpty(tenDen) ? tenDen : sbDen;
+                                            <option value="@cb.MaCb"
+                                                    data-sbdi="@sbDi" data-sden="@sbDen"
+                                                    data-tendi="@tenDi" data-tenden="@tenDen"
+                                                    data-tpdi="@tpDi" data-tpden="@tpDen"
+                                                    data-tenmb="@tenMb" data-hang="@cb.MaHang"
+                                                    data-giokh="@gioKh" data-ngaykh="@ngayKh"
+                                                    data-tgian="@thoiGianBay">
+                                                @gioKh | @tenDiHien → @tenDenHien | @ngayKh
+                                            </option>
+                                        }
+                                    }
+                                </select>
+
+                                <!-- Card preview thông tin chuyến bay đã chọn -->
+                                <div id="flightPreviewCard" class="flight-preview-card">
+                                    <div class="row align-items-center g-0">
+                                        <div class="col-4 text-center">
+                                            <div class="fp-code" id="fp-sbDi">---</div>
+                                            <div class="fp-city" id="fp-tpDi"></div>
+                                            <div class="fp-airport" id="fp-tenDi"></div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="fp-time" id="fp-gioKh">--:--</div>
+                                            <div class="fp-track">
+                                                <div class="fp-line"></div>
+                                                <i class="bi bi-airplane-fill fp-plane-icon"></i>
+                                            </div>
+                                            <div class="fp-meta">
+                                                <span id="fp-hang" class="badge bg-primary me-1" style="font-size:9px"></span>
+                                                <span id="fp-tenmb" class="text-muted" style="font-size:10px"></span>
+                                            </div>
+                                            <div class="fp-tgian" id="fp-tgian"></div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="fp-code" id="fp-sbDen">---</div>
+                                            <div class="fp-city" id="fp-tpDen"></div>
+                                            <div class="fp-airport" id="fp-tenDen"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fp-date-row">
+                                        <i class="bi bi-calendar3 me-1"></i><span id="fp-ngayKh">--/--/----</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="small fw-bold text-muted">HẠNG GHẾ</label>
+                                <select class="form-select border-0 bg-light p-3 rounded-4" id="create-hangGhe" onchange="onHangGheChange()">
+                                    <option value="">-- Đang tải... --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">HỌ TÊN KHÁCH HÀNG</label>
+                                <input type="text" class="form-control bg-light border-0 p-3 rounded-4" id="create-tenKh" placeholder="VD: NGUYEN VAN A">
+                                <div class="field-error" id="err-tenKh">Họ tên không được để trống.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">SỐ CCCD / PASSPORT</label>
+                                <input type="text" class="form-control bg-light border-0 p-3 rounded-4" id="create-cccd" placeholder="9 hoặc 12 chữ số">
+                                <div class="field-error" id="err-cccd">CCCD phải có 9 hoặc 12 chu số.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">SỐ ĐIỆN THOẠI</label>
+                                <input type="text" class="form-control bg-light border-0 p-3 rounded-4" id="create-sdt" placeholder="0xxxxxxxxx">
+                                <div class="field-error" id="err-sdt">SDT phải có 10 chu số, bắt đầu bằng 0.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">EMAIL</label>
+                                <input type="text" class="form-control bg-light border-0 p-3 rounded-4" id="create-email" placeholder="email@domain.com">
+                                <div class="field-error" id="err-email">Email không đúng định dạng.</div>
+                            </div>
+                            <input type="hidden" id="create-maGhe" value="">
+                            <div class="col-12">
+                                <div class="selected-seat-info" id="selectedSeatInfo">
+                                    <i class="bi bi-check-circle-fill fs-4"></i>
+                                    <div><div class="small opacity-75">Đã chọn ghế</div><div class="fw-bold fs-5" id="selectedSeatText">--</div></div>
+                                </div>
+                                <div class="field-error" id="err-ghe">Vui lòng chọn ghế trên sơ đồ.</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="price-display">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="small fw-bold text-muted">TỔNG TIỀN</div>
+                                            <h4 class="fw-bold mb-0" style="color:var(--primary-navy)" id="priceDisplay">-- Đ</h4>
+                                        </div>
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" name="trangThaiThanhToan" id="btnradio1" value="Đã thanh toán" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold px-3" for="btnradio1">Thu tiền ngay</label>
+                                            <input type="radio" class="btn-check" name="trangThaiThanhToan" id="btnradio2" value="Chờ thanh toán">
+                                            <label class="btn btn-outline-warning btn-sm fw-bold px-3" for="btnradio2">Giữ chỗ</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- PHƯƠNG THỨC THANH TOÁN -->
+                            <div class="col-12">
+                                <label class="small fw-bold text-muted">PHƯƠNG THỨC THANH TOÁN</label>
+                                <select class="form-select bg-light border-0 p-3 rounded-4" id="create-phuongThuc">
+                                    <option value="Tiền mặt tại quầy">💵 Tiền mặt tại quầy</option>
+                                    <option value="Chuyển khoản">🏦 Chuyển khoản (Banking)</option>
+                                    <option value="Quẹt thẻ POS">💳 Quẹt thẻ (POS)</option>
+                                    <option value="Ví điện tử">📱 Ví điện tử (Momo, ZaloPay)</option>
+                                </select>
+                            </div>
+
+                            <!-- 3 NÚT HÀNH ĐỘNG -->
+                            <div class="col-12">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <button type="button" id="btnXuatVe"
+                                                class="btn w-100 rounded-pill py-3 fw-bold text-white shadow-sm"
+                                                style="background: var(--primary-navy);"
+                                                onclick="submitBooking('export')">
+                                            <i class="bi bi-file-earmark-pdf me-2"></i>LƯU &amp; XUẤT VÉ
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="btnLuu"
+                                                class="btn w-100 rounded-pill py-2 fw-bold text-white"
+                                                style="background: #64748b;"
+                                                onclick="submitBooking('save')">
+                                            <i class="bi bi-save me-2"></i>Chỉ lưu
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button"
+                                                class="btn w-100 rounded-pill py-2 fw-bold"
+                                                style="background: #f0f4ff; color: var(--primary-navy); border: 2px solid var(--primary-navy);"
+                                                data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle me-2"></i>Hủy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="small fw-bold text-muted mb-2">SƠ ĐỒ GHẾ — Click để chọn</label>
+                        <div class="seat-map-wrapper" id="seatMapContainer">
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-grid-3x3-gap fs-1 d-block mb-2 opacity-25"></i>
+                                <span class="small">Chọn chuyến bay và hạng ghế để xem sơ đồ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XÁC NHẬN CHUNG -->
+<div class="modal fade" id="modalConfirm" tabindex="-1" style="z-index: 1070;">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content shadow-lg text-center p-4 rounded-4 border-0">
+            <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+            <h5 class="fw-bold mb-2">Xác nhận thao tác</h5>
+            <p class="text-muted small mb-4" id="confirmText">Bạn có chắc chắn thực hiện hành động này?</p>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-light w-50 fw-bold rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger w-50 fw-bold rounded-pill" id="btnConfirmAction">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1080; margin-top: 20px;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-4 py-3" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold fs-6 p-0" id="toastMessage">Thao tác thành công!</div>
+        </div>
+    </div>
+</div>
+
+<script src="~/admin/js/QuanLyDatVe.js" asp-append-version="true" defer></script>

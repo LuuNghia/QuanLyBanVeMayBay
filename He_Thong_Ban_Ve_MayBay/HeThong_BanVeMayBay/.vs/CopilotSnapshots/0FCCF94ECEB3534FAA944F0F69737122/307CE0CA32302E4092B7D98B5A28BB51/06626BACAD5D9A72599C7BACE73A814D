@@ -1,0 +1,72 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using HeThong_BanVeMayBay.Models.EF;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace HeThong_BanVeMayBay.Areas.User.Controllers
+{
+    [Area("User")]
+    public class BookingController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public BookingController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult TraCuuVe()
+        {
+            return View();
+        }
+
+        public IActionResult LichSuDatVe()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> ChonCho(string maCb)
+        {
+            var chuyenBay = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .FirstOrDefaultAsync(c => c.MaCb == maCb);
+
+            if (chuyenBay == null) return NotFound();
+
+            var danhSachGhe = await _context.Ghes
+                .Include(g => g.MaHangGheNavigation)
+                .Where(g => g.MaLoaiMb == chuyenBay.MaLoaiMb && g.DaXoa != true)
+                .OrderBy(g => g.ViTriHang).ThenBy(g => g.ViTriCot)
+                .ToListAsync();
+
+            var gheDaDat = await _context.Ves
+                .Where(v => v.MaCb == maCb && v.TrangThaiThanhToan == true)
+                .Select(v => v.MaGhe)
+                .ToListAsync();
+
+            var tienIchs = await _context.TienIches.ToListAsync();
+
+            ViewBag.ChuyenBay = chuyenBay;
+            ViewBag.DanhSachGhe = danhSachGhe;
+            ViewBag.GheDaDat = gheDaDat;
+            ViewBag.TienIchs = tienIchs;
+
+            return View();
+        }
+        
+        public IActionResult ThongTinKHDatVe()
+        {
+            return View();
+        }
+        
+        public IActionResult ThanhToan()
+        {
+            return View();
+        }
+    }
+}

@@ -1,0 +1,90 @@
+﻿const mockData = {
+    name: "NGUYEN VAN A", gender: "Nam", dob: "1995-01-20",
+    id: "012345678901", addr: "123 Qu?n 1, TP.HCM",
+    phone: "0901234567", email: "vana.nguyen@gmail.com"
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const seatsParam = params.get('seats');
+    
+    if (seatsParam) {
+        const seats = seatsParam.split(',');
+        const container = document.querySelector('.col-lg-8');
+        
+        // Update summary box
+        const seatSummary = container.querySelector('.ticket-info-box .col-md-5 strong.text-danger');
+        if (seatSummary) seatSummary.innerText = seatsParam;
+
+        // Get the existing passenger template
+        const passengerForms = container.querySelectorAll('.card-custom');
+        let template = passengerForms[1]; // Index 1 is the user form
+
+        // Remove the original one, we will generate new ones
+        template.remove();
+
+        seats.forEach((seat, index) => {
+            const clone = template.cloneNode(true);
+            clone.id = 'passenger_form_' + index;
+            
+            // Adjust header title to include seat number
+            const headerTitle = clone.querySelector('.card-header-title');
+            if (headerTitle) {
+                headerTitle.innerHTML = `<i class="bi bi-person-vcard-fill"></i> Thông tin hành khách - Ghế ${seat}`;
+            }
+
+            // Update IDs to be unique
+            const inputs = clone.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.id) {
+                    input.id = input.id + '_' + index;
+                }
+            });
+
+            const switchLabel = clone.querySelector('label[for="useAccount"]');
+            if (switchLabel) switchLabel.setAttribute('for', 'useAccount_' + index);
+
+            container.appendChild(clone);
+        });
+
+        // Add event listeners back to the first switch
+        const firstSwitch = document.getElementById('useAccount_0');
+        if (firstSwitch) {
+            firstSwitch.addEventListener('change', () => fillAccountInfo(0));
+        }
+    }
+});
+
+function fillAccountInfo(index = 0) {
+    const isChecked = document.getElementById('useAccount_' + index).checked;
+    document.getElementById('paxName_' + index).value = isChecked ? mockData.name : "";
+    document.getElementById('paxGender_' + index).value = isChecked ? mockData.gender : "";
+    document.getElementById('paxDob_' + index).value = isChecked ? mockData.dob : "";
+    document.getElementById('paxId_' + index).value = isChecked ? mockData.id : "";
+    document.getElementById('paxAddress_' + index).value = isChecked ? mockData.addr : "";
+}
+
+function syncWithPax(index = 0) {
+    const isSync = document.getElementById('syncContact') ? document.getElementById('syncContact').checked : false;
+    const contactName = document.getElementById('contactName');
+    if (contactName) {
+        contactName.value = isSync ? document.getElementById('paxName_' + index).value : "";
+    }
+    if (isSync && document.getElementById('useAccount_' + index).checked) {
+        const phone = document.getElementById('contactPhone');
+        const email = document.getElementById('contactEmail');
+        if (phone) phone.value = mockData.phone;
+        if (email) email.value = mockData.email;
+    }
+}
+
+document.getElementById('paxName').addEventListener('input', function () {
+    this.value = this.value.toUpperCase();
+    if (document.getElementById('syncContact').checked) document.getElementById('contactName').value = this.value;
+});
+
+function goToPayment(e) {
+    e.preventDefault();
+    alert("Đã xác nhận thông tin! Hệ thống đang chuyển sang trang Thanh toán...");
+    window.location.href = '/User/Booking/ThanhToan';
+}

@@ -1,0 +1,26 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using HeThong_BanVeMayBay.Models.EF;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace HeThong_BanVeMayBay.Areas.User.Controllers
+{
+    [Area("User")]
+    public class HomeController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public HomeController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.SanBays = await _context.SanBays.Where(s => s.DaXoa == false).ToListAsync();
+            ViewBag.HangGhes = await _context.DanhMucHangGhes.Where(h => h.DaXoa == false).ToListAsync();
+            return View();
+        }
+    }
+}

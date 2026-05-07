@@ -1,0 +1,180 @@
+﻿@{
+    ViewData["Title"] = "Chọn chổ ngồi";
+}
+<link rel="stylesheet" type="text/css" href="~/user/css/ChonCho.css" />
+
+<div class="step-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a asp-area="User" asp-controller="Home" asp-action="Index" class="back-btn" onclick="history.back()"><i class="bi bi-arrow-left me-2"></i>Quay lại danh sách chuyến bay</a>
+        <div class="small fw-bold text-muted text-uppercase">BƯỚC 2/4: CHỌN CHỖ NGỒI</div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row g-4">
+
+        <div class="col-lg-7 col-xl-8">
+            <div class="card-custom">
+                <h3 class="title-main">Sơ đồ máy bay (@(ViewBag.ChuyenBay?.MaLoaiMbNavigation?.TenLoaiMb ?? "Máy bay"))</h3>
+                
+                @if (ViewBag.DanhSachGhe != null && ViewBag.DanhSachGhe.Count > 0)
+                {
+                    <div id="seatMapContainer" class="d-flex flex-column align-items-center flex-grow-1 overflow-auto px-2 mt-4">
+                        @{
+                            var danhSachGhe = ViewBag.DanhSachGhe as List<HeThong_BanVeMayBay.Models.Entities.Ghe>;
+                            var maxHang = danhSachGhe.Max(g => g.ViTriHang) ?? 0;
+                            var maxCot = danhSachGhe.Max(g => g.ViTriCot) ?? 0;
+                            
+                            var gheDaDat = ViewBag.GheDaDat as List<int?> ?? new List<int?>();
+
+                            // Bổ sung Header Cột (A B C   D E F ...)
+                            <div class="d-flex justify-content-center align-items-center mb-3 text-muted fw-bold" style="font-size: 12px; gap: 15px;">
+                                @{
+                                    string[] colLabels = { "A", "B", "C", "D", "E", "F", "G", "H", "K", "L" };
+                                    string leftCols = string.Join(" ", colLabels.Take(maxCot / 2));
+                                    string rightCols = string.Join(" ", colLabels.Skip(maxCot / 2).Take(maxCot - maxCot / 2));
+                                }
+                                <div style="width: 150px; letter-spacing: 15px;" class="text-end">@leftCols</div>
+                                <div class="aisle-space text-center" style="width: 40px;"></div>
+                                <div style="width: 150px; letter-spacing: 15px;" class="text-start">@rightCols</div>
+                            </div>
+                            
+                            var danhSachHangGhe = danhSachGhe.Select(g => g.MaHangGheNavigation).Distinct().ToList();
+                            
+                            foreach (var hg in danhSachHangGhe)
+                            {
+                                if (hg == null) continue;
+                                
+                                var gheCuaHang = danhSachGhe.Where(g => g.MaHangGhe == hg.MaHangGhe).ToList();
+                                if (!gheCuaHang.Any()) continue;
+                                
+                                var color = hg.MauSac ?? "#ccc";
+                                
+                                <div class="p-4 mb-4 rounded-4 w-100" style="border: 2px solid @color; background-color: @(color)1a;">
+                                    <h6 class="text-center fw-bold mb-4 text-uppercase" style="color: @color;">
+                                        <i class="bi bi-star-fill me-1"></i> @hg.TenHangGhe
+                                    </h6>
+                                    
+                                    @{
+                                        var rowsTrongHang = gheCuaHang.Select(g => g.ViTriHang).Distinct().OrderBy(h => h).ToList();
+                                        foreach (var r in rowsTrongHang)
+                                        {
+                                            var seatsInRow = gheCuaHang.Where(g => g.ViTriHang == r).OrderBy(g => g.ViTriCot).ToList();
+
+                                            <div class="seat-row w-100 d-flex justify-content-center mb-2">
+                                                @for (int j = 1; j <= maxCot; j++)
+                                                {
+                                                    var ghe = seatsInRow.FirstOrDefault(g => g.ViTriCot == j);
+
+                                                    if (j == (maxCot / 2) + 1)
+                                                    {
+                                                        <div class="aisle-space text-center" style="width: 40px; display: flex; justify-content: center; align-items: center;">
+                                                            <span class="text-muted fw-bold small opacity-50">@r</span>
+                                                        </div>
+                                                    }
+
+                                                    if (ghe != null)
+                                                    {
+                                                        var isBooked = gheDaDat.Contains(ghe.MaGhe);
+                                                        var price = ghe.PhuThu ?? 0;
+                                                        var className = isBooked ? "seat booked" : (ghe.TrangThai == false ? "seat maintenance" : "seat available");
+                                                        
+                                                        <div class="@className mx-1 d-flex justify-content-center align-items-center bg-white" 
+                                                             style="width: 40px; height: 40px; border-radius: 8px; border: 2px solid @(isBooked || ghe.TrangThai == false ? "#dee2e6" : color); cursor: @(isBooked || ghe.TrangThai == false ? "not-allowed" : "pointer"); font-weight: bold; font-size: 13px;"
+                                                             data-seat-id="@ghe.MaGhe" 
+                                                             data-seat-no="@ghe.SoGhe" 
+                                                             data-color="@color"
+                                                             data-class-name="@(ghe.MaHangGheNavigation?.TenHangGhe)"
+                                                             data-price="@price"
+                                                             data-carryon="@(ghe.MaHangGheNavigation?.HanhLyXachTay)"
+                                                             data-checked="@(ghe.MaHangGheNavigation?.HanhLyKyGui)">
+                                                            <span style="color: @(isBooked || ghe.TrangThai == false ? "#adb5bd" : color);">@ghe.SoGhe</span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="empty-space mx-1" style="width: 40px; height: 40px;"></div>
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted text-center my-5">
+                        <i class="bi bi-grid-3x3-gap display-1 opacity-25"></i><br>Sơ đồ máy bay chưa được cấu hình.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-xl-4">
+            <div class="card-custom position-sticky" style="top: 100px;">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold" style="color: var(--primary-navy);">Chuyến bay @(ViewBag.ChuyenBay?.MaCb)</h4>
+                    <div class="text-muted small mt-1">@(ViewBag.ChuyenBay?.MaTuyenNavigation?.MaSbdiNavigation?.MaSb) <i class="bi bi-arrow-right mx-1"></i> @(ViewBag.ChuyenBay?.MaTuyenNavigation?.MaSbdenNavigation?.MaSb) | @(ViewBag.ChuyenBay?.NgayGioBay.ToString("dd/MM/yyyy"))</div>
+                    <div class="badge bg-primary mt-2 px-3 py-2 fs-6" id="badgeSeatId">Chưa chọn ghế</div>
+                </div>
+
+                <div class="section-title">QUYỀN LỢI & ĐIỀU KIỆN</div>
+                <ul class="info-list">
+                    <li>
+                        <div><i class="bi bi-briefcase me-3"></i><span class="fw-bold text-dark">Xách tay</span></div>
+                        <span class="text-muted fw-bold" id="cond-carryon">--</span>
+                    </li>
+                    <li>
+                        <div><i class="bi bi-luggage me-3"></i><span class="fw-bold text-dark">Ký gửi</span></div>
+                        <span class="text-muted fw-bold" id="cond-checked">--</span>
+                    </li>
+                    <li>
+                        <div><i class="bi bi-star-fill me-3"></i><span class="fw-bold text-dark">Dịch vụ</span></div>
+                        <span class="text-muted fw-bold" id="cond-amenities">
+                            @if (ViewBag.TienIchs != null)
+                            {
+                                var tienIchs = ViewBag.TienIchs as List<HeThong_BanVeMayBay.Models.Entities.TienIch>;
+                                if (tienIchs.Any(t => t.TenTienIch.Contains("Bữa ăn") || t.TenTienIch.Contains("Suất ăn")))
+                                {
+                                    <span class="text-success"><i class="bi bi-cup-hot-fill"></i> Có hỗ trợ ăn uống</span>
+                                }
+                                else
+                                {
+                                    <span>Cơ bản</span>
+                                }
+                            }
+                        </span>
+                    </li>
+                </ul>
+
+                <div class="section-title mt-4">CHI TIẾT THANH TOÁN</div>
+                <div class="bill-summary">
+                    <div class="bill-row">
+                        <span>Giá vé cơ bản</span>
+                        <span class="fw-bold">@String.Format("{0:N0}", ViewBag.ChuyenBay?.GiaVeCoBan ?? 0) đ</span>
+                        <input type="hidden" id="hiddenBasePrice" value="@(ViewBag.ChuyenBay?.GiaVeCoBan ?? 0)" />
+                    </div>
+                    <div class="bill-row">
+                        <span id="billSeatClass">Phụ thu ghế (Chưa chọn)</span>
+                        <span class="fw-bold text-danger" id="billSeatPrice">0 đ</span>
+                    </div>
+                    <div class="bill-row">
+                        <span class="fw-bold">TỔNG TIỀN TẠM TÍNH</span>
+                        <span id="billTotal" class="fw-bold fs-5 text-primary">@String.Format("{0:N0}", ViewBag.ChuyenBay?.GiaVeCoBan ?? 0) đ</span>
+                    </div>
+                </div>
+
+                <button class="btn-checkout" id="btnConfirm" disabled onclick="submitSelection()">
+                    <span>TIẾP TỤC ĐIỀN THÔNG TIN</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="~/user/js/ChonCho.js" asp-append-version="true" defer></script>

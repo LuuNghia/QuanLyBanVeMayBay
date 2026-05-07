@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Cấu hình Hệ thống";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/admin/css/Flight.CauHinhHeThong.css" />
+}
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Chính sách Hạng ghế</h2>
+            <p class="text-muted small mb-0">Thiết lập hệ số giá, quyền lợi hành lý và dịch vụ đi kèm cho từng hạng vé.</p>
+        </div>
+        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy); border:none;" onclick="openAddModal()">
+            <i class="bi bi-plus-lg me-2"></i>Thêm hạng vé mới
+        </button>
+    </div>
+
+    <div class="row g-4 mt-2" id="policyCardsContainer">
+        <div class="col-md-4" id="card-hang-nhat">
+            <div class="policy-card p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">HẠNG NHẤT</span>
+                    <div>
+                        <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Hạng Nhất')"></i>
+                        <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Hạng Nhất')"></i>
+                    </div>
+                </div>
+                <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x3.0</div>
+                <div class="text-muted small mb-4 fw-bold text-uppercase">Hệ số giá cơ bản</div>
+                <div class="mt-4 border-top pt-3">
+                    <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">15kg</b></div>
+                    <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">40kg</b></div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill text-success me-3"></i> Hoàn tiền miễn phí</div>
+                    <div class="feature-item"><i class="bi bi-star-fill text-warning me-3"></i> Suất ăn 5 sao & VIP Lounge</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="card-thuong-gia">
+            <div class="policy-card p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">THƯƠNG GIA</span>
+                    <div>
+                        <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Thương Gia')"></i>
+                        <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Thương Gia')"></i>
+                    </div>
+                </div>
+                <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x2.0</div>
+                <div class="text-muted small mb-4 fw-bold text-uppercase">Hệ số giá cơ bản</div>
+                <div class="mt-4 border-top pt-3">
+                    <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">12kg</b></div>
+                    <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">32kg</b></div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill text-success me-3"></i> Hoàn phí 10%</div>
+                    <div class="feature-item"><i class="bi bi-cup-hot-fill text-danger me-3"></i> Suất ăn nóng</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="card-pho-thong">
+            <div class="policy-card p-4 shadow-sm" style="opacity: 0.85;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="badge bg-secondary px-3 py-2 rounded-pill shadow-sm">PHỔ THÔNG</span>
+                    <div>
+                        <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Phổ Thông')"></i>
+                        <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Phổ Thông')"></i>
+                    </div>
+                </div>
+                <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x1.0</div>
+                <div class="text-muted small mb-4 fw-bold text-uppercase">Giá gốc (GiaVeCoBan)</div>
+                <div class="mt-4 border-top pt-3">
+                    <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">7kg</b></div>
+                    <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">23kg</b></div>
+                    <div class="feature-item"><i class="bi bi-x-circle-fill text-danger me-3"></i> Không hỗ trợ hoàn vé</div>
+                    <div class="feature-item"><i class="bi bi-water text-info me-3"></i> Nước suối miễn phí</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/admin/js/Flight.CauHinhHeThong.js"></script>
+}

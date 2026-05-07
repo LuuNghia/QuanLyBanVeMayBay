@@ -1,0 +1,97 @@
+﻿const seats = document.querySelectorAll('.seat:not(.booked)');
+
+const badgeSeatId = document.getElementById('badgeSeatId');
+const condCarryon = document.getElementById('cond-carryon');
+const condChecked = document.getElementById('cond-checked');
+const condAmenities = document.getElementById('cond-amenities');
+
+const billSeatClass = document.getElementById('billSeatClass');
+const billSeatPrice = document.getElementById('billSeatPrice');
+const billTotal = document.getElementById('billTotal');
+const btnConfirm = document.getElementById('btnConfirm');
+
+const basePrice = 1950000; // Giá vé + Thuế (Cơ định)
+let selectedSeats = [];
+
+seats.forEach(seat => {
+    seat.addEventListener('click', function () {
+        const seatId = this.getAttribute('data-seat');
+        const type = this.getAttribute('data-type');
+        const price = parseInt(this.getAttribute('data-price') || 0);
+
+        if (this.classList.contains('selected')) {
+            this.classList.remove('selected');
+            selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+        } else {
+            this.classList.add('selected');
+            selectedSeats.push({ id: seatId, type: type, price: price });
+        }
+
+        updatePanel();
+    });
+});
+
+function updatePanel() {
+    if (selectedSeats.length === 0) {
+        resetPanel();
+        return;
+    }
+
+    const seatIds = selectedSeats.map(s => s.id).join(', ');
+    badgeSeatId.innerText = "Ghế đã chọn: " + seatIds;
+
+    let hasBusiness = selectedSeats.some(s => s.type === 'business');
+    let hasPremium = selectedSeats.some(s => s.type === 'premium');
+
+    if (hasBusiness) {
+        billSeatClass.innerHTML = 'Phụ thu ghế <strong style="color:var(--text-business)">Thương gia</strong>';
+        condCarryon.innerHTML = '<span class="text-danger">15kg</span>';
+        condChecked.innerHTML = '<span class="text-danger">40kg</span>';
+        condAmenities.innerHTML = '<span class="text-warning">Suất ăn 5 sao, VIP</span>';
+    }
+    else if (hasPremium) {
+        billSeatClass.innerHTML = 'Phụ thu ghế <strong style="color:var(--text-premium)">Đặc biệt</strong>';
+        condCarryon.innerText = "10kg";
+        condChecked.innerText = "32kg";
+        condAmenities.innerHTML = '<span class="text-success">Suất ăn nóng</span>';
+    }
+    else {
+        billSeatClass.innerText = 'Phụ thu ghế (Phổ thông)';
+        condCarryon.innerText = "7kg";
+        condChecked.innerText = "23kg";
+        condAmenities.innerText = 'Cơ bản';
+    }
+
+    const totalSeatPrice = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+    if (totalSeatPrice === 0) {
+        billSeatPrice.innerText = "Miễn phí";
+    } else {
+        billSeatPrice.innerText = "+" + totalSeatPrice.toLocaleString('vi-VN') + " đ";
+    }
+
+    const total = (basePrice * selectedSeats.length) + totalSeatPrice;
+    billTotal.innerText = total.toLocaleString('vi-VN') + " đ";
+
+    btnConfirm.disabled = false;
+}
+
+function resetPanel() {
+    badgeSeatId.innerText = "Chưa chọn ghế";
+    condCarryon.innerText = "--";
+    condChecked.innerText = "--";
+    condAmenities.innerText = "--";
+
+    billSeatClass.innerText = "Phụ thu ghế (Chưa chọn)";
+    billSeatPrice.innerText = "0 ?";
+    billTotal.innerText = basePrice.toLocaleString('vi-VN') + " ?";
+
+    btnConfirm.disabled = true;
+}
+
+function submitSelection() {
+    if (selectedSeats.length > 0) {
+        const seatIds = selectedSeats.map(s => s.id).join(',');
+        alert(`Bạn đã chọn Ghế: ${seatIds}. Tổng tiền: ${billTotal.innerText}\nHệ thống sẽ chuyển sang bước điền thông tin hành khách!`);
+        window.location.href = `/User/Booking/ThongTinKHDatVe?seats=${seatIds}`;
+    }
+}

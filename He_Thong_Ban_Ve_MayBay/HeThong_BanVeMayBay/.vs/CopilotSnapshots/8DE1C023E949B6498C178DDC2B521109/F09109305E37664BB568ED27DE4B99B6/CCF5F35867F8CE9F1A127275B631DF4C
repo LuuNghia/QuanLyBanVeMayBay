@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "Sơ đồ ghế";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/SoDoGhe.css" asp-append-version="true" />
+}
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Cấu hình Sơ đồ Ghế</h2>
+            <p class="text-muted small mb-0">Thiết kế vị trí, phân loại hạng ghế cho từng tàu bay.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="card-custom d-flex justify-content-between align-items-center mb-4 p-4 bg-white rounded-4 shadow-sm">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary-subtle text-primary rounded-4 d-flex justify-content-center align-items-center me-4" style="width: 60px; height: 60px; background-color: #dbeafe;">
+                        <i class="bi bi-airplane-fill fs-3" style="color: var(--primary-navy);"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small mb-1 fw-bold text-uppercase">Đang hiệu chỉnh máy bay</div>
+                        <h4 class="fw-bold mb-2" id="aircraftName" style="color: var(--primary-navy);">Boeing 787-9 Dreamliner</h4>
+                        <span class="badge bg-primary-subtle text-primary me-2 px-3 py-2 rounded-pill" style="background-color: #dbeafe; color: #1e3a8a !important;">BUSINESS CLASS</span>
+                        <span class="badge bg-light text-muted px-3 py-2 border rounded-pill" id="seatCountBadge">SỨC CHỨA: 290 GHẾ</span>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-light fw-bold px-4 py-2 border rounded-pill dropdown-toggle" data-bs-toggle="dropdown">Thay đổi</button>
+                    <ul class="dropdown-menu shadow-lg border-0 mt-2">
+                        <li><a class="dropdown-item" href="#">Airbus A350-900</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card-custom text-center py-5 position-relative bg-white rounded-4 shadow-sm" style="min-height: 400px;">
+                <!-- Temporary filler for layout verification, the original had the actual seat layout here -->
+                <div class="d-flex justify-content-center align-items-center h-100 text-muted fw-bold">
+                    [Khu vực hiển thị Sơ đồ Ghế Đang Trống]
+                </div>
+                <div id="seatMapContainer">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card-custom p-4 bg-white rounded-4 shadow-sm mb-4">
+                <h6 class="fw-bold mb-4" style="color: var(--primary-navy);"><i class="bi bi-tag-fill me-2"></i>Thuộc tính Ghế</h6>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Phân loại ghế</label>
+                    <select class="form-select bg-light border-0 py-2 fw-bold text-dark" id="seatType">
+                        <option value="standard">Phổ thông (Standard)</option>
+                        <option value="business">Thương gia (Business)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Trạng thái bảo trì</label>
+                    <div class="d-flex bg-light p-1 rounded-3">
+                        <button type="button" class="btn w-50 py-2 fw-bold text-white shadow-sm" style="background: var(--primary-navy); font-size: 13px;" onclick="toastDemo('Đã mở khóa ghế!')">Hoạt động</button>
+                        <button type="button" class="btn w-50 py-2 fw-bold text-muted" style="font-size: 13px;" onclick="toastDemo('Ghế đã chuyển sang Bảo trì', 'bg-warning')">Khóa ghế</button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Giá phụ thu</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="seatPrice" value="150,000">
+                        <span class="input-group-text bg-light border-0 fw-bold text-muted">VND</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn flex-grow-1 text-white fw-bold py-2 rounded-3" style="background: var(--primary-navy);" onclick="updateSeat()">Cập nhật ghế</button>
+                    <button class="btn bg-danger-subtle text-danger px-3 rounded-3" onclick="deleteSeat()" style="background-color: #fee2e2; color: #dc2626 !important;"><i class="bi bi-trash-fill"></i></button>
+                </div>
+            </div>
+
+            <div class="card-custom p-4 bg-white rounded-4 shadow-sm">
+                <h6 class="fw-bold mb-3" style="color: var(--primary-navy);"><i class="bi bi-grid-1x2-fill me-2"></i>Thao tác hàng loạt</h6>
+                <div class="row g-2 mt-2">
+                    <div class="col-6"><button class="btn btn-bulk w-100"><i class="bi bi-layer-forward mb-2 fs-4"></i><br>THÊM HÀNG</button></div>
+                    <div class="col-6"><button class="btn btn-bulk w-100"><i class="bi bi-plus-square mb-2 fs-4"></i><br>THÊM 1 GHẾ</button></div>
+                    <div class="col-6"><button class="btn btn-bulk w-100"><i class="bi bi-distribute-horizontal mb-2 fs-4"></i><br>CHIA LỐI ĐI</button></div>
+                    <div class="col-6"><button class="btn btn-bulk w-100"><i class="bi bi-magic mb-2 fs-4"></i><br>AUTO LAYOUT</button></div>
+                    <div class="col-6"><button class="btn btn-bulk w-100"><i class="bi bi-files mb-2 fs-4"></i><br>SAO CHÉP HÀNG</button></div>
+                    <div class="col-6"><button class="btn btn-bulk w-100 text-danger"><i class="bi bi-eraser text-danger mb-2 fs-4"></i><br>LÀM SẠCH</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="floating-action-bar">
+    <button class="btn bg-white border fw-bold px-4 py-3 rounded-pill shadow-sm" onclick="undo()">
+        <i class="bi bi-arrow-counterclockwise me-2 fs-5 text-secondary"></i> Hoàn tác
+    </button>
+    <button class="btn text-white fw-bold px-5 py-3 rounded-pill shadow-lg ms-3" style="background: var(--primary-navy);" onclick="save()">
+        <i class="bi bi-floppy-fill me-2 fs-5"></i> Lưu cấu hình
+    </button>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/SoDoGhe.js" asp-append-version="true"></script>
+}

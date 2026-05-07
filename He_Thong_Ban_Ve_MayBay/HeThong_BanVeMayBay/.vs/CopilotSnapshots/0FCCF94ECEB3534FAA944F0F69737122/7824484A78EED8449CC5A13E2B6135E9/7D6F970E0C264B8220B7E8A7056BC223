@@ -1,0 +1,34 @@
+﻿const mockData = {
+    name: "NGUYEN VAN A", gender: "Nam", dob: "1995-01-20",
+    id: "012345678901", addr: "123 Qu?n 1, TP.HCM",
+    phone: "0901234567", email: "vana.nguyen@gmail.com"
+};
+
+function fillAccountInfo() {
+    const isChecked = document.getElementById('useAccount').checked;
+    document.getElementById('paxName').value = isChecked ? mockData.name : "";
+    document.getElementById('paxGender').value = isChecked ? mockData.gender : "";
+    document.getElementById('paxDob').value = isChecked ? mockData.dob : "";
+    document.getElementById('paxId').value = isChecked ? mockData.id : "";
+    document.getElementById('paxAddress').value = isChecked ? mockData.addr : "";
+    if (document.getElementById('syncContact').checked) syncWithPax();
+}
+
+function syncWithPax() {
+    const isSync = document.getElementById('syncContact').checked;
+    document.getElementById('contactName').value = isSync ? document.getElementById('paxName').value : "";
+    if (isSync && document.getElementById('useAccount').checked) {
+        document.getElementById('contactPhone').value = mockData.phone;
+        document.getElementById('contactEmail').value = mockData.email;
+    }
+}
+
+document.getElementById('paxName').addEventListener('input', function () {
+    this.value = this.value.toUpperCase();
+    if (document.getElementById('syncContact').checked) document.getElementById('contactName').value = this.value;
+});
+
+function goToPayment(e) {
+    e.preventDefault();
+    alert("?ã xác nh?n thông tin! H? th?ng ?ang chuy?n sang trang Thanh toán QR Code...");
+}

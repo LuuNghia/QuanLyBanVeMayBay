@@ -1,0 +1,174 @@
+﻿@model IEnumerable<HeThong_BanVeMayBay.Models.Entities.HangGhe>
+@{
+    ViewData["Title"] = "Cấu hình hạng ghế";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/DanhMucHangGhe.css" asp-append-version="true" />
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Chính sách Hạng ghế</h2>
+        <p class="text-muted small mb-0">Thiết lập hệ số giá, quyền lợi hành lý và dịch vụ đi kèm cho từng hạng vé.</p>
+    </div>
+    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy); border:none;" onclick="openAddModal()">
+        <i class="bi bi-plus-lg me-2"></i>Thêm hạng vé mới
+    </button>
+</div>
+
+<div class="row g-4 mt-2" id="policyCardsContainer">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var hangGhe in Model)
+        {
+            var badgeClass = "bg-secondary";
+            var textClass = "text-white";
+            
+            if (!string.IsNullOrEmpty(hangGhe.MauSac))
+            {
+                badgeClass = $"bg-{hangGhe.MauSac}";
+                if(hangGhe.MauSac == "warning") textClass = "text-dark";
+            }
+            else
+            {
+                if (hangGhe.TenHangGhe != null && hangGhe.TenHangGhe.Contains("Nhất", StringComparison.OrdinalIgnoreCase)) badgeClass = "bg-danger";
+                else if (hangGhe.TenHangGhe != null && hangGhe.TenHangGhe.Contains("Thương Gia", StringComparison.OrdinalIgnoreCase)) { badgeClass = "bg-warning"; textClass = "text-dark"; }
+            }
+
+            <div class="col-md-4" id="card-@hangGhe.MaHangGhe">
+                <div class="policy-card p-4 shadow-sm" style="@(badgeClass == "bg-secondary" ? "opacity: 0.85;" : "")">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge @badgeClass @textClass px-3 py-2 rounded-pill shadow-sm text-uppercase">@hangGhe.TenHangGhe</span>
+                        <div>
+                            <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('@hangGhe.MaHangGhe')"></i>
+                            <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('@hangGhe.MaHangGhe')"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x@(hangGhe.HeSoGia?.ToString("0.0") ?? "1.0")</div>
+                    <div class="text-muted small mb-4 fw-bold text-uppercase">
+                        @(hangGhe.HeSoGia == 1.0 ? "Giá gốc (GiaVeCoBan)" : "Hệ số giá cơ bản")
+                    </div>
+
+                    <div class="mt-4 border-top pt-3">
+                        <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">@(hangGhe.HanhLyXachTay ?? "7kg")</b></div>
+                        <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">@(hangGhe.HanhLyKyGui ?? "Không hỗ trợ")</b></div>
+                        
+                        @if (!string.IsNullOrEmpty(hangGhe.HoanVe) && !hangGhe.HoanVe.Contains("Không"))
+                        {
+                            <div class="feature-item"><i class="bi bi-check-circle-fill text-success me-3"></i> @hangGhe.HoanVe</div>
+                        }
+                        else
+                        {
+                            <div class="feature-item"><i class="bi bi-x-circle-fill text-danger me-3"></i> @(hangGhe.HoanVe ?? "Không hỗ trợ hoàn vé")</div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(hangGhe.DoiLich))
+                        {
+                            <div class="feature-item"><i class="bi bi-arrow-repeat text-info me-3"></i> @hangGhe.DoiLich</div>
+                        }
+
+                        @if(hangGhe.MaTienIches != null && hangGhe.MaTienIches.Any())
+                        {
+                            @foreach(var ti in hangGhe.MaTienIches)
+                            {
+                                <div class="feature-item"><i class="bi bi-star-fill text-warning me-3"></i> @ti.TenTienIch</div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 z-index-2 position-relative text-center py-5">
+            <h5 class="text-muted">Chưa có dữ liệu Danh mục hạng ghế.</h5>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="modalPolicy" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0" id="modalPolicyTitle" style="color: var(--primary-navy);"><i class="bi bi-gear-wide-connected me-2"></i>Cập nhật Hạng vé</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="policyForm">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted">TÊN HẠNG VÉ</label>
+                            <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="pName" placeholder="VD: Phổ thông Đặc biệt" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">MÃ MÀU (BADGE)</label>
+                            <select class="form-select bg-light border-0 py-2" id="pColor">
+                                <option value="danger">Đỏ (Danger)</option>
+                                <option value="warning">Vàng (Warning)</option>
+                                <option value="primary">Xanh đậm (Primary)</option>
+                                <option value="secondary">Xám (Secondary)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">HỆ SỐ GIÁ</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 fw-bold">x</span>
+                                <input type="number" step="0.1" class="form-control bg-light border-0 py-2 fw-bold" id="pMultiplier" placeholder="1.5" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">HÀNH LÝ XÁCH TAY</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pCarryOn" placeholder="VD: 10kg">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">HÀNH LÝ KÝ GỬI</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pChecked" placeholder="VD: 23kg">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">CHÍNH SÁCH HOÀN/ĐỔI VÉ</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pRefund" placeholder="VD: Hoàn phí 10%, Đổi vé miễn phí">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">TIỆN ÍCH ĐI KÈM (CÁCH NHAU BỞI DẤU PHẨY)</label>
+                            <textarea class="form-control bg-light border-0 py-2" rows="2" id="pAmenities" placeholder="VD: Suất ăn nóng, Wifi, Phòng chờ VIP..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn text-white rounded-pill px-5 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="savePolicy()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content shadow-lg text-center p-4" style="border-radius: 20px;">
+            <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+            <h5 class="fw-bold mb-2">Xác nhận xóa?</h5>
+            <p class="text-muted small mb-4">Bạn có chắc muốn xóa chính sách hạng vé <strong id="delPolicyName" class="text-dark"></strong> không? Các vé đã bán thuộc hạng này sẽ không bị ảnh hưởng.</p>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-light w-50 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger w-50 rounded-pill fw-bold" onclick="confirmDelete()">Xóa bỏ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1055; margin-top: 20px;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-3 py-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-bold fs-6" id="toastMessage">Thao tác thành công!</div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/admin/js/DanhMucHangGhe.js" asp-append-version="true" defer></script>

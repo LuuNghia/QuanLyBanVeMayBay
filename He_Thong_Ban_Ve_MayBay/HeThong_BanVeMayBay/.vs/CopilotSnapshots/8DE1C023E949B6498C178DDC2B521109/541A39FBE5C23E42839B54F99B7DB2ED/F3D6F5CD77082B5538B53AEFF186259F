@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Đặt Vé - SkyBooking Professional</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580;
+            --secondary-gold: #feba02;
+            --bg-light: #f4f6f9;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: var(--primary-navy) !important;
+            padding: 12px 0;
+            border: none;
+        }
+
+        .navbar-brand {
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            margin: 0 5px;
+            transition: 0.3s;
+            color: rgba(255,255,255,0.7) !important;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                color: var(--secondary-gold) !important;
+            }
+
+        .user-avatar-circle {
+            width: 35px;
+            height: 35px;
+            background-color: var(--secondary-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-navy);
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        /* --- TICKET CARD --- */
+        .ticket-card {
+            background: white;
+            border-radius: 16px;
+            border: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border-left: 6px solid #dee2e6;
+        }
+
+            .ticket-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(0, 53, 128, 0.1);
+            }
+
+        .status-paid {
+            border-left-color: #198754;
+        }
+
+        .status-pending {
+            border-left-color: #feba02;
+        }
+
+        .airline-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .airport-code {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary-navy);
+            line-height: 1;
+        }
+
+        .airport-name {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+        .pnr-box {
+            background: #f0f4f8;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .pnr-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #6c757d;
+            display: block;
+        }
+
+        .pnr-value {
+            font-family: 'Monaco', monospace;
+            font-weight: 900;
+            color: var(--primary-navy);
+            font-size: 18px;
+        }
+
+        .price-tag {
+            font-size: 20px;
+            font-weight: 800;
+            color: #dc3545;
+        }
+
+        /* --- MODAL DETAIL --- */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--primary-navy);
+            color: white;
+            padding: 20px 30px;
+            border: none;
+        }
+
+        .info-section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            border-left: 4px solid var(--secondary-gold);
+            padding-left: 10px;
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--primary-navy);
+            font-size: 15px;
+        }
+
+        /* --- FILTERS --- */
+        .filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: -30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-mini {
+            background: var(--primary-navy);
+            height: 120px;
+            width: 100%;
+        }
+
+        .btn-detail {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 8px 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-airplane-engines me-2"></i>SKYBOOKING</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Vé máy bay</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Lịch sử đặt vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Tra cứu vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hỗ trợ</a></li>
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
+                            <span class="me-1">Nguyễn Văn A</span>
+                            <div class="user-avatar-circle">NA</div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Thông tin cá nhân</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-mini"></div>
+
+    <div class="container" style="margin-top: -50px;">
+        <div class="filter-section mb-5">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold">Tìm kiếm mã PNR</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0" placeholder="Nhập mã đặt chỗ...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Trạng thái</label>
+                    <select class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option>Đã thanh toán</option>
+                        <option>Chờ thanh toán</option>
+                        <option>Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Tháng đặt vé</label>
+                    <input type="month" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-warning w-100 fw-bold py-2 shadow-sm">LỌC VÉ</button>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="fw-bold mb-4 text-navy"><i class="bi bi-clock-history me-2"></i>Danh sách đặt vé gần đây</h4>
+
+        <div class="card ticket-card status-paid">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-2 border-end text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Vietnam_Airlines_logo_2015.svg/1200px-Vietnam_Airlines_logo_2015.svg.png" class="airline-logo mb-2" alt="VN">
+                        <div class="pnr-box">
+                            <span class="pnr-label">MÃ ĐẶT CHỖ</span>
+                            <span class="pnr-value">SKY888</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 px-lg-5 py-3 py-lg-0">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="text-center">
+                                <div class="airport-code">SGN</div>
+                                <div class="airport-name">Hồ Chí Minh</div>
+                            </div>
+                            <div class="text-center flex-grow-1 px-3">
+                                <div class="small text-muted mb-1">VN123 • Th.Gia</div>
+                                <div class="position-relative">
+                                    <hr class="my-2">
+                                    <i class="bi bi-airplane-fill position-absolute top-50 start-50 translate-middle bg-white px-2 text-primary"></i>
+                                </div>
+                                <div class="small text-muted mt-1">2h 10m</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="airport-code">HAN</div>
+                                <div class="airport-name">Hà Nội</div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-3">
+                            <span class="small text-muted"><i class="bi bi-calendar3 me-1"></i> 25/03/2026</span>
+                            <span class="small text-muted"><i class="bi bi-clock me-1"></i> 08:00</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 text-center text-lg-start border-start px-lg-4">
+                        <div class="small text-muted mb-1">Tổng cộng</div>
+                        <div class="price-tag mb-2">1,250,000đ</div>
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill small">Đã thanh toán</span>
+                    </div>
+                    <div class="col-lg-3 text-center text-lg-end mt-3 mt-lg-0">
+                        <button class="btn btn-outline-primary btn-detail w-100 mb-2" onclick="viewDetail('SKY888')">Xem chi tiết</button>
+                        <button class="btn btn-primary btn-detail w-100"><i class="bi bi-cloud-download me-2"></i>Tải vé điện tử</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold text-white"><i class="bi bi-ticket-perforated me-2"></i>CHI TIẾT VÉ: <span id="modal-pnr"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+
+                    <div class="info-section-title" style="margin-top: 0;">THÔNG TIN CHUYẾN BAY</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="detail-label">Chuyến bay</div>
+                            <div class="detail-value text-primary">VN123 - Airbus A321</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="detail-label">Lộ trình</div>
+                            <div class="detail-value">TP.HCM (SGN) <i class="bi bi-arrow-right mx-1"></i> Hà Nội (HAN)</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="detail-label">Hạng ghế</div>
+                            <div class="detail-value text-warning">Thương gia (Business)</div>
+                        </div>
+                    </div>
+
+                    <div class="info-section-title">HÀNH KHÁCH & DỊCH VỤ</div>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light small fw-bold">
+                                <tr>
+                                    <th>Tên hành khách</th>
+                                    <th>Số ghế</th>
+                                    <th>Hành lý</th>
+                                    <th>Suất ăn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold text-uppercase">Nguyễn Văn A</td>
+                                    <td><span class="badge bg-primary fs-6">12A</span></td>
+                                    <td class="small">12kg Xách tay + 32kg Ký gửi</td>
+                                    <td class="small">Suất ăn nóng tiêu chuẩn</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row align-items-center bg-light rounded-4 p-4 mx-0">
+                        <div class="col-md-7 border-end">
+                            <div class="info-section-title border-0 p-0 mb-3" style="margin-top: 0;">CHI TIẾT THANH TOÁN</div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Giá vé gốc:</span>
+                                <span class="fw-bold">1.000.000 đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Hệ số Thương gia (x2.5):</span>
+                                <span class="fw-bold">+1.500.000 đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                                <span class="fw-bold text-navy">TỔNG TIỀN:</span>
+                                <span class="fw-bold text-danger fs-4">2.750.000 đ</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <div class="detail-label mb-2">Quét mã để Check-in</div>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=SKY888" alt="QR Code" class="img-thumbnail shadow-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
+                    <button class="btn btn-primary px-4 fw-bold"><i class="bi bi-file-earmark-pdf me-2"></i>Tải vé PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function viewDetail(pnr) {
+            document.getElementById('modal-pnr').innerText = pnr;
+            const myModal = new bootstrap.Modal(document.getElementById('detailModal'));
+            myModal.show();
+        }
+    </script>
+</body>
+</html>

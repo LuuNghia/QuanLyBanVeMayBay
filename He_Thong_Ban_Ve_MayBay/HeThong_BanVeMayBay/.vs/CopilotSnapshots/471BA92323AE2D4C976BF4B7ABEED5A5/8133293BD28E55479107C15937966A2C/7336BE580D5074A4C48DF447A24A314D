@@ -1,0 +1,335 @@
+﻿@model IEnumerable<HeThong_BanVeMayBay.Models.Entities.DatVe>
+@{
+    ViewData["Title"] = "Quản lý Đặt vé";
+}
+
+
+    <link rel="stylesheet" href="~/admin/css/QuanLyDatVe.css" asp-append-version="true" />
+
+
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Quản lý Đặt vé</h2>
+                <p class="text-muted small mb-0">Theo dõi và xử lý các giao dịch đặt chỗ trên toàn hệ thống.</p>
+            </div>
+            <button class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy); border:none;" data-bs-toggle="modal" data-bs-target="#modalCreateBooking">
+                <i class="bi bi-plus-lg me-2"></i>Tạo đặt chỗ mới
+            </button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="filter-card h-100">
+                    <div class="row g-3 small">
+                        <div class="col-md-6">
+                            <label class="fw-bold text-muted mb-2 text-uppercase">Lọc theo trạng thái</label>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-dark btn-sm rounded-start-3">Tất cả</button>
+                                <button class="btn btn-outline-secondary btn-sm">Đã thanh toán</button>
+                                <button class="btn btn-outline-secondary btn-sm">Chờ thanh toán</button>
+                                <button class="btn btn-outline-secondary btn-sm rounded-end-3">Đã hủy</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold text-muted mb-2 text-uppercase">Tháng đặt vé</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar3"></i></span>
+                                <input type="month" class="form-control bg-light border-start-0 fw-bold" value="2026-06">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="revenue-card shadow-sm">
+                    <div class="text-navy opacity-75 small fw-bold mb-1 text-uppercase">Doanh thu tháng này</div>
+                    <h3 class="fw-bold text-navy mb-1">@(ViewBag.DoanhThuThangNay?.ToString("N0") ?? "0") đ</h3>
+                    <div class="text-success small fw-bold">+0.0% <span class="text-muted fw-normal">so với tháng trước</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var booking in Model)
+                {
+                    var mainTicket = booking.Ves?.FirstOrDefault();
+                    if(mainTicket == null) continue;
+
+                    var route = mainTicket.MaCbNavigation?.MaTuyenNavigation;
+                    var timeStrStart = mainTicket.MaCbNavigation?.NgayGioBay.ToString("HH:mm") ?? "--:--";
+                    // Giả lập thời gian bay 2 tiếng nếu không có lưu trong CSDL
+                    var timeStrEnd = mainTicket.MaCbNavigation?.NgayGioBay.AddHours(2).ToString("HH:mm") ?? "--:--";
+
+                    var sbDi = route?.MaSbdiNavigation?.MaSb ?? "---";
+                    var sbDen = route?.MaSbdenNavigation?.MaSb ?? "---";
+
+                    var hangGhe = mainTicket?.MaGheNavigation?.MaHangGheNavigation?.TenHangGhe ?? "PHỔ THÔNG";
+                    var soGhe = mainTicket?.MaGheNavigation?.SoGhe ?? "Chưa chọn";
+                    
+                    var hangBay = mainTicket.MaCbNavigation?.MaHang ?? "VJ-000";
+                    
+                    var trangThai = booking.TrangThaiThanhToan ?? "Chờ thanh toán";
+                    var statusClass = trangThai == "Đã thanh toán" || trangThai == "Thành công" ? "bg-success-subtle text-success" 
+                                    : trangThai == "Đã hủy" ? "bg-danger-subtle text-danger" 
+                                    : "bg-warning-subtle text-warning";
+
+                    <div class="booking-item" id="ticket-@booking.MaDatVe">
+                        <div class="row align-items-center text-center text-md-start">
+                            <div class="col-md-3">
+                                <div class="fw-bold text-primary fs-6">#PNR-@booking.MaDatVe.ToString("D4")</div>
+                                <div class="fw-bold text-dark">@mainTicket.TenHanhKhach</div>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="d-flex align-items-center justify-content-center gap-3">
+                                    <div><div class="fw-bold">@sbDi</div><div class="small text-muted">@timeStrStart</div></div>
+                                    <div class="text-muted small"><i class="bi bi-airplane-fill"></i><br>@hangBay</div>
+                                    <div><div class="fw-bold">@sbDen</div><div class="small text-muted">@timeStrEnd</div></div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <span class="badge @(hangGhe.Contains("Thương Gia", StringComparison.OrdinalIgnoreCase) ? "bg-warning text-dark border-warning" : "bg-light text-muted border-secondary") border shadow-sm">
+                                    @((hangGhe.Length > 15 ? hangGhe.Substring(0,10) + "..." : hangGhe).ToUpper())
+                                </span>
+                                <div class="small text-muted mt-1">Ghế @soGhe</div>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="fw-bold">@(booking.TongTien?.ToString("N0") ?? "0") đ</div>
+                                <span id="status-@booking.MaDatVe" class="status-badge @statusClass mt-1 d-inline-block">@(trangThai.ToUpper())</span>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn-action" data-bs-toggle="modal" data-bs-target="#modalDetail" title="Xem chi tiết"><i class="bi bi-eye"></i></button>
+                                <button class="btn-action" onclick="printTicket()" title="In vé"><i class="bi bi-printer"></i></button>
+                                @if (trangThai != "Đã thanh toán" && trangThai != "Thành công")
+                                {
+                                    <button id="btnPay-@booking.MaDatVe" class="btn-action bg-success-subtle text-success border border-success border-opacity-25" title="Xác nhận Thu tiền" onclick="openPaymentModal('@booking.MaDatVe', '@(booking.TongTien?.ToString("N0") ?? "0") đ')"><i class="bi bi-credit-card-fill"></i></button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h5 class="text-muted">Hiện tại chưa có lượt đặt vé nào.</h5>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2 mb-5">
+            <div class="small text-muted fst-italic">Hiển thị dữ liệu của @ViewBag.TongSoDatVe hóa đơn</div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#">Trang trước</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Tiếp theo</a></li>
+                </ul>
+            </nav>
+        </div>
+
+    <div class="modal fade" id="modalPayment" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="fw-bold text-navy mb-0"><i class="bi bi-credit-card-fill me-2"></i>Thanh toán vé</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="text-muted small mb-1 text-uppercase fw-bold">Mã đặt chỗ</p>
+                    <h4 class="fw-bold text-primary mb-3" id="payPnrCode">SK-0000</h4>
+                    
+                    <p class="text-muted small mb-1 text-uppercase fw-bold">Cần thanh toán</p>
+                    <h2 class="fw-bold text-danger mb-4" id="payAmount">0 đ</h2>
+                    
+                    <div class="text-start">
+                        <label class="small fw-bold text-muted mb-2">PHƯƠNG THỨC THANH TOÁN</label>
+                        <select class="form-select bg-light border-0 p-3 rounded-3 mb-4 fw-bold">
+                            <option>Tiền mặt tại quầy</option>
+                            <option>Chuyển khoản (Banking)</option>
+                            <option>Quẹt thẻ (POS)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="btn w-100 rounded-pill py-3 fw-bold text-white shadow-sm" style="background: var(--primary-navy);" onclick="confirmPayment()">XÁC NHẬN ĐÃ THU TIỀN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+                <div class="modal-header border-0 text-white" style="background: var(--navy-gradient); padding: 20px 30px;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 p-2 rounded-3 me-3">
+                            <i class="bi bi-ticket-perforated fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">CHI TIẾT VÉ ĐIỆN TỬ</h5>
+                            <small class="opacity-75">Mã giữ chỗ (PNR): <span class="fw-bold text-warning">SK-9823</span></small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm rounded-4 p-4">
+                                <div class="row align-items-center text-center">
+                                    <div class="col-md-4">
+                                        <h2 class="fw-bold mb-0 text-navy">SGN</h2>
+                                        <div class="small fw-bold">TP. Hồ Chí Minh</div>
+                                        <div class="mt-3 p-2 bg-light rounded-3">
+                                            <div class="small text-muted">Khởi hành</div>
+                                            <div class="fw-bold">15/06/2026 - 14:30</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 py-3 py-md-0">
+                                        <div class="text-primary fw-bold mb-1">VN-215</div>
+                                        <div class="position-relative mx-4">
+                                            <hr class="border-primary border-2 opacity-25">
+                                            <i class="bi bi-airplane-fill position-absolute top-50 start-50 translate-middle bg-white px-3 fs-4 text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h2 class="fw-bold mb-0 text-navy">HAN</h2>
+                                        <div class="small fw-bold">Hà Nội</div>
+                                        <div class="mt-3 p-2 bg-light rounded-3">
+                                            <div class="small text-muted">Hạ cánh</div>
+                                            <div class="fw-bold">15/06/2026 - 16:45</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                                <h6 class="fw-bold text-navy border-bottom pb-2 mb-3"><i class="bi bi-person-circle me-2"></i>Thông tin khách hàng</h6>
+                                <div class="row g-2 small">
+                                    <div class="col-5 text-muted">Hành khách:</div><div class="col-7 fw-bold">TRẦN HOÀNG NAM</div>
+                                    <div class="col-5 text-muted">CCCD/Passport:</div><div class="col-7 fw-bold">079123456789</div>
+                                    <div class="col-5 text-muted">Số điện thoại:</div><div class="col-7 fw-bold">0908 123 456</div>
+                                    <div class="col-5 text-muted">Hạng ghế:</div><div class="col-7"><span class="badge bg-primary">THƯƠNG GIA</span></div>
+                                    <div class="col-5 text-muted">Vị trí ghế:</div><div class="col-7 fw-bold text-danger fs-5">2A</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                                <h6 class="fw-bold text-navy border-bottom pb-2 mb-3"><i class="bi bi-luggage me-2"></i>Quyền lợi & Hành lý</h6>
+                                <ul class="list-unstyled small mb-0">
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Xách tay: <strong>12kg</strong></li>
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Ký gửi: <strong>32kg</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm rounded-4 p-3" style="background: #f8fafc; border: 1px dashed #cbd5e1 !important;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="small text-muted">Ngày đặt: 10/10/2023 - Kênh: <span class="fw-bold">Website</span></div>
+                                        <div class="status-badge bg-success-subtle text-success mt-1 d-inline-block">ĐÃ THANH TOÁN QUA VNPAY</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="small text-muted">Tổng thanh toán:</div>
+                                        <h3 class="fw-bold text-navy mb-0">3,450,000 đ</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4 pt-0 justify-content-center bg-light">
+                    <button class="btn btn-navy rounded-pill px-5 text-white me-2" style="background: var(--primary-navy);" onclick="printTicket()"><i class="bi bi-printer me-2"></i>In thẻ lên máy bay</button>
+                    <button class="btn btn-danger rounded-pill px-4" onclick="cancelTicket()"><i class="bi bi-x-circle me-2"></i>Hủy vé này</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCreateBooking" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="fw-bold text-navy mb-0"><i class="bi bi-plus-circle me-2"></i>Tạo đặt chỗ mới tại quầy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form class="modal-body p-4" onsubmit="submitBooking(event)">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="small fw-bold text-muted">CHỌN CHUYẾN BAY</label>
+                            <select class="form-select bg-light border-0 p-3 rounded-4">
+                                @if (ViewBag.ChuyenBays != null)
+                                {
+                                    foreach (var cb in ViewBag.ChuyenBays)
+                                    {
+                                        var tuyen = cb.MaTuyenNavigation != null ? $"{cb.MaTuyenNavigation.MaSbdi} -> {cb.MaTuyenNavigation.MaSbden}" : cb.MaTuyen;
+                                        <option value="@cb.MaCb">@tuyen (@cb.MaHang) - Khởi hành: @cb.NgayGioBay.ToString("dd/MM/yyyy HH:mm")</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6"><label class="small fw-bold text-muted">HỌ TÊN KHÁCH (IN HOA)</label><input type="text" class="form-control bg-light border-0 p-3 rounded-4" placeholder="VD: NGUYEN VAN A" required></div>
+                        <div class="col-md-6"><label class="small fw-bold text-muted">SỐ CCCD / PASSPORT</label><input type="text" class="form-control bg-light border-0 p-3 rounded-4" placeholder="Nhập số giấy tờ định danh..." required></div>
+                        
+                        <div class="col-md-6"><label class="small fw-bold text-muted">SỐ ĐIỆN THOẠI</label><input type="text" class="form-control bg-light border-0 p-3 rounded-4" placeholder="090..." required></div>
+                        <div class="col-md-6"><label class="small fw-bold text-muted">EMAIL (TÙY CHỌN)</label><input type="email" class="form-control bg-light border-0 p-3 rounded-4" placeholder="email@domain.com"></div>
+                        
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted">HẠNG GHẾ</label>
+                            <select class="form-select border-0 bg-light p-3 rounded-4"><option>Phổ thông</option><option>Thương gia</option></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted">CHỌN GHẾ TRỐNG</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control border-0 bg-light p-3 rounded-4" placeholder="VD: 15F">
+                                <button type="button" class="btn text-white rounded-4 px-3" style="background: var(--primary-navy);"><i class="bi bi-grid-3x3-gap"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4 pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center bg-warning-subtle p-3 rounded-4">
+                                <div>
+                                    <div class="small fw-bold text-muted">TỔNG TIỀN THANH TOÁN</div>
+                                    <h4 class="fw-bold text-navy mb-0">1,250,000 đ</h4>
+                                </div>
+                                <div class="text-end">
+                                    <label class="small fw-bold mb-2">Trạng thái thu tiền</label>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" checked>
+                                        <label class="btn btn-outline-success btn-sm fw-bold px-3" for="btnradio1">Thu tiền ngay</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                                        <label class="btn btn-outline-warning btn-sm fw-bold px-3" for="btnradio2">Giữ chỗ</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12"><button type="submit" class="btn w-100 rounded-pill py-3 fw-bold text-white mt-2 shadow-sm" style="background: var(--primary-navy);">LƯU & XUẤT VÉ</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1060; margin-top: 20px;">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-4 py-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold fs-6 p-0" id="toastMessage">Thao tác thành công!</div>
+            </div>
+        </div>
+    </div>
+
+
+<script src="~/admin/js/QuanLyDatVe.js" asp-append-version="true" defer></script>

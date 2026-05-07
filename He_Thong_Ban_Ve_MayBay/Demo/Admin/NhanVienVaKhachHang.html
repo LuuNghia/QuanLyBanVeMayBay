@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyBooking - Quản lý Người dùng</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580;
+            --navy-gradient: linear-gradient(90deg, #00265c 0%, #003580 100%);
+            --secondary-gold: #feba02;
+            --sidebar-width: 280px;
+            --bg-light: #f8faff;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); margin: 0; }
+
+        /* --- SIDEBAR --- */
+        #sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-navy); position: fixed; left: 0; top: 0; z-index: 1001; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; color: white; font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 25px; margin: 4px 15px; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { font-size: 1.2rem; margin-right: 15px; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.active { background: var(--secondary-gold) !important; color: var(--primary-navy) !important; font-weight: 600; }
+
+        /* --- TOPBAR --- */
+        .topbar { margin-left: var(--sidebar-width); background: var(--navy-gradient); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .search-box { background: var(--glass-white); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 8px 20px; width: 400px; backdrop-filter: blur(10px); }
+        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.5); }
+        .avatar-ad { width: 42px; height: 42px; background: var(--secondary-gold); color: var(--primary-navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { margin-left: var(--sidebar-width); padding: 35px; padding-bottom: 80px;}
+        .card-stat { background: white; border-radius: 20px; padding: 25px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-left: 4px solid var(--primary-navy); }
+        .user-table-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+
+        /* TABS & TABLE */
+        .nav-tabs { border: none; }
+        .nav-tabs .nav-link { border: none; color: #64748b; font-weight: 600; padding: 10px 25px; margin-right: 10px; position: relative; }
+        .nav-tabs .nav-link.active { color: var(--primary-navy); background: transparent; }
+        .nav-tabs .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--secondary-gold); border-radius: 3px; }
+        .table thead th { background-color: #f8fafc; border: none; color: #888; font-size: 11px; text-transform: uppercase; padding: 15px; }
+        .table tbody td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+        .btn-action { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; border: none; color: #475569; transition: 0.2s; margin-left: 5px;}
+        .btn-action:hover { background: var(--primary-navy); color: white; transform: scale(1.1);}
+        .status-toggle .form-check-input:checked { background-color: #10b981; border-color: #10b981; }
+        
+        .page-link { border: none; margin: 0 3px; border-radius: 8px !important; color: #64748b; font-weight: 500;}
+        .page-link:hover { background-color: #f1f5f9; color: var(--primary-navy); }
+        .page-item.active .page-link { background-color: var(--primary-navy); color: white; }
+
+        /* MODAL CUSTOM CSS */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: 1px solid #f1f5f9; padding: 20px 25px; }
+        .modal-footer { border-top: 1px solid #f1f5f9; padding: 15px 25px; }
+        .role-switch { width: 45px; height: 24px; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-airplane-engines-fill me-2 text-warning"></i>SkyBooking
+            <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">HỆ THỐNG QUẢN TRỊ</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="../Admin/DashBoard.html" class="nav-link"><i class="bi bi-grid-fill"></i> Tổng quan</a>
+            <a href="../Admin/SanBayVaTuyenBay.html" class="nav-link active"><i class="bi bi-geo-alt-fill"></i> Sân bay & Tuyến bay</a>
+            <a href="../Admin/QuanLyChuyenBay.html" class="nav-link"><i class="bi bi-airplane-fill"></i> Quản lý Chuyến bay</a>
+            <a href="../Admin/SoDoGhe.html" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Máy bay & Sơ đồ ghế</a>
+            <a href="../Admin/QuanLyDatVe.html" class="nav-link"><i class="bi bi-ticket-perforated-fill"></i> Quản lý Đặt vé</a>
+            <a href="../Admin/NhanVienVaKhachHang.html" class="nav-link"><i class="bi bi-people-fill"></i> Nhân viên & Khách hàng</a>
+            <a href="../Admin/CauHinhHeThong.html" class="nav-link"><i class="bi bi-gear-fill"></i> Cấu hình hệ thống</a>
+        </nav>
+    </div>
+
+    <div class="topbar">
+        <div class="search-box d-flex align-items-center">
+            <i class="bi bi-search text-white opacity-50 me-2"></i>
+            <input type="text" placeholder="Tìm tên nhân viên, email, mã khách hàng...">
+        </div>
+        <div class="d-flex align-items-center text-white">
+            <i class="bi bi-bell-fill me-4 fs-5 cursor-pointer"></i>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
+                    <div class="fw-bold small">Nguyễn Admin</div>
+                    <div class="opacity-75 small">Quản trị viên</div>
+                </div>
+                <div class="avatar-ad shadow-sm">AD</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Nhân viên & Khách hàng</h3>
+                <p class="text-muted small">Cấu hình tài khoản, phân quyền và lịch sử hoạt động.</p>
+            </div>
+            <button class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="openAddUserModal()">
+                <i class="bi bi-person-plus-fill me-2"></i>Thêm người dùng mới
+            </button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4"><div class="card-stat"><div class="text-muted small fw-bold text-uppercase">Tổng số tài khoản</div><h3 class="fw-bold mt-1">1,452</h3></div></div>
+            <div class="col-md-4"><div class="card-stat" style="border-color: #0ea5e9;"><div class="text-muted small fw-bold text-uppercase">Nhân viên đang trực</div><h3 class="fw-bold mt-1">24</h3></div></div>
+            <div class="col-md-4"><div class="card-stat" style="border-color: #10b981;"><div class="text-muted small fw-bold text-uppercase">Khách hàng mới (Tháng)</div><h3 class="fw-bold mt-1">256</h3></div></div>
+        </div>
+
+        <div class="user-table-container">
+            <ul class="nav nav-tabs mb-4" id="userTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#staff-content">Nhân viên</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customer-content">Khách hàng</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="userTabContent">
+                <div class="tab-pane fade show active" id="staff-content">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>ID</th><th>THÀNH VIÊN</th><th>CHỨC VỤ</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold text-primary">#NV001</td>
+                                    <td><div class="fw-bold">Nguyễn Admin</div><div class="small text-muted">admin@skybooking.vn</div></td>
+                                    <td><span class="badge bg-danger-subtle text-danger rounded-pill px-3">Quản trị viên</span></td>
+                                    <td>
+                                        <div class="form-check form-switch status-toggle">
+                                            <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Đã cập nhật trạng thái hoạt động')">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action text-primary" title="Phân quyền" onclick="openRoleModal('Nguyễn Admin')"><i class="bi bi-shield-lock-fill"></i></button>
+                                        <button class="btn-action" title="Sửa" onclick="openAddUserModal(true)"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action" title="Khóa/Xóa" onclick="confirmAction('Bạn có chắc muốn Khóa tài khoản Nguyễn Admin?')"><i class="bi bi-slash-circle text-danger"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-primary">#NV042</td>
+                                    <td><div class="fw-bold">Phạm Bán Vé</div><div class="small text-muted">phambanve@skybooking.vn</div></td>
+                                    <td><span class="badge bg-primary-subtle text-primary rounded-pill px-3">Nhân viên quầy</span></td>
+                                    <td>
+                                        <div class="form-check form-switch status-toggle">
+                                            <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Đã cập nhật trạng thái hoạt động')">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action text-primary" title="Phân quyền" onclick="openRoleModal('Phạm Bán Vé')"><i class="bi bi-shield-lock-fill"></i></button>
+                                        <button class="btn-action" title="Sửa" onclick="openAddUserModal(true)"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action" title="Khóa/Xóa" onclick="confirmAction('Bạn có chắc muốn Khóa tài khoản Phạm Bán Vé?')"><i class="bi bi-slash-circle text-danger"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="customer-content">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>MÃ KH</th><th>HỌ TÊN</th><th>LOẠI THÀNH VIÊN</th><th>ĐIỂM TÍCH LŨY</th><th class="text-end">THAO TÁC</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold text-primary">#KH9823</td>
+                                    <td><div class="fw-bold">Lê Văn Khách</div><div class="small text-muted">0909 123 456</div></td>
+                                    <td><span class="badge bg-warning text-dark px-3 py-2 rounded-3" style="font-size: 10px;">THÀNH VIÊN VÀNG</span></td>
+                                    <td class="fw-bold text-primary">1,250 pts</td>
+                                    <td class="text-end">
+                                        <button class="btn-action text-primary" title="Lịch sử bay" onclick="openHistoryModal()"><i class="bi bi-clock-history"></i></button>
+                                        <button class="btn-action" title="Reset Mật khẩu" onclick="confirmAction('Reset mật khẩu về mặc định cho Khách hàng này?', 'Chấp nhận')"><i class="bi bi-key"></i></button>
+                                        <button class="btn-action" title="Khóa thẻ" onclick="confirmAction('Khóa thẻ thành viên Lê Văn Khách?')"><i class="bi bi-slash-circle text-danger"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-primary">#KH5521</td>
+                                    <td><div class="fw-bold">Trần Văn Bay</div><div class="small text-muted">0888 777 666</div></td>
+                                    <td><span class="badge bg-light text-muted px-3 py-2 border rounded-3" style="font-size: 10px;">THÀNH VIÊN THƯỜNG</span></td>
+                                    <td class="fw-bold text-primary">420 pts</td>
+                                    <td class="text-end">
+                                        <button class="btn-action text-primary" title="Lịch sử bay" onclick="openHistoryModal()"><i class="bi bi-clock-history"></i></button>
+                                        <button class="btn-action" title="Reset Mật khẩu" onclick="confirmAction('Reset mật khẩu về mặc định cho Khách hàng này?', 'Chấp nhận')"><i class="bi bi-key"></i></button>
+                                        <button class="btn-action" title="Khóa thẻ" onclick="confirmAction('Khóa thẻ thành viên Trần Văn Bay?')"><i class="bi bi-slash-circle text-danger"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="small text-muted fst-italic">Hiển thị 1 - 2 của kết quả</div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAddUser" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="fw-bold mb-0 text-navy" id="modalAddUserTitle"><i class="bi bi-person-circle me-2"></i>Thêm Người dùng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="userForm">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">LOẠI TÀI KHOẢN</label>
+                            <select class="form-select bg-light border-0 py-2">
+                                <option value="staff">Nhân viên hệ thống</option>
+                                <option value="customer">Khách hàng</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">HỌ VÀ TÊN</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" placeholder="VD: Nguyễn Văn A" required>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">SỐ ĐIỆN THOẠI</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">SỐ CCCD/PASSPORT</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">EMAIL ĐĂNG NHẬP</label>
+                            <input type="email" class="form-control bg-light border-0 py-2" placeholder="email@skybooking.vn" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn text-white rounded-pill px-4" style="background: var(--primary-navy);" onclick="submitForm('userForm', 'modalAddUser', 'Lưu thông tin thành công!')">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalRole" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-light">
+                    <h5 class="fw-bold mb-0 text-navy"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>Phân quyền hệ thống</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="bg-primary-subtle text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
+                            <i class="bi bi-person-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0" id="roleUserName">Nguyễn Admin</h6>
+                            <small class="text-muted">Nhân viên hệ thống</small>
+                        </div>
+                    </div>
+                    
+                    <p class="small fw-bold text-muted mb-3">CHỌN QUYỀN TRUY CẬP MODULE:</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded-3">
+                        <div class="fw-bold small"><i class="bi bi-grid-fill me-2 text-muted"></i>Tổng quan (Dashboard)</div>
+                        <div class="form-check form-switch"><input class="form-check-input role-switch" type="checkbox" checked></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded-3">
+                        <div class="fw-bold small"><i class="bi bi-airplane-fill me-2 text-muted"></i>Điều hành Chuyến bay & Máy bay</div>
+                        <div class="form-check form-switch"><input class="form-check-input role-switch" type="checkbox" checked></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded-3">
+                        <div class="fw-bold small"><i class="bi bi-ticket-perforated-fill me-2 text-muted"></i>Quản lý Đặt vé (Bán vé)</div>
+                        <div class="form-check form-switch"><input class="form-check-input role-switch" type="checkbox" checked></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded-3">
+                        <div class="fw-bold small"><i class="bi bi-gear-fill me-2 text-muted"></i>Cấu hình hệ thống (Cao nhất)</div>
+                        <div class="form-check form-switch"><input class="form-check-input role-switch" type="checkbox"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn text-white rounded-pill px-4 w-100" style="background: var(--primary-navy);" onclick="submitForm('', 'modalRole', 'Đã cập nhật quyền truy cập!')">Xác nhận quyền</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalHistory" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="fw-bold mb-0 text-navy"><i class="bi bi-clock-history me-2"></i>Lịch sử chuyến bay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 bg-light border-bottom d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-3">Thành viên Vàng</span>
+                        <span class="fw-bold">Lê Văn Khách</span>
+                        <span class="text-muted ms-auto small">Tổng số: 12 chuyến</span>
+                    </div>
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-muted"><th>MÃ VÉ</th><th>HÀNH TRÌNH</th><th>NGÀY BAY</th><th>TRẠNG THÁI</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-primary">SK-9823</td>
+                                <td><span class="fw-bold">SGN</span> <i class="bi bi-arrow-right opacity-50"></i> <span class="fw-bold">HAN</span></td>
+                                <td>15/06/2026</td>
+                                <td><span class="badge bg-success-subtle text-success">Đã hoàn thành</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">SK-5124</td>
+                                <td><span class="fw-bold">HAN</span> <i class="bi bi-arrow-right opacity-50"></i> <span class="fw-bold">DAD</span></td>
+                                <td>01/05/2026</td>
+                                <td><span class="badge bg-success-subtle text-success">Đã hoàn thành</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalConfirm" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content shadow-lg text-center p-4">
+                <i class="bi bi-exclamation-circle text-danger display-4 mb-3"></i>
+                <h5 class="fw-bold mb-2">Xác nhận thao tác</h5>
+                <p class="text-muted small mb-4" id="confirmText">Bạn có chắc chắn thực hiện hành động này?</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light w-50 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger w-50 fw-bold" id="btnConfirmAction" onclick="submitForm('', 'modalConfirm', 'Đã xử lý yêu cầu!')">Khóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1060; margin-top: 20px;">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-3 py-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold fs-6" id="toastMessage">Thao tác thành công!</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Khởi tạo Toast
+        const toastEl = document.getElementById('liveToast');
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+        function toastMessage(msg, colorClass = 'bg-success') {
+            document.getElementById('toastMessage').innerText = msg;
+            toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+            bsToast.show();
+        }
+
+        // Mở Modal Thêm / Sửa
+        function openAddUserModal(isEdit = false) {
+            document.getElementById('modalAddUserTitle').innerHTML = isEdit ? '<i class="bi bi-pencil-square me-2"></i>Cập nhật thông tin' : '<i class="bi bi-person-circle me-2"></i>Thêm Người dùng mới';
+            if(!isEdit) document.getElementById('userForm').reset();
+            new bootstrap.Modal(document.getElementById('modalAddUser')).show();
+        }
+
+        // Mở Modal Phân quyền
+        function openRoleModal(userName) {
+            document.getElementById('roleUserName').innerText = userName;
+            new bootstrap.Modal(document.getElementById('modalRole')).show();
+        }
+
+        // Mở Modal Lịch sử
+        function openHistoryModal() {
+            new bootstrap.Modal(document.getElementById('modalHistory')).show();
+        }
+
+        // Mở Modal Xác nhận chung (Reset pass, Khóa tài khoản)
+        function confirmAction(text, btnText = 'Khóa') {
+            document.getElementById('confirmText').innerText = text;
+            const btn = document.getElementById('btnConfirmAction');
+            btn.innerText = btnText;
+            if(btnText === 'Chấp nhận') {
+                btn.className = 'btn btn-primary w-50 fw-bold';
+            } else {
+                btn.className = 'btn btn-danger w-50 fw-bold';
+            }
+            new bootstrap.Modal(document.getElementById('modalConfirm')).show();
+        }
+
+        // Hàm giả lập Submit các form
+        function submitForm(formId, modalId, successMsg) {
+            if(formId) document.getElementById(formId).reset();
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            toastMessage(successMsg);
+        }
+    </script>
+</body>
+</html>

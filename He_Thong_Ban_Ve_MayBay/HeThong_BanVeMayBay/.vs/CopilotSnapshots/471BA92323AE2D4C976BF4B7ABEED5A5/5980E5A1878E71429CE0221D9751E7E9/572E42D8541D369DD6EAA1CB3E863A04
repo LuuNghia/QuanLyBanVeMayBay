@@ -1,0 +1,26 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using HeThong_BanVeMayBay.Models.EF;
+using Microsoft.EntityFrameworkCore;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")] 
+    public class HomeController : Controller
+    {
+        private readonly QL_BanVeMayBayContext _context;
+
+        public HomeController(QL_BanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.TotalFlights = await _context.ChuyenBays.CountAsync();
+            ViewBag.TotalBookings = await _context.DatVes.CountAsync();
+            ViewBag.TotalCustomers = await _context.KhachHangs.CountAsync();
+            
+            return View();
+        }
+    }
+}

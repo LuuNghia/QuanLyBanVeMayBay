@@ -1,0 +1,200 @@
+:root {
+    --primary-navy: #003580;
+    --secondary-gold: #feba02;
+    --accent-blue: #006ce4;
+    --light-bg: #f5f7fa;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.profile-container {
+    background-color: var(--light-bg);
+    min-height: 100vh;
+}
+
+.profile-sidebar {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-navy), #004ba8);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+}
+
+.profile-img-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.btn-edit-avatar {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--secondary-gold);
+    border: none;
+    color: var(--primary-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.btn-edit-avatar:hover {
+    transform: scale(1.1);
+    background: #e2a602;
+}
+
+.profile-nav .nav-link {
+    padding: 18px 25px !important;
+    color: #1f2937 !important; /* Force dark color */
+    font-weight: 600 !important;
+    border-left: 4px solid transparent !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    background: transparent !important;
+}
+
+.profile-nav .nav-link i {
+    font-size: 1.2rem;
+    width: 25px;
+}
+
+.profile-nav .nav-link:hover {
+    background-color: #fff9e6 !important;
+    color: var(--secondary-gold) !important;
+}
+
+.profile-nav .nav-link.active {
+    background-color: #fff9e6 !important;
+    color: var(--secondary-gold) !important;
+    border-left: 5px solid var(--secondary-gold) !important;
+    font-weight: 700 !important;
+}
+
+.content-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--card-shadow);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-bottom: 30px;
+    position: relative;
+    padding-left: 15px;
+}
+
+.badge-custom {
+    background: #f0f7ff !important;
+    color: #003580 !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    padding: 8px 25px !important;
+    border-radius: 50px !important;
+    border: 1px solid #cce3ff !important;
+    box-shadow: 0 2px 8px rgba(0, 53, 128, 0.08);
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background-color: var(--secondary-gold);
+    border-radius: 2px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: white;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 108, 228, 0.1);
+}
+
+.btn-save {
+    background: linear-gradient(to right, var(--primary-navy), #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 53, 128, 0.2);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 53, 128, 0.3);
+    color: white;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 24px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--primary-navy);
+    color: white;
+    padding: 25px 30px;
+    border: none;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, var(--accent-blue), #004ba8);
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+}

@@ -1,0 +1,409 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyBooking - Hệ Thống Đặt Vé Chuyên Nghiệp</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #003580;
+            --secondary: #feba02;
+            --bg-light: #f4f6f9;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: #333;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: var(--primary) !important;
+            padding: 12px 0;
+        }
+
+        .navbar-brand {
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+            object-fit: cover;
+        }
+
+        /* --- HERO & SEARCH --- */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: -60px;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .btn-search {
+            background-color: var(--secondary);
+            color: var(--primary);
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+            .btn-search:hover {
+                background-color: #e2a602;
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+
+        /* --- DANH SÁCH CHUYẾN BAY --- */
+        #flight-results-section {
+            display: none;
+            padding-top: 100px;
+            padding-bottom: 50px;
+        }
+
+        .flight-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+            .flight-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+                border-left: 6px solid var(--secondary);
+            }
+
+        /* --- GIAO DIỆN CHỌN CHỖ "XỊN" --- */
+        #seat-selection-section {
+            display: none;
+            padding-top: 30px;
+        }
+
+        .cabin-wrapper {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        }
+
+        .cabin-block {
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .block-first {
+            background: #fff5f5;
+            border: 1px solid #ffcccc;
+        }
+
+        .block-business {
+            background: #f0f7ff;
+            border: 1px solid #cce5ff;
+        }
+
+        .block-economy {
+            background: #f8f9fa;
+            border: 1px solid #e2e3e5;
+        }
+
+        .cabin-title {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .seat-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .seat {
+            width: 42px;
+            height: 42px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+            .seat:nth-child(3n) {
+                margin-right: 15px;
+            }
+
+                .seat:nth-child(3n):last-child {
+                    margin-right: 0;
+                }
+
+            .seat.selected {
+                background: #198754 !important;
+                color: white !important;
+                border: none;
+            }
+
+            .seat.occupied {
+                background: #dee2e6;
+                color: #adb5bd;
+                cursor: not-allowed;
+                border: none;
+            }
+
+        /* --- CARD CHI TIẾT VÉ SANG TRỌNG --- */
+        .detail-card {
+            background: #ffffff;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 53, 128, 0.15);
+            border: 1px solid #f1f4f9;
+            position: sticky;
+            top: 20px;
+        }
+
+        .price-block {
+            background: linear-gradient(145deg, #fffcf5, #fff9e6);
+            border: 1px solid #ffeeba;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .price-tag {
+            font-size: 32px;
+            font-weight: 900;
+            color: #e63946;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .amenity-pill {
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin: 3px;
+            border: 1px solid #d1fae5;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-airplane-engines me-2"></i>SKYBOOKING</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="#" onclick="location.reload()"><i class="bi bi-ticket-perforated me-1"></i>Vé máy bay</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-clock-history me-1"></i>Lịch sử đặt vé</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-search me-1"></i>Tra cứu vé</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <span class="me-2 d-none d-lg-inline text-white">Nguyễn Văn A</span>
+                            <img src="https://ui-avatars.com/api/?name=Nguyen+A&background=feba02&color=003580" class="user-avatar" alt="User">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="search-area" class="hero-section">
+        <div class="container text-center mb-5">
+            <h1 class="fw-bold display-5">Khám Phá Bầu Trời Mới <i class="bi bi-cloud-sun ms-2"></i></h1>
+            <p class="lead opacity-75">Săn vé giá tốt, tận hưởng hành trình 5 sao</p>
+        </div>
+        <div class="container">
+            <div class="card search-card p-4 p-md-5 text-dark">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i>Điểm đi</label>
+                        <select class="form-select"><option>Hồ Chí Minh (SGN)</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo me-1"></i>Điểm đến</label>
+                        <select class="form-select"><option>Hà Nội (HAN)</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i>Ngày đi</label>
+                        <input type="date" class="form-control" value="2026-03-25">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i>Hạng vé</label>
+                        <select class="form-select"><option>Tất cả các hạng</option></select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-search w-100 py-3 fw-bold" onclick="searchFlights()">TÌM KIẾM</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="flight-results-section" class="container">
+        <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-send-check me-2"></i>Lựa chọn chuyến bay tốt nhất</h4>
+        <div id="flight-list">
+            <div class="card flight-card p-4 shadow-sm" onclick="selectFlight('VN123', 'Vietnam Airlines')">
+                <div class="row align-items-center">
+                    <div class="col-md-4"><h5 class="fw-bold mb-0">VN123 | Vietnam Airlines</h5><small class="text-muted">Airbus A321 • Bay thẳng</small></div>
+                    <div class="col-md-4 text-center"><span class="fs-4 fw-bold">08:00</span> <i class="bi bi-arrow-right mx-3"></i> <span class="fs-4 fw-bold">10:10</span></div>
+                    <div class="col-md-4 text-md-end"><span class="fs-4 fw-bold text-danger">1,250,000đ</span><button class="btn btn-primary px-4 rounded-pill ms-2">Chọn chuyến</button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="seat-selection-section" class="container mb-5">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="cabin-wrapper">
+                    <h3 class="fw-bold text-center text-primary mb-4">Sơ đồ chỗ ngồi</h3>
+                    <div class="cabin-block block-first">
+                        <div class="cabin-title"><i class="bi bi-stars me-2 text-danger"></i>Khoang Hạng Nhất</div>
+                        <div class="seat-grid" id="grid-first"></div>
+                    </div>
+                    <div class="cabin-block block-business">
+                        <div class="cabin-title"><i class="bi bi-gem me-2 text-primary"></i>Khoang Thương Gia</div>
+                        <div class="seat-grid" id="grid-business"></div>
+                    </div>
+                    <div class="cabin-block block-economy">
+                        <div class="cabin-title"><i class="bi bi-people-fill me-2 text-secondary"></i>Khoang Phổ Thông</div>
+                        <div class="seat-grid" id="grid-economy"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="detail-card">
+                    <div class="text-center mb-4">
+                        <div class="class-name" id="res-class">Chọn ghế</div>
+                        <div class="small text-muted fw-medium">Mã hiệu: <span class="text-primary" id="res-flight-id">---</span></div>
+                    </div>
+                    <div class="price-block shadow-sm">
+                        <div class="price-tag" id="res-price">0 VNĐ</div>
+                        <div class="text-muted small">Đã bao gồm thuế & phí</div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="info-item shadow-sm"><span><i class="bi bi-briefcase-fill"></i>Xách tay</span><strong id="res-hand">--</strong></div>
+                        <div class="info-item shadow-sm"><span><i class="bi bi-luggage-fill"></i>Ký gửi</span><strong id="res-check">--</strong></div>
+                        <div class="info-item shadow-sm"><span><i class="bi bi-arrow-repeat"></i>Điều kiện</span><span class="badge bg-light text-primary rounded-pill" id="res-refund">--</span></div>
+                    </div>
+                    <div class="mb-4"><div id="res-amenities"></div></div>
+                    <button class="btn btn-confirm text-white" onclick="alert('Xác nhận thành công!')">TIẾN HÀNH XÁC NHẬN <i class="bi bi-arrow-right-short fs-4"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const configs = {
+            "Hạng Nhất": { price: 5500000, hand: "15kg", check: "40kg", refund: "Hoàn vé miễn phí", amenities: ["Suất ăn 5 sao", "Giường nằm", "Phòng chờ VIP"] },
+            "Thương Gia": { price: 3400000, hand: "12kg", check: "32kg", refund: "Phí hoàn 10%", amenities: ["Suất ăn nóng", "Ghế ngả sâu", "Phòng chờ"] },
+            "Phổ Thông": { price: 1250000, hand: "7kg", check: "23kg", refund: "Không hoàn vé", amenities: ["Đồ ăn nhẹ", "Nước suối"] }
+        };
+
+        function searchFlights() {
+            document.getElementById('flight-results-section').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('flight-results-section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function selectFlight(id, name) {
+            document.getElementById('search-area').style.display = 'none';
+            document.getElementById('flight-results-section').style.display = 'none';
+            document.getElementById('seat-selection-section').style.display = 'block';
+            document.getElementById('res-flight-id').innerText = id;
+
+            renderCabin('grid-first', 1, 1, "Hạng Nhất");
+            renderCabin('grid-business', 2, 4, "Thương Gia");
+            renderCabin('grid-economy', 5, 12, "Phổ Thông");
+        }
+
+        function renderCabin(elementId, start, end, className) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            for(let r = start; r <= end; r++) {
+                ['A','B','C','D','E','F'].forEach(c => {
+                    const seat = document.createElement('div');
+                    seat.className = 'seat';
+                    seat.innerText = r + c;
+                    if(r===3 && c==='C') seat.classList.add('occupied');
+                    seat.onclick = function() {
+                        if(this.classList.contains('occupied')) return;
+                        document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+                        this.classList.add('selected');
+                        updateDetail(className, r+c);
+                    };
+                    container.appendChild(seat);
+                });
+            }
+        }
+
+        function updateDetail(className, seatId) {
+            const data = configs[className];
+            document.getElementById('res-class').innerText = `${className} (${seatId})`;
+            document.getElementById('res-price').innerText = data.price.toLocaleString() + " VNĐ";
+            document.getElementById('res-hand').innerText = data.hand;
+            document.getElementById('res-check').innerText = data.check;
+            document.getElementById('res-refund').innerText = data.refund;
+            const amBox = document.getElementById('res-amenities');
+            amBox.innerHTML = '';
+            data.amenities.forEach(a => { amBox.innerHTML += `<span class="amenity-pill"><i class="bi bi-check2-circle me-1"></i>${a}</span>`; });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

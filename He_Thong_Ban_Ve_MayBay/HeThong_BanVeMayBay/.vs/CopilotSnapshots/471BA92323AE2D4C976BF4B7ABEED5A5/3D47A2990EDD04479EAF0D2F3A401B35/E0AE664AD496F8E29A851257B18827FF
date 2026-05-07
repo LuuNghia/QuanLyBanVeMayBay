@@ -1,0 +1,42 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class AccountController : Controller
+    {
+        private readonly QL_BanVeMayBayContext _context;
+
+        public AccountController(QL_BanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> NhanVienVaKhachHang()
+        {
+            var nhanViens = await _context.NhanViens
+                .Include(nv => nv.MaTkNavigation)
+                .OrderBy(nv => nv.MaNv)
+                .ToListAsync();
+
+            var khachHangs = await _context.KhachHangs
+                .Include(kh => kh.MaTkNavigation)
+                .OrderByDescending(kh => kh.DiemTichLuy)
+                .ToListAsync();
+
+            var totalAccounts = await _context.TaiKhoans.CountAsync();
+            var activeStaffs = nhanViens.Count(nv => nv.MaTkNavigation?.TrangThai == true);
+
+            ViewBag.NhanViens = nhanViens;
+            ViewBag.KhachHangs = khachHangs;
+            ViewBag.TotalAccounts = totalAccounts;
+            ViewBag.ActiveStaffs = activeStaffs;
+
+            return View("NhanVienVaKhachHang");
+        }
+    }
+}

@@ -1,0 +1,69 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - User</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Dùng chung một số css từ admin nếu cần màu/font, hoặc tự định nghĩa trong user.css -->
+    <link rel="stylesheet" href="~/admin/css/Admin.css" />
+    <link rel="stylesheet" href="~/user/css/user.css" />
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm"
+        style="background-color: var(--primary-navy, #003580);">
+        <div class="container px-4">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-airplane-engines-fill me-2"
+                    style="color: var(--secondary-gold, #feba02); font-size: 1.5rem;"></i>
+                <span class="fw-bold fs-4" style="color: white; letter-spacing: 1px;">SkyBooking</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-medium px-3 mx-1" href="/User/Home/Index"><i
+                                class="bi bi-house-door me-1"></i>Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-medium px-3 mx-1" href="/User/Booking/TraCuuVe"><i
+                                class="bi bi-search me-1"></i>Tra cứu vé</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-medium px-3 mx-1" href="/User/Booking/LichSuDatVe"><i
+                                class="bi bi-clock-history me-1"></i>Lịch sử</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="/User/Profile/ThongTinCaNhan" class="d-flex align-items-center text-decoration-none">
+                        <span class="text-white me-2 d-none d-md-inline fw-medium">Nguyễn Khách</span>
+                        <img src="https://ui-avatars.com/api/?name=Nguyen+Khach&background=feba02&color=003580"
+                            class="rounded-circle border border-2 border-white shadow-sm" width="40" height="40" alt="User">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4 pb-5">
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/user/js/user_common.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+
+</html>

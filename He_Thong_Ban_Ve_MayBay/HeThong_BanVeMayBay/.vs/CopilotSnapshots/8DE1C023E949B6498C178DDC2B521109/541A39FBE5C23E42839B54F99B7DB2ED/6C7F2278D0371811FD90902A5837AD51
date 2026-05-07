@@ -1,0 +1,196 @@
+﻿@{
+    ViewData["Title"] = "Lịch sử đặt vé";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/user/css/Booking.LichSuDatVe.css" />
+}
+
+<nav class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#"><i class="bi bi-airplane-engines me-2"></i>SKYBOOKING</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Vé máy bay</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Lịch sử đặt vé</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Tra cứu vé</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Hỗ trợ</a></li>
+            </ul>
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        <span class="me-1">Nguyễn Văn A</span>
+                        <div class="user-avatar-circle">NA</div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Thông tin cá nhân</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="hero-mini"></div>
+
+<div class="container" style="margin-top: -50px;">
+    <div class="filter-section mb-5">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Tìm kiếm mã PNR</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0" placeholder="Nhập mã đặt chỗ...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Trạng thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả trạng thái</option>
+                    <option>Đã thanh toán</option>
+                    <option>Chờ thanh toán</option>
+                    <option>Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Tháng đặt vé</label>
+                <input type="month" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-warning w-100 fw-bold py-2 shadow-sm">LỌC VÉ</button>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 text-navy"><i class="bi bi-clock-history me-2"></i>Danh sách đặt vé gần đây</h4>
+
+    <div class="card ticket-card status-paid">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-lg-2 border-end text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Vietnam_Airlines_logo_2015.svg/1200px-Vietnam_Airlines_logo_2015.svg.png" class="airline-logo mb-2" alt="VN">
+                    <div class="pnr-box">
+                        <span class="pnr-label">MÃ ĐẶT CHỖ</span>
+                        <span class="pnr-value">SKY888</span>
+                    </div>
+                </div>
+                <div class="col-lg-5 px-lg-5 py-3 py-lg-0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="text-center">
+                            <div class="airport-code">SGN</div>
+                            <div class="airport-name">Hồ Chí Minh</div>
+                        </div>
+                        <div class="text-center flex-grow-1 px-3">
+                            <div class="small text-muted mb-1">VN123 • Th.Gia</div>
+                            <div class="position-relative">
+                                <hr class="my-2">
+                                <i class="bi bi-airplane-fill position-absolute top-50 start-50 translate-middle bg-white px-2 text-primary"></i>
+                            </div>
+                            <div class="small text-muted mt-1">2h 10m</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="airport-code">HAN</div>
+                            <div class="airport-name">Hà Nội</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 mt-3">
+                        <span class="small text-muted"><i class="bi bi-calendar3 me-1"></i> 25/03/2026</span>
+                        <span class="small text-muted"><i class="bi bi-clock me-1"></i> 08:00</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 text-center text-lg-start border-start px-lg-4">
+                    <div class="small text-muted mb-1">Tổng cộng</div>
+                    <div class="price-tag mb-2">1,250,000đ</div>
+                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill small">Đã thanh toán</span>
+                </div>
+                <div class="col-lg-3 text-center text-lg-end mt-3 mt-lg-0">
+                    <button class="btn btn-outline-primary btn-detail w-100 mb-2" onclick="viewDetail('SKY888')">Xem chi tiết</button>
+                    <button class="btn btn-primary btn-detail w-100"><i class="bi bi-cloud-download me-2"></i>Tải vé điện tử</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-ticket-perforated me-2"></i>CHI TIẾT VÉ: <span id="modal-pnr"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+
+                <div class="info-section-title" style="margin-top: 0;">THÔNG TIN CHUYẾN BAY</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="detail-label">Chuyến bay</div>
+                        <div class="detail-value text-primary">VN123 - Airbus A321</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Lộ trình</div>
+                        <div class="detail-value">TP.HCM (SGN) <i class="bi bi-arrow-right mx-1"></i> Hà Nội (HAN)</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Hạng ghế</div>
+                        <div class="detail-value text-warning">Thương gia (Business)</div>
+                    </div>
+                </div>
+
+                <div class="info-section-title">HÀNH KHÁCH & DỊCH VỤ</div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light small fw-bold">
+                            <tr>
+                                <th>Tên hành khách</th>
+                                <th>Số ghế</th>
+                                <th>Hành lý</th>
+                                <th>Suất ăn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-uppercase">Nguyễn Văn A</td>
+                                <td><span class="badge bg-primary fs-6">12A</span></td>
+                                <td class="small">12kg Xách tay + 32kg Ký gửi</td>
+                                <td class="small">Suất ăn nóng tiêu chuẩn</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row align-items-center bg-light rounded-4 p-4 mx-0">
+                    <div class="col-md-7 border-end">
+                        <div class="info-section-title border-0 p-0 mb-3" style="margin-top: 0;">CHI TIẾT THANH TOÁN</div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Giá vé gốc:</span>
+                            <span class="fw-bold">1.000.000 đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Hệ số Thương gia (x2.5):</span>
+                            <span class="fw-bold">+1.500.000 đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                            <span class="fw-bold text-navy">TỔNG TIỀN:</span>
+                            <span class="fw-bold text-danger fs-4">2.750.000 đ</span>
+                        </div>
+                    </div>
+                    <div class="col-md-5 text-center">
+                        <div class="detail-label mb-2">Quét mã để Check-in</div>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=SKY888" alt="QR Code" class="img-thumbnail shadow-sm">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary px-4 fw-bold"><i class="bi bi-file-earmark-pdf me-2"></i>Tải vé PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/user/js/Booking.LichSuDatVe.js"></script>
+}

@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/user/css/Home.Index.css" />
+}
+
+<section id="search-area" class="hero-section">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+            <h1 class="fw-bold display-5 text-primary mb-3">Khám Phá Bầu Trời Mới <i class="bi bi-cloud-sun ms-2 text-warning"></i></h1>
+            <p class="lead text-muted">Săn vé giá tốt, tận hưởng hành trình 5 sao cùng SkyBooking</p>
+        </div>
+        <div class="col-lg-6">
+            <div class="card-custom search-card">
+                <h4 class="fw-bold text-primary mb-4"><i class="bi bi-search me-2"></i>Tìm chuyến bay</h4>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-geo-alt me-1"></i>ĐIỂM ĐI</label>
+                        <select class="form-select bg-light border-0 py-2"><option>Hồ Chí Minh (SGN)</option></select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-geo me-1"></i>ĐIỂM ĐẾN</label>
+                        <select class="form-select bg-light border-0 py-2"><option>Hà Nội (HAN)</option></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-calendar-event me-1"></i>NGÀY ĐI</label>
+                        <input type="date" class="form-control bg-light border-0 py-2" value="2026-03-25">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-person-badge me-1"></i>HẠNG VÉ</label>
+                        <select class="form-select bg-light border-0 py-2"><option>Tất cả</option></select>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button class="btn btn-primary-custom w-100 py-3 fs-5" onclick="searchFlights()">TÌM CHUYẾN BAY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="flight-results-section" class="mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold text-primary m-0"><i class="bi bi-send-check me-2"></i>Kết quả tìm kiếm</h4>
+        <span class="text-muted small">Hiển thị 1 kết quả</span>
+    </div>
+    <div id="flight-list">
+        <div class="card-custom flight-card mb-3 cursor-pointer" onclick="selectFlight('VN123', 'Vietnam Airlines')">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="fw-bold mb-1 text-primary">VN123</h5>
+                    <div class="small fw-bold text-muted">Vietnam Airlines • VNA-A321</div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0 d-flex justify-content-center align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fs-4 fw-bold">08:00</div>
+                        <div class="small text-muted">SGN</div>
+                    </div>
+                    <div class="d-flex flex-column align-items-center px-2">
+                        <small class="text-muted" style="font-size: 10px;">2h 10m</small>
+                        <div style="width: 60px; height: 2px; background: var(--secondary-gold); position: relative;">
+                            <i class="bi bi-airplane-fill position-absolute text-warning" style="top: -10px; right: -5px; transform: rotate(45deg);"></i>
+                        </div>
+                        <small class="text-muted" style="font-size: 10px;">Bay thẳng</small>
+                    </div>
+                    <div class="text-start">
+                        <div class="fs-4 fw-bold">10:10</div>
+                        <div class="small text-muted">HAN</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="fs-4 fw-bold text-danger mb-2">1,250,000 đ</div>
+                    <button class="btn btn-secondary-custom rounded-pill px-4" onclick="location.href='/User/Booking/ChonCho'; event.stopPropagation();">Chọn ghế</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/user/js/Home.Index.js"></script>
+}

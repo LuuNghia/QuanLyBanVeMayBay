@@ -1,0 +1,74 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - SkyViet Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/account.css">
+</head>
+<body>
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="brand-logo">
+                <i class="bi bi-airplane-engines-fill"></i>
+                <div class="brand-name">SkyViet Airlines</div>
+                <p class="text-muted small mt-2">Chào mừng bạn quay trở lại</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="mb-1">
+                    <label class="form-label">Tên đăng nhập</label>
+                    <div class="input-group-custom">
+                        <input type="text" id="username" class="form-control-custom" placeholder="Nhập tài khoản" required
+                               oninvalid="this.setCustomValidity('Vui lòng nhập tên đăng nhập')" 
+                               oninput="this.setCustomValidity('')">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+
+                <div class="mb-1">
+                    <label class="form-label">Mật khẩu</label>
+                    <div class="input-group-custom">
+                        <input type="password" id="password" class="form-control-custom" placeholder="Nhập mật khẩu" required
+                               oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')" 
+                               oninput="this.setCustomValidity('')">
+                        <i class="bi bi-lock"></i>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember">
+                        <label class="form-check-label small text-muted" for="remember">Ghi nhớ tôi</label>
+                    </div>
+                    <a href="#" class="small text-muted text-decoration-none">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary-custom" id="btnLogin">
+                    ĐĂNG NHẬP
+                </button>
+            </form>
+
+            <div class="divider">HOẶC</div>
+
+            <div class="link-box">
+                Bạn chưa có tài khoản? <a href="/Account/Register">Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/account.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿// Kh?i t?o Toast
+const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+function toastMessage(msg, colorClass = 'bg-success') {
+    document.getElementById('toastMessage').innerText = msg;
+    toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+    bsToast.show();
+}
+
+// M? Modal Thêm / S?a
+function openAddUserModal(isEdit = false) {
+    document.getElementById('modalAddUserTitle').innerHTML = isEdit ? '<i class="bi bi-pencil-square me-2"></i>C?p nh?t thông tin' : '<i class="bi bi-person-circle me-2"></i>Thêm Ng??i dùng m?i';
+    if (!isEdit) document.getElementById('userForm').reset();
+    new bootstrap.Modal(document.getElementById('modalAddUser')).show();
+}
+
+// M? Modal Phân quy?n
+function openRoleModal(userName) {
+    document.getElementById('roleUserName').innerText = userName;
+    new bootstrap.Modal(document.getElementById('modalRole')).show();
+}
+
+// M? Modal L?ch s?
+function openHistoryModal() {
+    new bootstrap.Modal(document.getElementById('modalHistory')).show();
+}
+
+// M? Modal Xác nh?n chung (Reset pass, Khóa tài kho?n)
+function confirmAction(text, btnText = 'Khóa') {
+    document.getElementById('confirmText').innerText = text;
+    const btn = document.getElementById('btnConfirmAction');
+    btn.innerText = btnText;
+    if (btnText === 'Ch?p nh?n') {
+        btn.className = 'btn btn-primary w-50 fw-bold';
+    } else {
+        btn.className = 'btn btn-danger w-50 fw-bold';
+    }
+    new bootstrap.Modal(document.getElementById('modalConfirm')).show();
+}
+
+// Hàm gi? l?p Submit các form
+function submitForm(formId, modalId, successMsg) {
+    if (formId) document.getElementById(formId).reset();
+    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+    toastMessage(successMsg);
+}

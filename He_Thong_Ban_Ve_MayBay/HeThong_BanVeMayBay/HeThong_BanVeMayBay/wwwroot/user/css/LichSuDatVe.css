@@ -1,0 +1,131 @@
+/* --- TICKET CARD --- */
+.ticket-card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border-left: 6px solid #dee2e6;
+}
+
+    .ticket-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 53, 128, 0.1);
+    }
+
+.status-paid {
+    border-left-color: #198754;
+}
+
+.status-pending {
+    border-left-color: #feba02;
+}
+
+.airline-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.airport-code {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary-navy);
+    line-height: 1;
+}
+
+.airport-name {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.pnr-box {
+    background: #f0f4f8;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.pnr-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #6c757d;
+    display: block;
+}
+
+.pnr-value {
+    font-family: 'Monaco', monospace;
+    font-weight: 900;
+    color: var(--primary-navy);
+    font-size: 18px;
+}
+
+.price-tag {
+    font-size: 20px;
+    font-weight: 800;
+    color: #dc3545;
+}
+
+/* --- MODAL DETAIL --- */
+.modal-content {
+    border-radius: 20px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--primary-navy);
+    color: white;
+    padding: 20px 30px;
+    border: none;
+}
+
+.info-section-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--primary-navy);
+    border-left: 4px solid var(--secondary-gold);
+    padding-left: 10px;
+    margin-bottom: 15px;
+    margin-top: 25px;
+}
+
+.detail-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.detail-value {
+    font-weight: 700;
+    color: var(--primary-navy);
+    font-size: 15px;
+}
+
+/* --- FILTERS --- */
+.filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: -30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 10;
+}
+
+.hero-mini {
+    background: var(--primary-navy);
+    height: 120px;
+    width: 100%;
+}
+
+.btn-detail {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 8px 20px;
+}

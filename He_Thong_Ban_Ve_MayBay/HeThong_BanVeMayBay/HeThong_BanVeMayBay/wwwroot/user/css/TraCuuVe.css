@@ -1,0 +1,72 @@
+.lookup-hero {
+    background: linear-gradient(135deg, #003580 0%, #0056b3 100%);
+    padding: 80px 0 120px 0;
+    color: white;
+    text-align: center;
+}
+
+.lookup-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: -80px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: none;
+    position: relative;
+    z-index: 10;
+}
+
+.btn-lookup {
+    background-color: #ffb703;
+    color: #003580;
+    font-weight: 800;
+    border: none;
+    border-radius: 10px;
+    height: 54px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-lookup:hover {
+    background-color: #f9a825;
+    transform: translateY(-2px);
+    color: #003580;
+}
+
+.ticket-result-card {
+    background: white;
+    border-radius: 15px;
+    border: 1px solid #e2e8f0;
+    border-left: 6px solid #003580 !important;
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease;
+}
+
+.ticket-result-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.label-custom {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.input-custom {
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+    padding: 12px 15px;
+    font-weight: 500;
+}
+
+.input-custom:focus {
+    border-color: #003580;
+    box-shadow: none;
+}

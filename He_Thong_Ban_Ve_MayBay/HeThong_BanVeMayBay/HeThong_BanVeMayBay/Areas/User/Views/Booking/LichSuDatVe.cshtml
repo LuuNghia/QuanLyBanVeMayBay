@@ -1,0 +1,155 @@
+@{
+    ViewData["Title"] = "Lịch sử đặt vé";
+}
+<link rel="stylesheet" type="text/css" href="~/user/css/LichSuDatVe.css" />
+
+<div class="hero-mini"></div>
+
+<div class="container" style="margin-top: -50px;">
+    <div class="filter-section mb-5">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Tìm kiếm theo mã đặt chỗ</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="txtPnr" class="form-control border-start-0" placeholder="Nhập mã đặt chỗ...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Trạng thái</label>
+                <select id="selStatus" class="form-select">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="Đã thanh toán">Đã thanh toán</option>
+                    <option value="Chờ thanh toán">Chờ thanh toán</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Ngày đặt vé</label>
+                <input type="date" id="txtDate" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <button id="btnFilter" class="btn btn-warning w-100 fw-bold py-2 shadow-sm">LỌC VÉ</button>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 text-navy"><i class="bi bi-clock-history me-2"></i>Danh sách đặt vé gần đây</h4>
+
+    <div id="ticketList">
+        <!-- Danh sách vé sẽ được load vào đây -->
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Đang tải lịch sử đặt vé...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi tiết vé -->
+<div class="modal fade" id="ticketDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary"><i class="bi bi-ticket-perforated me-2"></i>Chi tiết vé điện tử</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Thông tin Chuyến bay -->
+                <div class="info-section-title mb-3">THÔNG TIN CHUYẾN BAY</div>
+                <div class="row g-3 mb-4 bg-light rounded-4 p-3">
+                    <div class="col-md-4">
+                        <div class="detail-label">Chuyến bay</div>
+                        <div class="detail-value text-primary fw-bold" id="modal-flight-code">-</div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="detail-label">Lộ trình</div>
+                        <div class="detail-value fw-bold" id="modal-route">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Khởi hành</div>
+                        <div class="detail-value" id="modal-departure-time">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Hạ cánh (Dự kiến)</div>
+                        <div class="detail-value" id="modal-arrival-time">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Thời gian bay</div>
+                        <div class="detail-value" id="modal-duration">-</div>
+                    </div>
+                </div>
+
+                <!-- Thông tin Hành khách -->
+                <div class="info-section-title mb-3">THÔNG TIN HÀNH KHÁCH</div>
+                <div class="row g-3 mb-4 border rounded-4 p-3">
+                    <div class="col-md-4">
+                        <div class="detail-label">Họ và tên</div>
+                        <div class="detail-value fw-bold text-uppercase" id="modal-passenger-name">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">CCCD / Passport</div>
+                        <div class="detail-value" id="modal-passenger-cccd">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Số điện thoại</div>
+                        <div class="detail-value" id="modal-passenger-phone">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Hạng ghế</div>
+                        <div class="detail-value text-warning fw-bold" id="modal-seat-class">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Số ghế</div>
+                        <div class="detail-value fw-bold fs-5 text-primary" id="modal-seat-number">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-label">Ngày giao dịch</div>
+                        <div class="detail-value text-success" id="modal-booking-date">-</div>
+                    </div>
+                </div>
+
+                <!-- Dịch vụ & Tiện ích -->
+                <div class="info-section-title mb-3">DỊCH VỤ & TIỆN ÍCH</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100">
+                            <div class="detail-label mb-2"><i class="bi bi-briefcase me-2"></i>Hành lý</div>
+                            <div class="detail-value small" id="modal-baggage-info">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100">
+                            <div class="detail-label mb-2"><i class="bi bi-star me-2"></i>Tiện ích đi kèm</div>
+                            <div class="detail-value small" id="modal-amenities">
+                                <!-- Sẽ được điền động bằng danh sách <div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh toán -->
+                <div class="bg-dark text-white rounded-4 p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small opacity-75 mb-1">Tổng tiền thanh toán</div>
+                        <div class="fw-bold fs-3 text-warning" id="modal-total-price">-</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small opacity-75 mb-2" id="modal-status-label">Trạng thái: -</div>
+                        <div id="modal-qr-container">
+                            <img src="" alt="QR Code" class="img-fluid rounded bg-white p-1" style="width: 80px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="btnPrintTicket">
+                    <i class="bi bi-printer me-2"></i>In vé
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/user/js/LichSuDatVe.js" asp-append-version="true" defer></script>

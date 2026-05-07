@@ -1,0 +1,80 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class FlightController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public FlightController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> QuanLyChuyenBay()
+        {
+            var flights = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .OrderByDescending(c => c.NgayGioBay)
+                .ToListAsync();
+
+            return View(flights);
+        }
+
+        public async Task<IActionResult> QuanLyMayBay()
+        {
+            var planes = await _context.LoaiMayBays
+                .OrderBy(m => m.MaLoaiMb)
+                .ToListAsync();
+
+            return View(planes);
+        }
+
+        public IActionResult SoDoGhe()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> SanBayVaTuyenBay()
+        {
+            var airports = await _context.SanBays
+                .OrderBy(sb => sb.MaSb)
+                .ToListAsync();
+
+            var routes = await _context.TuyenBays
+                .Include(t => t.MaSbdiNavigation)
+                .Include(t => t.MaSbdenNavigation)
+                .OrderBy(t => t.MaTuyen)
+                .ToListAsync();
+
+            ViewBag.Airports = airports;
+            ViewBag.Routes = routes;
+
+            return View();
+        }
+
+        public async Task<IActionResult> DanhMucHangGhe()
+        {
+            var danhMucHangGhe = await _context.HangGhes
+                .Include(hg => hg.MaTienIches) 
+                .OrderByDescending(hg => hg.HeSoGia) 
+                .ToListAsync();
+
+            return View(danhMucHangGhe);
+        }
+        
+        public IActionResult CauHinhHeThong()
+        {
+            return View();
+        }
+    }
+}

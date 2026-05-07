@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Hạ tầng bay";
+    var airports = ViewBag.Airports as IEnumerable<HeThong_BanVeMayBay.Models.Entities.SanBay>;
+    var routes = ViewBag.Routes as IEnumerable<HeThong_BanVeMayBay.Models.Entities.TuyenBay>;
+    
+    var activeRoutesCount = routes?.Count(r => r.TrangThai == true) ?? 0;
+    var maintenanceRoutesCount = routes?.Count(r => r.TrangThai == false) ?? 0;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/SanBayVaTuyenBay.css" asp-append-version="true" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1" style="color: #003580;">Quản lý Hạ tầng bay</h3>
+        <p class="text-muted small">Cấu hình danh sách Sân bay và mạng lưới Tuyến bay khai thác.</p>
+    </div>
+    <button id="dynamicAddBtn" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: #003580;" onclick="openAddModal()">
+        <i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới
+    </button>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #003580;">
+            <div class="text-muted small fw-bold text-uppercase">Sân bay đối tác</div>
+            <h3 class="fw-bold mt-1">@(airports?.Count() ?? 0) <span class="fs-6 text-muted fw-normal">sân bay</span></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #0ea5e9;">
+            <div class="text-muted small fw-bold text-uppercase">Tuyến bay đang khai thác</div>
+            <h3 class="fw-bold mt-1">@activeRoutesCount <span class="fs-6 text-muted fw-normal">tuyến</span></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #f59e0b;">
+            <div class="text-muted small fw-bold text-uppercase">Tuyến bay bảo trì</div>
+            <h3 class="fw-bold mt-1 text-warning">@maintenanceRoutesCount <span class="fs-6 text-muted fw-normal">tuyến</span></h3>
+        </div>
+    </div>
+</div>
+
+<div class="custom-container">
+    <ul class="nav nav-tabs mb-4" id="infraTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="airport-tab" data-bs-toggle="tab" data-bs-target="#airport-content" type="button" onclick="if(typeof updateAddButton === 'function') updateAddButton('airport')"><i class="bi bi-building me-2"></i>Danh sách Sân bay</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="route-tab" data-bs-toggle="tab" data-bs-target="#route-content" type="button" onclick="if(typeof updateAddButton === 'function') updateAddButton('route')"><i class="bi bi-geo-alt me-2"></i>Mạng lưới Tuyến bay</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        
+        <div class="tab-pane fade show active" id="airport-content">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr><th>MÃ SÂN BAY</th><th>TÊN SÂN BAY</th><th>THÀNH PHỐ / QUỐC GIA</th><th class="text-end">THAO TÁC</th></tr>
+                    </thead>
+                    <tbody>
+                        @if(airports != null && airports.Any())
+                        {
+                            foreach (var sb in airports)
+                            {
+                                <tr id="sb-@sb.MaSb">
+                                    <td class="fw-bold text-primary">@sb.MaSb</td>
+                                    <td class="fw-bold">@sb.TenSb</td>
+                                    <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> @sb.ThanhPho</td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditAirport('@sb.MaSb', '@sb.TenSb', '@sb.ThanhPho')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay @sb.MaSb', 'sb-@sb.MaSb')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center py-4">Chưa có dữ liệu sân bay.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="small text-muted fst-italic">Hiển thị dữ liệu trang 1</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="route-content">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr><th>MÃ TUYẾN</th><th>HÀNH TRÌNH</th><th>KHOẢNG CÁCH</th><th>TG DỰ KIẾN</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr>
+                    </thead>
+                    <tbody>
+                        @if(routes != null && routes.Any())
+                        {
+                            foreach (var route in routes)
+                            {
+                                var from = route.MaSbdiNavigation?.MaSb ?? route.MaSbdi ?? "N/A";
+                                var to = route.MaSbdenNavigation?.MaSb ?? route.MaSbden ?? "N/A";
+                                <tr id="tb-@route.MaTuyen">
+                                    <td class="fw-bold text-primary">@route.MaTuyen</td>
+                                    <td><span class="fw-bold">@from</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="fw-bold">@to</span></td>
+                                    <td>@route.KhoangCach km</td>
+                                    <td>@route.ThoiGianBayDuKien phút</td>
+                                    <td>
+                                        <div class="form-check form-switch status-toggle">
+                                            <input class="form-check-input" type="checkbox" @(route.TrangThai == true ? "checked" : "") onchange="if(typeof toastMessage === 'function') toastMessage('Cập nhật trạng thái tuyến bay')">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditRoute('@route.MaTuyen')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Tuyến bay @route.MaTuyen', 'tb-@route.MaTuyen')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6" class="text-center py-4">Chưa có dữ liệu tuyến bay.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="small text-muted fst-italic">Hiển thị dữ liệu trang 1</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="modalAirport" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0 text-navy" id="titleAirport" style="color: #003580;"><i class="bi bi-building me-2"></i>Thêm Sân bay mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="formAirport" onsubmit="submitForm(event, 'modalAirport')">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">MÃ SÂN BAY (3 KÝ TỰ)</label>
+                        <input type="text" class="form-control form-control-lg" id="maSb" maxlength="3" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">TÊN SÂN BAY</label>
+                        <input type="text" class="form-control form-control-lg" id="tenSb" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">THÀNH PHỐ / QUỐC GIA</label>
+                        <input type="text" class="form-control form-control-lg" id="thanhPho" required />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">TRẠNG THÁI</label>
+                        <select class="form-select form-select-lg" id="trangThaiSb" required>
+                            <option value="">Chọn trạng thái</option>
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Ngưng hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-light rounded-pill px-4 me-2" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: #003580;" id="btnSubmitAirport">
+                            <i class="bi bi-check2-circle me-2"></i>Lưu sân bay
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRoute" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0 text-navy" id="titleRoute" style="color: #003580;"><i class="bi bi-geo-alt me-2"></i>Thêm Tuyến bay mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="formRoute" onsubmit="submitForm(event, 'modalRoute')">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">MÃ TUYẾN</label>
+                        <input type="text" class="form-control form-control-lg" id="maTuyen" required />
+                    </div>
+                    <div class="mb
+

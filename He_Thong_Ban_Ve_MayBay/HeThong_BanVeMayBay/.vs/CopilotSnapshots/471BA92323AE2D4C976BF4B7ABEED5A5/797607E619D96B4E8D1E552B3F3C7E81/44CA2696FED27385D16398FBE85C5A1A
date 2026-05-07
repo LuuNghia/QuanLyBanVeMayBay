@@ -1,0 +1,72 @@
+﻿using Microsoft.EntityFrameworkCore;
+using HeThong_BanVeMayBay.Models.EF;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. CẤU HÌNH DỊCH VỤ (SERVICES)
+// Thiết lập kết nối cơ sở dữ liệu qua Entity Framework Core
+builder.Services.AddDbContext<QlBanVeMayBayContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Kích hoạt mô hình MVC (Model-View-Controller)
+builder.Services.AddControllersWithViews();
+// Kích hoạt Razor Pages nếu các Area hoặc tính năng khác có dùng
+builder.Services.AddRazorPages();
+
+var app = builder.Build();
+
+// 2. CẤU HÌNH PIPELINE (MIDDLEWARE)
+if (app.Environment.IsDevelopment())
+{
+    // Hiển thị Exception chi tiết khi đang ở môi trường phát triển (Dev)
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Hiển thị trang báo lỗi chung nếu đã triển khai (Prod)
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection(); // Tự động chuyển HTTP sang HTTPS
+app.UseStaticFiles();      // Cho phép đọc/truy cập file trong wwwroot (css, js, hình ảnh)
+
+app.UseRouting();          // Kích hoạt cơ chế định tuyến
+app.UseAuthorization();    // Phân quyền cho ứng dụng
+
+// 3. ĐỊNH TUYẾN CHUYỂN HƯỚNG MẶC ĐỊNH
+// tự động chuyển hướng đường dẫn gốc (/) tải vào luôn trang User thay vì Admin như trước
+app.MapGet("/", (HttpContext ctx) =>
+{
+    ctx.Response.Redirect("/Admin/Home");
+    return Task.CompletedTask;
+});
+
+// 4. KHAI BÁO CÁC ENDPOINT (ROUTES)
+
+// Định tuyến rõ ràng cho khu vực Admin
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Admin/{controller=Home}/{action=Index}/{id?}",
+    defaults: new { area = "Admin" });
+
+// Khai báo thêm định tuyến cho khu vực cho User
+app.MapControllerRoute(
+    name: "user",
+    pattern: "User/{controller=Home}/{action=Index}/{id?}",
+    defaults: new { area = "User" });
+
+// Định tuyến tổng quát có bắt Area cho các phân hệ
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+// Tuyến đường mặc định chung
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Kết nối các Endpoint dành cho file Razor Pages
+app.MapRazorPages();
+
+app.Run();

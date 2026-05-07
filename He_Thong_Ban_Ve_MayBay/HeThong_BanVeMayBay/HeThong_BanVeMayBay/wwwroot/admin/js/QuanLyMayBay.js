@@ -1,0 +1,163 @@
+// Khởi tạo Toast (Thông báo)
+const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+let activeTab = 'hhk'; // Mặc định là tab Hãng hàng không
+let isEdit = false;
+let delType = '';
+let delId = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash) {
+        const tabTrigger = document.querySelector(`button[data-bs-toggle="tab"][data-bs-target="${hash}"]`);
+        if (tabTrigger) {
+            const tab = new bootstrap.Tab(tabTrigger);
+            tab.show();
+            updateAddBtn(hash === '#tab-mb' ? 'mb' : 'hhk');
+        }
+    }
+
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tabTrigger => {
+        tabTrigger.addEventListener('shown.bs.tab', event => {
+            const target = event.target.getAttribute('data-bs-target');
+            if (target) {
+                history.replaceState(null, document.title, `${window.location.pathname}${window.location.search}${target}`);
+            }
+        });
+    });
+});
+// Hàm hiện thông báo
+function showToast(msg, color = 'bg-success') {
+    const msgEl = document.getElementById('toastMsg');
+    if (msgEl) {
+        msgEl.innerText = msg;
+        toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-4 py-3 ${color}`;
+        bsToast.show();
+    }
+}
+
+// Cập nhật trạng thái Tab và nút Thêm khi người dùng chuyển Tab
+function updateAddBtn(tab) {
+    activeTab = tab;
+    const btn = document.getElementById('dynamicAddBtn');
+    if (btn) {
+        btn.innerHTML = tab === 'hhk'
+            ? '<i class="bi bi-plus-lg me-2"></i>Thêm Hãng bay'
+            : '<i class="bi bi-plus-lg me-2"></i>Thêm Máy bay';
+    }
+}
+
+// 1. MỞ MODAL THÊM MỚI
+function openAddModal() {
+    isEdit = false;
+    if (activeTab === 'hhk') {
+        document.getElementById('titleHhk').innerText = 'Thêm Hãng Bay';
+        document.getElementById('formHhk').reset();
+        document.getElementById('hMa').readOnly = false;
+        new bootstrap.Modal(document.getElementById('modalHhk')).show();
+    } else {
+        document.getElementById('titleMb').innerText = 'Thêm Máy Bay';
+        document.getElementById('formMb').reset();
+        document.getElementById('mMa').readOnly = false;
+        new bootstrap.Modal(document.getElementById('modalMb')).show();
+    }
+}
+
+// 2. MỞ MODAL SỬA
+function openEditHhk(ma, ten) {
+    isEdit = true;
+    document.getElementById('titleHhk').innerText = 'Sửa Hãng Bay';
+    const hMa = document.getElementById('hMa');
+    hMa.value = ma;
+    hMa.readOnly = true; // Không cho sửa khóa chính
+    document.getElementById('hTen').value = ten;
+    new bootstrap.Modal(document.getElementById('modalHhk')).show();
+}
+
+function openEditMb(ma, ten, hang, soGhe) {
+    isEdit = true;
+    document.getElementById('titleMb').innerText = 'Sửa Máy Bay';
+
+    const mMa = document.getElementById('mMa');
+    mMa.value = ma;
+    mMa.readOnly = true;
+
+    document.getElementById('mTen').value = ten;
+    document.getElementById('mGhe').value = soGhe || 180;
+
+    // Gán mã hãng vào dropdown (nó sẽ tự chọn tên hãng tương ứng)
+    const mHang = document.getElementById('mHang');
+    if (mHang) {
+        mHang.value = hang;
+    }
+
+    new bootstrap.Modal(document.getElementById('modalMb')).show();
+}
+
+// 3. XỬ LÝ LƯU (SUBMIT)
+async function submitHhk(e) {
+    e.preventDefault();
+    const ma = document.getElementById('hMa').value.trim().toUpperCase();
+    const ten = document.getElementById('hTen').value.trim();
+
+    if (!ma || !ten) return showToast('Vui lòng điền đủ thông tin!', 'bg-warning text-dark');
+
+    const url = isEdit ? '/Admin/Flight/SuaHangHangKhong' : '/Admin/Flight/ThemHangHangKhong';
+    await sendRequest(url, { MaHang: ma, TenHang: ten }, 'modalHhk');
+}
+
+async function submitMb(e) {
+    e.preventDefault();
+    const ma = document.getElementById('mMa').value.trim().toUpperCase();
+    const ten = document.getElementById('mTen').value.trim();
+    const hang = document.getElementById('mHang').value;
+    const soGhe = document.getElementById('mGhe').value;
+
+    if (!ma || !ten || !hang || !soGhe) return showToast('Vui lòng điền đủ thông tin!', 'bg-warning text-dark');
+
+    const url = isEdit ? '/Admin/Flight/SuaMayBay' : '/Admin/Flight/ThemMayBay';
+    await sendRequest(url, { MaLoaiMb: ma, TenLoaiMb: ten, MaHang: hang, SoLuongGhe: parseInt(soGhe) }, 'modalMb');
+}
+
+// Hàm gửi dữ liệu chung
+async function sendRequest(url, payload, modalId) {
+    try {
+        const req = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (req.ok) {
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            showToast('Lưu thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await req.text();
+            showToast(err, 'bg-danger');
+        }
+    } catch (err) { showToast('Lỗi server!', 'bg-danger'); }
+}
+
+// 4. XỬ LÝ XÓA
+function openDeleteModal(type, id) {
+    delType = type;
+    delId = id;
+    document.getElementById('delId').innerText = id;
+    new bootstrap.Modal(document.getElementById('modalDelete')).show();
+}
+
+async function executeDelete() {
+    const url = delType === 'hhk' ? `/Admin/Flight/XoaHangHangKhong?id=${delId}` : `/Admin/Flight/XoaMayBay?id=${delId}`;
+    try {
+        const res = await fetch(url, { method: 'DELETE' });
+        bootstrap.Modal.getInstance(document.getElementById('modalDelete')).hide();
+        if (res.ok) {
+            showToast('Đã xóa thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await res.text();
+            showToast(err || 'Không thể xóa!', 'bg-danger');
+        }
+    } catch (e) { showToast('Lỗi server!', 'bg-danger'); }
+}

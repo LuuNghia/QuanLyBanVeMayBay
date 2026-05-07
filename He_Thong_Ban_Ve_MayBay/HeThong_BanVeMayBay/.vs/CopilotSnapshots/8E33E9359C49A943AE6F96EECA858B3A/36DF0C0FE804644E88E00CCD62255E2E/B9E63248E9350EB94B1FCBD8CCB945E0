@@ -1,0 +1,140 @@
+﻿/* user_common.js */
+
+$(document).ready(function() {
+    // Kh?i t?o các tooltips chung
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Thêm active cho menu hi?n t?i
+    var currentUrl = window.location.pathname.toLowerCase();
+    $('.navbar-nav .nav-link').each(function() {
+        if ($(this).attr('href').toLowerCase() === currentUrl) {
+            $(this).addClass('active fw-bold').css('color', '#feba02', 'important');
+        }
+    });
+});
+
+function toastDemo(message, bgClass = 'bg-success') {
+    let t = document.createElement('div');
+    t.className = `toast align-items-center text-white border-0 ${bgClass} position-fixed top-0 end-0 m-3 z-index-toast`;
+    t.style.zIndex = '9999';
+    t.setAttribute('role', 'alert');
+    t.setAttribute('aria-live', 'assertive');
+    t.setAttribute('aria-atomic', 'true');
+    t.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body fw-bold">
+            ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>`;
+    document.body.appendChild(t); const seats = document.querySelectorAll('.seat:not(.booked)');
+
+    const badgeSeatId = document.getElementById('badgeSeatId');
+    const condCarryon = document.getElementById('cond-carryon');
+    const condChecked = document.getElementById('cond-checked');
+    const condAmenities = document.getElementById('cond-amenities');
+
+    const billSeatClass = document.getElementById('billSeatClass');
+    const billSeatPrice = document.getElementById('billSeatPrice');
+    const billTotal = document.getElementById('billTotal');
+    const btnConfirm = document.getElementById('btnConfirm');
+
+    const basePrice = 1950000; // Giá vé + Thu? (C? ??nh)
+    let currentSeat = null;
+
+    seats.forEach(seat => {
+        seat.addEventListener('click', function () {
+            // B? ch?n n?u click l?i
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                resetPanel();
+                currentSeat = null;
+                return;
+            }
+
+            // Xóa ch?n gh? c?
+            seats.forEach(s => s.classList.remove('selected'));
+
+            // Ch?n gh? m?i
+            this.classList.add('selected');
+            currentSeat = this;
+
+            // L?y thông tin
+            const seatId = this.getAttribute('data-seat');
+            const type = this.getAttribute('data-type');
+            const price = parseInt(this.getAttribute('data-price'));
+
+            // C?p nh?t UI
+            updatePanel(seatId, type, price);
+        });
+    });
+
+    function updatePanel(seatId, type, price) {
+        badgeSeatId.innerText = "Gh? ?ã ch?n: " + seatId;
+
+        // C?p nh?t ?i?u ki?n
+        if (type === 'business') {
+            billSeatClass.innerHTML = 'Ph? thu gh? <strong style="color:var(--text-business)">Th??ng gia</strong>';
+            condCarryon.innerHTML = '<span class="text-danger">15kg</span>';
+            condChecked.innerHTML = '<span class="text-danger">40kg</span>';
+            condAmenities.innerHTML = '<span class="text-warning">Su?t ?n 5 sao, VIP</span>';
+        }
+        else if (type === 'premium') {
+            billSeatClass.innerHTML = 'Ph? thu gh? <strong style="color:var(--text-premium)">??c bi?t</strong>';
+            condCarryon.innerText = "10kg";
+            condChecked.innerText = "32kg";
+            condAmenities.innerHTML = '<span class="text-success">Su?t ?n nóng</span>';
+        }
+        else {
+            billSeatClass.innerText = 'Ph? thu gh? (Ph? thông)';
+            condCarryon.innerText = "7kg";
+            condChecked.innerText = "23kg";
+            condAmenities.innerText = 'C? b?n';
+        }
+
+        // C?p nh?t Giá bill
+        if (price === 0) {
+            billSeatPrice.innerText = "Mi?n phí";
+        } else {
+            billSeatPrice.innerText = "+" + price.toLocaleString('vi-VN') + " ?";
+        }
+
+        // C?p nh?t T?ng ti?n
+        const total = basePrice + price;
+        billTotal.innerText = total.toLocaleString('vi-VN') + " ?";
+
+        btnConfirm.disabled = false;
+    }
+
+    function resetPanel() {
+        badgeSeatId.innerText = "Ch?a ch?n gh?";
+        condCarryon.innerText = "--";
+        condChecked.innerText = "--";
+        condAmenities.innerText = "--";
+
+        billSeatClass.innerText = "Ph? thu gh? (Ch?a ch?n)";
+        billSeatPrice.innerText = "0 ?";
+        billTotal.innerText = basePrice.toLocaleString('vi-VN') + " ?";
+
+        btnConfirm.disabled = true;
+    }
+
+    function submitSelection() {
+        if (currentSeat) {
+            const seatId = currentSeat.getAttribute('data-seat');
+            toastDemo(`Bạn đã chọn Ghế ${seatId}. Đang chuyển trang...`);
+            setTimeout(() => {
+                window.location.href = "/User/Booking/ThongTinKHDatVe";
+            }, 1500);
+        }
+    }
+    let bsToast = new bootstrap.Toast(t, { delay: 3000 });
+    bsToast.show();
+    
+    t.addEventListener('hidden.bs.toast', () => {
+        t.remove();
+    });
+}

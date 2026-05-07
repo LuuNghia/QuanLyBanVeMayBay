@@ -1,0 +1,45 @@
+﻿using Microsoft.EntityFrameworkCore;
+using HeThong_BanVeMayBay.Models.EF;
+
+var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddDbContext<QL_BanVeMayBayContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllersWithViews();
+// Enable Razor Pages in case some areas use Pages
+builder.Services.AddRazorPages();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+
+// Explicit admin area route for convenience when testing admin area
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Admin/{controller=Home}/{action=Index}/{id?}",
+    defaults: new { area = "Admin" });
+
+// Generic area route
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Map Razor Pages if present
+app.MapRazorPages();
+
+app.Run();

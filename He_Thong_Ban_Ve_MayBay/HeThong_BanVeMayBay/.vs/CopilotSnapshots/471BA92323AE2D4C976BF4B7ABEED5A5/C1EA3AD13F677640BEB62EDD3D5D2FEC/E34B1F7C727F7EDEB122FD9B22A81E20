@@ -1,0 +1,194 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class FlightController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public FlightController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> QuanLyChuyenBay()
+        {
+            var flights = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .OrderByDescending(c => c.NgayGioBay)
+                .ToListAsync();
+
+            return View(flights);
+        }
+
+        public async Task<IActionResult> QuanLyMayBay()
+        {
+            var planes = await _context.LoaiMayBays
+                .OrderBy(m => m.MaLoaiMb)
+                .ToListAsync();
+
+            return View(planes);
+        }
+
+        public IActionResult SoDoGhe()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> SanBayVaTuyenBay()
+        {
+            var airports = await _context.SanBays
+                .OrderBy(sb => sb.MaSb)
+                .ToListAsync();
+
+            var routes = await _context.TuyenBays
+                .Include(t => t.MaSbdiNavigation)
+                .Include(t => t.MaSbdenNavigation)
+                .OrderBy(t => t.MaTuyen)
+                .ToListAsync();
+
+            ViewBag.Airports = airports;
+            ViewBag.Routes = routes;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemSanBay([FromBody] SanBay sanBay)
+        {
+            if (sanBay == null || string.IsNullOrWhiteSpace(sanBay.MaSb)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var exists = await _context.SanBays.AnyAsync(s => s.MaSb == sanBay.MaSb);
+            if (exists) return BadRequest("Sân bay đã tồn tại trong hệ thống.");
+
+            sanBay.DaXoa = false;
+            _context.SanBays.Add(sanBay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm sân bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaSanBay([FromBody] SanBay sanBay)
+        {
+            if (sanBay == null || string.IsNullOrWhiteSpace(sanBay.MaSb)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var existingSb = await _context.SanBays.FirstOrDefaultAsync(s => s.MaSb == sanBay.MaSb);
+            if (existingSb == null) return NotFound("Sân bay không tồn tại.");
+
+            existingSb.TenSb = sanBay.TenSb;
+            existingSb.ThanhPho = sanBay.ThanhPho;
+
+            _context.SanBays.Update(existingSb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật sân bay thành công" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaSanBay(string id)
+        {
+            var existingSb = await _context.SanBays.FirstOrDefaultAsync(s => s.MaSb == id);
+            if (existingSb == null) return NotFound("Sân bay không tồn tại.");
+
+            var isUsedInRoute = await _context.TuyenBays.AnyAsync(t => t.MaSbdi == id || t.MaSbden == id);
+            if (isUsedInRoute) return BadRequest("Không thể xóa sân bay đang có tuyến bay hoạt động.");
+
+            _context.SanBays.Remove(existingSb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa sân bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemTuyenBay([FromBody] TuyenBay tuyenBay)
+        {
+            if (tuyenBay == null || string.IsNullOrWhiteSpace(tuyenBay.MaSbdi) || string.IsNullOrWhiteSpace(tuyenBay.MaSbden)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            if (tuyenBay.MaSbdi == tuyenBay.MaSbden) return BadRequest("Điểm đi và điểm đến không được trùng nhau.");
+
+            var maTuyen = $"{tuyenBay.MaSbdi}-{tuyenBay.MaSbden}";
+            var exists = await _context.TuyenBays.AnyAsync(t => t.MaTuyen == maTuyen);
+            
+            if (exists) return BadRequest("Tuyến bay này đã tồn tại.");
+
+            tuyenBay.MaTuyen = maTuyen;
+            tuyenBay.TrangThai = true;
+            tuyenBay.DaXoa = false;
+            
+            _context.TuyenBays.Add(tuyenBay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm tuyến bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaTuyenBay([FromBody] TuyenBay tuyenBay)
+        {
+            if (tuyenBay == null || string.IsNullOrWhiteSpace(tuyenBay.MaTuyen)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == tuyenBay.MaTuyen);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            existingTb.KhoangCach = tuyenBay.KhoangCach;
+            
+            _context.TuyenBays.Update(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật tuyến bay thành công" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaTuyenBay(string id)
+        {
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == id);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            var isUsedInFlight = await _context.ChuyenBays.AnyAsync(c => c.MaTuyen == id);
+            if (isUsedInFlight) return BadRequest("Không thể xóa tuyến bay đang có chuyến bay lên lịch.");
+
+            _context.TuyenBays.Remove(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa tuyến bay thành công" });
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CapNhatTrangThaiTuyenBay(string id, bool status)
+        {
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == id);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            existingTb.TrangThai = status;
+            
+            _context.TuyenBays.Update(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật trạng thái thành công" });
+        }
+
+        public async Task<IActionResult> DanhMucHangGhe()
+        {
+            var danhMucHangGhe = await _context.HangGhes
+                .Include(hg => hg.MaTienIches) 
+                .OrderByDescending(hg => hg.HeSoGia) 
+                .ToListAsync();
+
+            return View(danhMucHangGhe);
+        }
+        
+        public IActionResult CauHinhHeThong()
+        {
+            return View();
+        }
+    }
+}

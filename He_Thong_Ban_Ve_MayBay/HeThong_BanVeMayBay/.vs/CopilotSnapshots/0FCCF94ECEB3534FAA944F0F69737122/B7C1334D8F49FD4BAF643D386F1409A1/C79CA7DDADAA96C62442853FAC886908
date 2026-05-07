@@ -1,0 +1,105 @@
+﻿const badgeSeatId = document.getElementById('badgeSeatId');
+const condCarryon = document.getElementById('cond-carryon');
+const condChecked = document.getElementById('cond-checked');
+const condAmenities = document.getElementById('cond-amenities');
+
+const billSeatClass = document.getElementById('billSeatClass');
+const billSeatPrice = document.getElementById('billSeatPrice');
+const billTotal = document.getElementById('billTotal');
+const btnConfirm = document.getElementById('btnConfirm');
+
+const basePriceInput = document.getElementById('hiddenBasePrice');
+const basePrice = basePriceInput ? parseInt(basePriceInput.value) || 0 : 0; 
+
+let selectedSeats = [];
+
+const seats = document.querySelectorAll('.seat.available'); // Only click available seats
+
+seats.forEach(seat => {
+    // Ap dung mau theo data-color mac dinh khi hien thi (vi bi ghi de boi CSS)
+    const color = seat.getAttribute('data-color');
+    if(color && !seat.classList.contains('selected')){
+        seat.style.color = color;
+        seat.style.borderColor = color;
+    }
+
+    seat.addEventListener('click', function () {
+        const seatId = this.getAttribute('data-seat-id');
+        const seatNo = this.getAttribute('data-seat-no');
+        const className = this.getAttribute('data-class-name');
+        const price = parseInt(this.getAttribute('data-price') || 0);
+
+        if (this.classList.contains('selected')) {
+            this.classList.remove('selected');
+            this.style.backgroundColor = 'white';
+            this.querySelector('span').style.color = color;
+            selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+        } else {
+            this.classList.add('selected');
+            this.style.backgroundColor = color;
+            this.querySelector('span').style.color = 'white';
+            selectedSeats.push({ 
+                id: seatId, 
+                no: seatNo, 
+                type: className, 
+                price: price,
+                carryon: this.getAttribute('data-carryon'),
+                checked: this.getAttribute('data-checked')
+            });
+        }
+
+        updatePanel();
+    });
+});
+
+function updatePanel() {
+    if (selectedSeats.length === 0) {
+        resetPanel();
+        return;
+    }
+
+    const seatNos = selectedSeats.map(s => s.no).join(', ');
+    badgeSeatId.innerText = "Ghế chờ lấy: " + seatNos;
+    
+    // Dung thong tin cua ghe cuoi cung duoc chon de cap nhat Panel dk
+    const lastSelected = selectedSeats[selectedSeats.length - 1];
+    
+    let typeSummary = Array.from(new Set(selectedSeats.map(s => s.type))).join(' & ');
+    billSeatClass.innerHTML = `Phụ thu ghế <strong>${typeSummary}</strong>`;
+
+    if(lastSelected.carryon) condCarryon.innerHTML = `<span class="text-primary">${lastSelected.carryon}</span>`;
+    if(lastSelected.checked) condChecked.innerHTML = `<span class="text-primary">${lastSelected.checked}</span>`;
+
+    const totalSeatPrice = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+    if (totalSeatPrice === 0) {
+        billSeatPrice.innerText = "Miễn phí";
+    } else {
+        billSeatPrice.innerText = "+" + totalSeatPrice.toLocaleString('vi-VN') + " đ";
+    }
+
+    const total = (basePrice * selectedSeats.length) + totalSeatPrice;
+    billTotal.innerText = total.toLocaleString('vi-VN') + " đ";
+
+    btnConfirm.disabled = false;
+}
+
+function resetPanel() {
+    badgeSeatId.innerText = "Chưa chọn ghế";
+    condCarryon.innerText = "--";
+    condChecked.innerText = "--";
+
+    billSeatClass.innerText = "Phụ thu ghế (Chưa chọn)";
+    billSeatPrice.innerText = "0 đ";
+    billTotal.innerText = basePrice.toLocaleString('vi-VN') + " đ";
+
+    btnConfirm.disabled = true;
+}
+
+function submitSelection() {
+    if (selectedSeats.length > 0) {
+        const seatIds = selectedSeats.map(s => s.id).join(',');
+        const seatNos = selectedSeats.map(s => s.no).join(',');
+        alert(`Bạn đã chọn Ghế: ${seatNos}. Tổng tiền: ${billTotal.innerText}\nHệ thống sẽ chuyển sang bước điền thông tin hành khách!`);
+        window.location.href = `/User/Booking/ThongTinKHDatVe?seats=${seatNos}&ids=${seatIds}`;
+    }
+}

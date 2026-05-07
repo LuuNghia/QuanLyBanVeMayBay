@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Hạ tầng bay";
+    var airports = ViewBag.Airports as IEnumerable<HeThong_BanVeMayBay.Models.Entities.SanBay>;
+    var routes = ViewBag.Routes as IEnumerable<HeThong_BanVeMayBay.Models.Entities.TuyenBay>;
+    
+    var activeRoutesCount = routes?.Count(r => r.TrangThai == true) ?? 0;
+    var maintenanceRoutesCount = routes?.Count(r => r.TrangThai == false) ?? 0;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/SanBayVaTuyenBay.css" asp-append-version="true" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1" style="color: #003580;">Quản lý Hạ tầng bay</h3>
+        <p class="text-muted small">Cấu hình danh sách Sân bay và mạng lưới Tuyến bay khai thác.</p>
+    </div>
+    <button id="dynamicAddBtn" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: #003580;" onclick="openAddModal()">
+        <i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới
+    </button>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #003580;">
+            <div class="text-muted small fw-bold text-uppercase">Sân bay đối tác</div>
+            <h3 class="fw-bold mt-1">@(airports?.Count() ?? 0) <span class="fs-6 text-muted fw-normal">sân bay</span></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #0ea5e9;">
+            <div class="text-muted small fw-bold text-uppercase">Tuyến bay đang khai thác</div>
+            <h3 class="fw-bold mt-1">@activeRoutesCount <span class="fs-6 text-muted fw-normal">tuyến</span></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-stat" style="border-left: 4px solid #f59e0b;">
+            <div class="text-muted small fw-bold text-uppercase">Tuyến bay bảo trì</div>
+            <h3 class="fw-bold mt-1 text-warning">@maintenanceRoutesCount <span class="fs-6 text-muted fw-normal">tuyến</span></h3>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">Danh Sách Sân Bay</h4>
+            <button class="btn btn-primary" onclick="openAddModal()">
+                <i class="bi bi-plus-lg me-2"></i>Thêm Sân Bay
+            </button>
+        </div>
+        <div class="custom-container mb-5">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>MÃ SÂN BAY</th>
+                            <th>TÊN SÂN BAY</th>
+                            <th>THÀNH PHỐ</th>
+                            <th class="text-center">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(airports != null && airports.Any())
+                        {
+                            foreach (var sb in airports)
+                            {
+                                <tr id="sb-@sb.MaSb">
+                                    <td class="fw-bold">@sb.MaSb</td>
+                                    <td class="fw-bold">@sb.TenSb</td>
+                                    <td>@sb.ThanhPho</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" onclick="openEditAirport('@sb.MaSb', '@sb.TenSb', '@sb.ThanhPho')"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Xóa" onclick="confirmDelete('Sân bay @sb.MaSb', 'sb-@sb.MaSb')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center py-4">Chưa có dữ liệu sân bay.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">Danh Sách Tuyến Bay</h4>
+            <button class="btn btn-primary" onclick="openRouteModal()">
+                <i class="bi bi-plus-lg me-2"></i>Thêm Tuyến Bay
+            </button>
+        </div>
+        <div class="custom-container">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>MÃ TUYẾN</th>
+                            <th>SÂN BAY ĐI</th>
+                            <th>SÂN BAY ĐẾN</th>
+                            <th>KHOẢNG CÁCH (KM)</th>
+                            <th>T.GIAN DỰ KIẾN (Phút)</th>
+                            <th class="text-center">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(routes != null && routes.Any())
+                        {
+                            foreach (var route in routes)
+                            {
+                                var from = route.MaSbdiNavigation?.TenSb ?? route.MaSbdi ?? "N/A";
+                                var to = route.MaSbdenNavigation?.TenSb ?? route.MaSbden ?? "N/A";
+                                <tr id="tb-@route.MaTuyen">
+                                    <td class="fw-bold">@route.MaTuyen</td>
+                                    <td class="fw-bold text-primary">@from</td>
+                                    <td class="fw-bold text-success">@to</td>
+                                    <td>@route.KhoangCach</td>
+                                    <td>@route.ThoiGianBayDuKien</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" onclick="openEditRoute('@route.MaTuyen')"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Xóa" onclick="confirmDelete('Tuyến bay @route.MaTuyen', 'tb-@route.MaTuyen')"><i class="bi bi-trash"></i></button>
+

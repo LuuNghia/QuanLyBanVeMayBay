@@ -1,0 +1,31 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class FlightController : Controller
+    {
+        public IActionResult QuanLyChuyenBay()
+        {
+            return View("QuanLyChuyenBay");
+        }
+        public IActionResult QuanLyMayBay()
+        {
+            return View("QuanLyMayBay");
+        }
+        public IActionResult SoDoGhe()
+        {
+            return View("SoDoGhe");
+        }
+
+        public IActionResult SanBayVaTuyenBay()
+        {
+            return View("SanBayVaTuyenBay");
+        }
+
+        public IActionResult CauHinhHeThong()
+        {
+            return View("CauHinhHeThong");
+        }
+    }
+}

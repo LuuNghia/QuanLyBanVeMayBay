@@ -1,0 +1,409 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class AccountController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public AccountController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> NhanVienVaKhachHang()
+        {
+            var nhanViens = await _context.NhanViens
+                .Include(nv => nv.MaTkNavigation)
+                .Where(nv => (nv.DaXoa == false || nv.DaXoa == null)
+                             && (nv.MaTkNavigation == null || nv.MaTkNavigation.DaXoa == false || nv.MaTkNavigation.DaXoa == null))
+                .OrderBy(nv => nv.MaNv)
+                .ToListAsync();
+
+            var khachHangs = await _context.KhachHangs
+                .Include(kh => kh.MaTkNavigation)
+                .Where(kh => (kh.DaXoa == false || kh.DaXoa == null)
+                             && (kh.MaTkNavigation == null || kh.MaTkNavigation.DaXoa == false || kh.MaTkNavigation.DaXoa == null))
+                .OrderByDescending(kh => kh.DiemTichLuy)
+                .ToListAsync();
+
+            var totalAccounts = await _context.TaiKhoans.CountAsync();
+            var activeStaffs = nhanViens.Count(nv => nv.MaTkNavigation?.TrangThai == true);
+            var loaiTaiKhoanList = await _context.TaiKhoans
+                .Where(tk => !string.IsNullOrWhiteSpace(tk.LoaiTaiKhoan))
+                .Select(tk => tk.LoaiTaiKhoan)
+                .Distinct()
+                .ToListAsync();
+
+            var defaultLoaiTaiKhoan = new[] { "Admin", "Nhân viên", "Khách hàng" };
+            foreach (var type in defaultLoaiTaiKhoan)
+            {
+                if (!loaiTaiKhoanList.Any(t => t.Equals(type, System.StringComparison.OrdinalIgnoreCase)))
+                {
+                    loaiTaiKhoanList.Add(type);
+                }
+            }
+
+            ViewBag.NhanViens = nhanViens;
+            ViewBag.KhachHangs = khachHangs;
+            ViewBag.TotalAccounts = totalAccounts;
+            ViewBag.ActiveStaffs = activeStaffs;
+            ViewBag.LoaiTaiKhoanList = loaiTaiKhoanList;
+
+            return View("NhanVienVaKhachHang");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LayThongTinNhanVien(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var nhanVien = await _context.NhanViens
+                .Include(nv => nv.MaTkNavigation)
+                .FirstOrDefaultAsync(nv => nv.MaNv == id && (nv.DaXoa == false || nv.DaXoa == null));
+
+            if (nhanVien == null) return NotFound("Không tìm thấy nhân viên.");
+
+            return Ok(new
+            {
+                maNv = nhanVien.MaNv,
+                maTk = nhanVien.MaTk,
+                hoTen = nhanVien.HoTen,
+                soDienThoai = nhanVien.SoDienThoai,
+                email = nhanVien.Email,
+                cccd = nhanVien.Cccd,
+                loaiTaiKhoan = nhanVien.MaTkNavigation?.LoaiTaiKhoan,
+                gioiTinh = nhanVien.GioiTinh,
+                ngaySinh = nhanVien.NgaySinh?.ToString("yyyy-MM-dd"),
+                diaChi = nhanVien.DiaChi,
+                chucVu = nhanVien.ChucVu
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LayThongTinKhachHang(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var khachHang = await _context.KhachHangs
+                .Include(kh => kh.MaTkNavigation)
+                .FirstOrDefaultAsync(kh => kh.MaKh == id && (kh.DaXoa == false || kh.DaXoa == null));
+
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+            return Ok(new
+            {
+                maKh = khachHang.MaKh,
+                maTk = khachHang.MaTk,
+                hoTen = khachHang.HoTen,
+                soDienThoai = khachHang.SoDienThoai,
+                email = khachHang.Email,
+                cccd = khachHang.Cccd,
+                loaiTaiKhoan = khachHang.MaTkNavigation?.LoaiTaiKhoan,
+                gioiTinh = khachHang.GioiTinh,
+                ngaySinh = khachHang.NgaySinh?.ToString("yyyy-MM-dd"),
+                diaChi = khachHang.DiaChi
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CapNhatNhanVien([FromBody] CapNhatNhanVienRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.MaNv)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var nhanVien = await _context.NhanViens.FirstOrDefaultAsync(nv => nv.MaNv == req.MaNv);
+            if (nhanVien == null) return NotFound("Không tìm thấy nhân viên.");
+
+            if (string.IsNullOrWhiteSpace(req.HoTen) || string.IsNullOrWhiteSpace(req.SoDienThoai)
+                || string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Cccd))
+            {
+                return BadRequest("Vui lòng nhập đầy đủ thông tin.");
+            }
+
+            nhanVien.HoTen = req.HoTen;
+            nhanVien.GioiTinh = req.GioiTinh;
+            nhanVien.NgaySinh = req.NgaySinh;
+            nhanVien.SoDienThoai = req.SoDienThoai;
+            nhanVien.Email = req.Email;
+            nhanVien.Cccd = req.Cccd;
+            nhanVien.DiaChi = req.DiaChi;
+            nhanVien.ChucVu = req.ChucVu;
+
+            _context.NhanViens.Update(nhanVien);
+
+            if (req.MaTk.HasValue)
+            {
+                var taiKhoan = await _context.TaiKhoans.FirstOrDefaultAsync(tk => tk.MaTk == req.MaTk.Value);
+                if (taiKhoan != null)
+                {
+                    taiKhoan.LoaiTaiKhoan = req.LoaiTaiKhoan;
+                    _context.TaiKhoans.Update(taiKhoan);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật nhân viên thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CapNhatKhachHang([FromBody] CapNhatKhachHangRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.MaKh)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.MaKh == req.MaKh);
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+            if (string.IsNullOrWhiteSpace(req.HoTen) || string.IsNullOrWhiteSpace(req.SoDienThoai)
+                || string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Cccd))
+            {
+                return BadRequest("Vui lòng nhập đầy đủ thông tin.");
+            }
+
+            khachHang.HoTen = req.HoTen;
+            khachHang.GioiTinh = req.GioiTinh;
+            khachHang.NgaySinh = req.NgaySinh;
+            khachHang.SoDienThoai = req.SoDienThoai;
+            khachHang.Email = req.Email;
+            khachHang.Cccd = req.Cccd;
+            khachHang.DiaChi = req.DiaChi;
+
+            _context.KhachHangs.Update(khachHang);
+
+            if (req.MaTk.HasValue)
+            {
+                var taiKhoan = await _context.TaiKhoans.FirstOrDefaultAsync(tk => tk.MaTk == req.MaTk.Value);
+                if (taiKhoan != null)
+                {
+                    taiKhoan.LoaiTaiKhoan = req.LoaiTaiKhoan;
+                    _context.TaiKhoans.Update(taiKhoan);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật khách hàng thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemNhanVien([FromBody] TaoTaiKhoanRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.HoTen) || string.IsNullOrWhiteSpace(req.Email))
+                return BadRequest("Vui lòng nhập đầy đủ thông tin.");
+
+            if (string.IsNullOrWhiteSpace(req.ChucVu))
+                return BadRequest("Vui lòng chọn chức vụ.");
+
+            if (await _context.TaiKhoans.AnyAsync(tk => tk.TenDangNhap == req.Email))
+                return BadRequest("Email đã tồn tại trong hệ thống.");
+
+            var taiKhoan = new Models.Entities.TaiKhoan
+            {
+                TenDangNhap = req.Email,
+                MatKhau = "123456",
+                LoaiTaiKhoan = req.LoaiTaiKhoan,
+                TrangThai = true,
+                DaXoa = false
+            };
+
+            var maNv = await GenerateNhanVienId();
+            var nhanVien = new Models.Entities.NhanVien
+            {
+                MaNv = maNv,
+                HoTen = req.HoTen,
+                GioiTinh = req.GioiTinh,
+                NgaySinh = req.NgaySinh,
+                SoDienThoai = req.SoDienThoai,
+                Email = req.Email,
+                Cccd = req.Cccd,
+                DiaChi = req.DiaChi,
+                ChucVu = req.ChucVu,
+                NgayVaoLam = System.DateOnly.FromDateTime(System.DateTime.Now),
+                DaXoa = false,
+                MaTkNavigation = taiKhoan
+            };
+
+            _context.NhanViens.Add(nhanVien);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm nhân viên thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemKhachHang([FromBody] TaoTaiKhoanRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.HoTen) || string.IsNullOrWhiteSpace(req.Email))
+                return BadRequest("Vui lòng nhập đầy đủ thông tin.");
+
+            if (await _context.TaiKhoans.AnyAsync(tk => tk.TenDangNhap == req.Email))
+                return BadRequest("Email đã tồn tại trong hệ thống.");
+
+            var taiKhoan = new Models.Entities.TaiKhoan
+            {
+                TenDangNhap = req.Email,
+                MatKhau = "123456",
+                LoaiTaiKhoan = req.LoaiTaiKhoan,
+                TrangThai = true,
+                DaXoa = false
+            };
+
+            var maKh = await GenerateKhachHangId();
+            var khachHang = new Models.Entities.KhachHang
+            {
+                MaKh = maKh,
+                HoTen = req.HoTen,
+                GioiTinh = req.GioiTinh,
+                NgaySinh = req.NgaySinh,
+                SoDienThoai = req.SoDienThoai,
+                Email = req.Email,
+                Cccd = req.Cccd,
+                DiaChi = req.DiaChi,
+                LoaiThanhVien = "Thường",
+                DiemTichLuy = 0,
+                DaXoa = false,
+                MaTkNavigation = taiKhoan
+            };
+
+            _context.KhachHangs.Add(khachHang);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm khách hàng thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CapNhatTrangThaiTaiKhoan(int maTk, bool status)
+        {
+            var taiKhoan = await _context.TaiKhoans.FirstOrDefaultAsync(tk => tk.MaTk == maTk);
+            if (taiKhoan == null) return NotFound("Tài khoản không tồn tại.");
+
+            taiKhoan.TrangThai = status;
+            _context.TaiKhoans.Update(taiKhoan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật trạng thái tài khoản thành công." });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaTaiKhoan(int maTk)
+        {
+            var taiKhoan = await _context.TaiKhoans
+                .Include(tk => tk.KhachHang)
+                .Include(tk => tk.NhanVien)
+                .FirstOrDefaultAsync(tk => tk.MaTk == maTk);
+
+            if (taiKhoan == null) return NotFound("Tài khoản không tồn tại.");
+
+            var hasDatVe = await _context.DatVes.AnyAsync(dv => dv.MaTk == maTk);
+
+            if (hasDatVe)
+            {
+                taiKhoan.DaXoa = true;
+                taiKhoan.TrangThai = false;
+
+                if (taiKhoan.KhachHang != null) taiKhoan.KhachHang.DaXoa = true;
+                if (taiKhoan.NhanVien != null) taiKhoan.NhanVien.DaXoa = true;
+
+                _context.TaiKhoans.Update(taiKhoan);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Đã xóa mềm tài khoản do có dữ liệu liên kết." });
+            }
+
+            if (taiKhoan.KhachHang != null)
+            {
+                _context.KhachHangs.Remove(taiKhoan.KhachHang);
+            }
+
+            if (taiKhoan.NhanVien != null)
+            {
+                _context.NhanViens.Remove(taiKhoan.NhanVien);
+            }
+
+            _context.TaiKhoans.Remove(taiKhoan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa tài khoản thành công." });
+        }
+
+        public class CapNhatNhanVienRequest
+        {
+            public string MaNv { get; set; }
+            public int? MaTk { get; set; }
+            public string HoTen { get; set; }
+            public string GioiTinh { get; set; }
+            public DateOnly? NgaySinh { get; set; }
+            public string SoDienThoai { get; set; }
+            public string Email { get; set; }
+            public string Cccd { get; set; }
+            public string DiaChi { get; set; }
+            public string ChucVu { get; set; }
+            public string LoaiTaiKhoan { get; set; }
+        }
+
+        public class CapNhatKhachHangRequest
+        {
+            public string MaKh { get; set; }
+            public int? MaTk { get; set; }
+            public string HoTen { get; set; }
+            public string GioiTinh { get; set; }
+            public DateOnly? NgaySinh { get; set; }
+            public string SoDienThoai { get; set; }
+            public string Email { get; set; }
+            public string Cccd { get; set; }
+            public string DiaChi { get; set; }
+            public string LoaiTaiKhoan { get; set; }
+        }
+
+        public class TaoTaiKhoanRequest
+        {
+            public string HoTen { get; set; }
+            public string GioiTinh { get; set; }
+            public DateOnly? NgaySinh { get; set; }
+            public string SoDienThoai { get; set; }
+            public string Email { get; set; }
+            public string Cccd { get; set; }
+            public string DiaChi { get; set; }
+            public string ChucVu { get; set; }
+            public string LoaiTaiKhoan { get; set; }
+        }
+
+        private async Task<string> GenerateNhanVienId()
+        {
+            var lastId = await _context.NhanViens
+                .OrderByDescending(nv => nv.MaNv)
+                .Select(nv => nv.MaNv)
+                .FirstOrDefaultAsync();
+
+            int nextNumber = 1;
+            if (!string.IsNullOrWhiteSpace(lastId) && lastId.Length > 2
+                && int.TryParse(lastId.Substring(2), out var parsed))
+            {
+                nextNumber = parsed + 1;
+            }
+
+            return $"NV{nextNumber:D3}";
+        }
+
+        private async Task<string> GenerateKhachHangId()
+        {
+            var lastId = await _context.KhachHangs
+                .OrderByDescending(kh => kh.MaKh)
+                .Select(kh => kh.MaKh)
+                .FirstOrDefaultAsync();
+
+            int nextNumber = 1;
+            if (!string.IsNullOrWhiteSpace(lastId) && lastId.Length > 2
+                && int.TryParse(lastId.Substring(2), out var parsed))
+            {
+                nextNumber = parsed + 1;
+            }
+
+            return $"KH{nextNumber:D3}";
+        }
+    }
+}

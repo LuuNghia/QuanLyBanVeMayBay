@@ -1,0 +1,183 @@
+@using HeThong_BanVeMayBay.Models.EF
+@using HeThong_BanVeMayBay.Models.Entities
+@{
+    ViewData["Title"] = "Nhập thông tin hành khách";
+    var cb = ViewBag.ChuyenBay as ChuyenBay;
+    var selectedSeats = ViewBag.SelectedSeats as List<Ghe>;
+    var seatNos = ViewBag.SeatNos as string;
+    
+    decimal basePrice = cb?.GiaVeCoBan ?? 0;
+    decimal totalBill = 0;
+    
+    // Ràng buộc 18 tuổi
+    string maxDate = DateTime.Now.AddYears(-18).ToString("yyyy-MM-dd");
+
+    // Tính tổng tiền trước khi render form
+    if (selectedSeats != null) {
+        foreach(var s in selectedSeats) {
+            totalBill += (decimal)Math.Round((double)basePrice * (s.MaHangGheNavigation?.HeSoGia ?? 1.0)) + (s.PhuThu ?? 0);
+        }
+    }
+    
+    var user = ViewBag.CurrentUser as KhachHang;
+}
+
+<link rel="stylesheet" type="text/css" href="~/user/css/ThongTinKHDatVe.css" />
+<!-- Flatpickr for Vietnamese Date Format -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-input {
+        background-color: white !important;
+    }
+    /* Làm nổi bật ô nhập sai */
+    .is-invalid-custom {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+    }
+</style>
+
+<div class="step-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="javascript:history.back()" class="back-link"><i class="bi bi-chevron-left"></i> Quay lại chọn ghế</a>
+        <div class="step-text text-uppercase">BƯỚC 3/4: ĐIỀN THÔNG TIN</div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <form class="row g-4" id="bookingForm" action="/User/Booking/TiepTucThanhToan" method="POST" novalidate>
+        <input type="hidden" name="MaCb" value="@(cb?.MaCb)" />
+        <input type="hidden" name="SeatIds" value="@(selectedSeats != null ? string.Join(",", selectedSeats.Select(s => s.MaGhe)) : "")" />
+        <input type="hidden" name="MaKh" value="@(user?.MaKh)" />
+        <input type="hidden" name="TongTien" value="@totalBill" />
+        <input type="hidden" name="GiaTungGhe" value="@(selectedSeats != null && selectedSeats.Count > 0 ? (totalBill / selectedSeats.Count) : 0)" />
+        
+        <div class="col-lg-8">
+            <div class="card-custom">
+                <h4 class="card-header-title"><i class="bi bi-ticket-detailed-fill"></i> Tóm tắt chuyến đi</h4>
+                <div class="ticket-info-box">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <div class="small text-muted mb-1">Mã chuyến: @(cb?.MaCb) | @(cb?.NgayGioBay.ToString("dd/MM/yyyy"))</div>
+                            <div class="h5 fw-bold text-navy mb-2">
+                                @(cb?.MaTuyenNavigation?.MaSbdiNavigation?.TenSb) 
+                                <i class="bi bi-arrow-right mx-1"></i> 
+                                @(cb?.MaTuyenNavigation?.MaSbdenNavigation?.TenSb)
+                            </div>
+                            <div class="d-flex gap-2">
+                                @if (selectedSeats != null) {
+                                    var distinctClasses = selectedSeats.Select(s => s.MaHangGheNavigation?.TenHangGhe).Where(n => n != null).Distinct();
+                                    foreach(var cName in distinctClasses) {
+                                        <span class="badge-class">@cName.ToUpper()</span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-5 border-start ps-4">
+                            <div class="mb-2">Số lượng: <strong>@(selectedSeats?.Count ?? 0) ghế</strong></div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @if (selectedSeats != null) {
+                                    foreach(var s in selectedSeats) {
+                                        <span class="seat-badge-info" style="background-color: @(s.MaHangGheNavigation?.MauSac ?? "#ccc")">@s.SoGhe</span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom">
+                <h4 class="card-header-title"><i class="bi bi-person-vcard-fill"></i> Thông tin khách hàng</h4>
+                <p class="text-muted small mb-4">Vui lòng điền thông tin người đại diện đặt vé (Yêu cầu trên 18 tuổi).</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">HỌ VÀ TÊN <span class="text-danger">*</span></label>
+                        <input type="text" name="HoTen" class="form-control" placeholder="VD: Nguyễn Văn A" value="@(user?.HoTen)" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">LOẠI KHÁCH <span class="text-danger">*</span></label>
+                        <select class="form-select" name="LoaiHanhKhach" required>
+                            <option value="Người lớn" selected>Người lớn</option>
+                            <option value="Trẻ em">Trẻ em</option>
+                            <option value="Em bé">Em bé</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">GIỚI TÍNH <span class="text-danger">*</span></label>
+                        <select class="form-select" name="GioiTinh" required>
+                            <option value="" @(string.IsNullOrEmpty(user?.GioiTinh) ? "selected" : "") disabled>Chọn</option>
+                            <option value="Nam" @(user?.GioiTinh == "Nam" ? "selected" : "")>Nam</option>
+                            <option value="Nữ" @(user?.GioiTinh == "Nữ" ? "selected" : "")>Nữ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">SỐ CCCD / HỘ CHIẾU <span class="text-danger">*</span></label>
+                        <input type="text" name="Cccd" class="form-control" placeholder="Số định danh" value="@(user?.Cccd)" required pattern="^[0-9]{9,12}$">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">NGÀY SINH (DD/MM/YYYY) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" id="paxDob" name="NgaySinh" class="form-control" placeholder="dd/mm/yyyy" required 
+                                   data-max-date="@maxDate"
+                                   value="@(user?.NgaySinh?.ToString("dd/MM/yyyy"))"
+                                   pattern="^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">SỐ ĐIỆN THOẠI <span class="text-danger">*</span></label>
+                        <input type="tel" name="ContactPhone" class="form-control" placeholder="0901234567" value="@(user?.SoDienThoai)" required pattern="^0[0-9]{9}$">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">EMAIL (PHẢI CÓ @@gmail.com) <span class="text-danger">*</span></label>
+                        <input type="text" id="contactEmail" name="ContactEmail" class="form-control" placeholder="abc@@gmail.com" value="@(user?.Email)" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">ĐỊA CHỈ</label>
+                        <input type="text" name="ContactAddress" class="form-control" placeholder="Số nhà, tên đường..." value="@(user?.DiaChi)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-panel">
+                <h5 class="fw-bold text-navy mb-4"><i class="bi bi-cash-stack me-2"></i>Chi tiết thanh toán</h5>
+                
+                @if (selectedSeats != null) {
+                    @foreach(var s in selectedSeats) {
+                        var sPrice = (decimal)Math.Round((double)basePrice * (s.MaHangGheNavigation?.HeSoGia ?? 1.0)) + (s.PhuThu ?? 0);
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Ghế @s.SoGhe (@(s.MaHangGheNavigation?.TenHangGhe ?? "N/A"))</span>
+                            <span class="fw-bold">@sPrice.ToString("N0") đ</span>
+                        </div>
+                    }
+                }
+
+                <div class="d-flex justify-content-between mb-2 small text-muted">
+                    <span>Thuế & Phí (Bao gồm)</span>
+                    <span>0 đ</span>
+                </div>
+                
+                <div class="bill-total d-flex justify-content-between mb-4 mt-3">
+                    <span>TỔNG TIỀN</span>
+                    <span class="text-primary">@totalBill.ToString("N0") đ</span>
+                </div>
+
+                <button type="submit" class="btn-checkout d-flex justify-content-between align-items-center" id="btnSubmit">
+                    <span>TIẾP TỤC THANH TOÁN</span>
+                    <i class="bi bi-arrow-right-circle-fill fs-4"></i>
+                </button>
+                <p class="text-center mt-3 small text-muted">Bằng cách tiếp tục, bạn đồng ý với Điều khoản dịch vụ của SkyBooking.</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/user/js/ThongTinKHDatVe.js"></script>
+}

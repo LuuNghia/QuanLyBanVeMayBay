@@ -1,0 +1,120 @@
+﻿/* =========================================================
+   1. BỐ CỤC CHUNG & TAB (Đã khử mờ hoàn toàn)
+   ========================================================= */
+#pills-tab .nav-link {
+    color: #475569 !important;
+    opacity: 1 !important;
+    background: transparent;
+    border: 1px solid transparent;
+    margin: 0 5px;
+    transition: all 0.2s ease;
+    padding: 10px 25px;
+}
+
+    #pills-tab .nav-link.active {
+        background-color: #ffc107 !important;
+        color: #000 !important;
+        border-color: #ffc107 !important;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+
+    #pills-tab .nav-link:hover:not(.active) {
+        background-color: #f1f5f9 !important;
+        color: #1e293b !important;
+    }
+
+/* =========================================================
+   2. CUSTOM CHÍNH SÁCH CARD (Fix lỗi bị che)
+   ========================================================= */
+.policy-card {
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #f8fafc;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem !important; /* Tạo khoảng trống an toàn xung quanh */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    position: relative;
+}
+
+    .policy-card:hover {
+        border-color: #ffc107;
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Căn chỉnh Header bên trong Card */
+    .policy-card .d-flex.justify-content-between {
+        align-items: center !important;
+        margin-bottom: 1.5rem;
+        margin-top: 5px; /* Hạ thấp cụm header xuống 1 chút */
+    }
+
+/* =========================================================
+   3. BADGE & ICON (Fix lỗi hiển thị)
+   ========================================================= */
+/* Badge trắng phải có viền để không bị trùng màu nền */
+.badge.bg-white {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #475569 !important;
+    min-width: 110px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cụm nền xám cho icon Sửa/Xóa */
+.bg-light.p-1.rounded-pill {
+    background-color: #f8fafc !important;
+    border: 1px solid #f1f5f9;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .cursor-pointer:hover {
+        transform: scale(1.2);
+    }
+
+/* =========================================================
+   4. NỘI DUNG CHI TIẾT (x3.0 & Tiện ích)
+   ========================================================= */
+.multiplier-text {
+    font-size: 3rem; /* Điều chỉnh lại kích thước cho cân đối */
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: #003366; /* Màu Navy đồng nhất */
+}
+
+.feature-item {
+    font-size: 14.5px;
+    padding: 14px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    color: #475569;
+    display: flex;
+    align-items: center;
+}
+
+    .feature-item:last-child {
+        border-bottom: none;
+    }
+
+.icon-box {
+    width: 28px;
+    text-align: center;
+    margin-right: 12px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Shadow cực nhẹ cho các thành phần con */
+.shadow-xs {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}

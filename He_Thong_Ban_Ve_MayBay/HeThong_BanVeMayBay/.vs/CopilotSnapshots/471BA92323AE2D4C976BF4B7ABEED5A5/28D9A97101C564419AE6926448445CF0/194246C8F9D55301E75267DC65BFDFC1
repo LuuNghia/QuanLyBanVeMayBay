@@ -1,0 +1,20 @@
+﻿// ...existing code...
+        modelBuilder.Entity<Ve>(entity =>
+        {
+            entity.HasKey(e => e.MaVe).HasName("PK__Ve__2725100F2F7CD16D");
+
+            entity.ToTable("Ve");
+
+            entity.HasIndex(e => new { e.MaCb, e.MaGhe }, "UQ_GheChuyenBay").IsUnique();
+
+            entity.Property(e => e.MaVe)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.CccdPassport)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CCCD_Passport");
+            entity.Property(e => e.GiaVeThucTe).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.MaCb)
+                .HasMaxLength(20)
+// ...existing code...

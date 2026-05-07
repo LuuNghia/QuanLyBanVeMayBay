@@ -1,0 +1,248 @@
+@{
+    ViewData["Title"] = "Cấu hình Sơ đồ ghế";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/SoDoGhe.css" asp-append-version="true" />
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Cấu hình Sơ đồ Ghế</h2>
+        <p class="text-muted small mb-0">Thiết kế vị trí, phân loại hạng ghế và thuộc tính cho từng tàu bay.</p>
+    </div>
+</div>
+
+<div class="row g-4 align-items-start">
+    <div class="col-xl-8 d-flex flex-column gap-4">
+        <div class="card-custom h-auto d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary-subtle text-primary rounded-4 d-flex justify-content-center align-items-center me-4" style="width: 60px; height: 60px; background-color: #dbeafe;">
+                    <i class="bi bi-airplane-fill fs-3" style="color: var(--primary-navy);"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1 fw-bold text-uppercase">Đang hiệu chỉnh máy bay</div>
+                    <h4 class="fw-bold mb-2" id="aircraftName" style="color: var(--primary-navy);">Boeing 787-9 Dreamliner</h4>
+                    <span class="badge bg-light text-muted px-3 py-2 border rounded-pill" id="seatCountBadge">TỔNG: <span id="totalSeatsDisplay">0</span> GHẾ</span>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-light fw-bold px-4 py-2 border rounded-pill dropdown-toggle" data-bs-toggle="dropdown">Đổi tàu bay</button>
+                <ul class="dropdown-menu shadow-lg border-0 mt-2" id="planeDropdown">
+                    @if(ViewBag.DanhSachMayBay != null)
+                    {
+                        foreach(var mb in ViewBag.DanhSachMayBay)
+                        {
+                            <li><a class="dropdown-item" href="#" data-ma-mb="@mb.MaLoaiMb" onclick="selectPlane('@mb.MaLoaiMb', '@mb.TenLoaiMb', @mb.SoLuongGhe)">@mb.TenLoaiMb (@mb.MaLoaiMb)</a></li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-custom text-center position-relative d-flex flex-column" style="height: calc(100vh - 200px); padding-bottom: 20px;">
+
+            <div class="d-flex justify-content-center align-items-center gap-4 text-muted fw-bold small mb-4 bg-light py-2 mx-auto rounded-pill flex-shrink-0" style="width: fit-content; padding: 0 30px;">
+                <span><i class="bi bi-door-closed-fill me-2"></i>BUỒNG LÁI</span>
+                <span><i class="bi bi-cup-hot-fill mx-2"></i> BẾP & VỆ SINH <i class="bi bi-gender-ambiguous ms-1"></i></span>
+            </div>
+
+            <div id="seatMapContainer" class="d-flex flex-column align-items-center flex-grow-1 overflow-auto px-2">
+                <div class="text-muted m-auto">
+                    <i class="bi bi-grid-3x3-gap display-1 opacity-25"></i><br>Chưa có sơ đồ.<br>Sử dụng công cụ bên phải để tạo.
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-4 mt-3 pt-3 border-top flex-shrink-0 flex-wrap" id="mapLegend">
+                @if(ViewBag.DanhSachHangGhe != null)
+                {
+                    foreach (var hg in ViewBag.DanhSachHangGhe)
+                    {
+                        <div class="d-flex align-items-center small fw-bold">
+                            <div class="legend-box" style="background-color: @hg.MauSac; border: 1px solid #ccc;"></div> @hg.TenHangGhe
+                        </div>
+                    }
+                }
+                <div class="d-flex align-items-center small fw-bold text-muted"><div class="legend-box bg-secondary"></div> Khóa</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 d-flex flex-column gap-4">
+
+        <div class="card-custom h-auto" id="propertyPanel">
+            <h6 class="fw-bold mb-4" id="panelTitle" style="color: var(--primary-navy);">
+                <i class="bi bi-check-square-fill me-2 text-success"></i><span id="selectedCountText">Chưa chọn ghế nào</span>
+            </h6>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Phân loại hạng ghế</label>
+                <select class="form-select bg-light border-0 py-2 fw-bold text-dark" id="propSeatClass">
+                    @if(ViewBag.DanhSachHangGhe != null)
+                    {
+                        foreach(var hg in ViewBag.DanhSachHangGhe)
+                        {
+                            <option value="@hg.MaHangGhe" data-color="@hg.MauSac" data-name="@hg.TenHangGhe">@hg.TenHangGhe</option>
+                        }
+                    }
+                </select>
+            </div>
+
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Giá phụ thu (Override)</label>
+                <div class="input-group">
+                    <input type="number" class="form-control bg-light border-0 py-2 fw-bold" id="propExtraPrice" placeholder="VD: 150000">
+                    <span class="input-group-text bg-light border-0 fw-bold text-muted">VND</span>
+                </div>
+                <div class="form-text small"><i class="bi bi-info-circle me-1"></i>Chỉ nhập nếu muốn thu thêm tiền ngoài giá gốc của Hạng ghế.</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted text-uppercase">Trạng thái ghế</label>
+                <select class="form-select bg-light border-0 py-2 fw-bold" id="propStatus">
+                    <option value="active">Hoạt động</option>
+                    <option value="maintenance">Khóa / Bảo trì</option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn flex-grow-1 text-white fw-bold py-2 rounded-3" style="background: var(--primary-navy);" onclick="applyProperties()">Áp dụng thuộc tính</button>
+            </div>
+        </div>
+
+        <div class="card-custom h-auto">
+            <h6 class="fw-bold mb-3" style="color: var(--primary-navy);"><i class="bi bi-magic me-2 text-warning"></i>Công cụ tạo nhanh</h6>
+            <div class="row g-2 mt-2">
+                <div class="col-12">
+                    <button class="btn btn-bulk w-100 py-3" data-bs-toggle="modal" data-bs-target="#autoLayoutModal">
+                        <i class="bi bi-grid-3x3 mb-2 display-6 text-primary"></i><br><span class="fw-bold">TẠO SƠ ĐỒ TỰ ĐỘNG</span>
+                    </button>
+                </div>
+                <div class="col-6"><button class="btn btn-bulk w-100" onclick="clearSelection()"><i class="bi bi-x-square mb-2 fs-4"></i><br>BỎ CHỌN TẤT CẢ</button></div>
+                <div class="col-6"><button class="btn btn-bulk w-100 text-danger" onclick="clearMap()"><i class="bi bi-eraser text-danger mb-2 fs-4"></i><br>XÓA TRẮNG SƠ ĐỒ</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="floating-action-bar">
+    <button class="btn text-white fw-bold px-5 py-3 rounded-pill shadow-lg d-flex align-items-center" style="background: var(--primary-navy);" onclick="saveConfiguration()">
+        <i class="bi bi-floppy-fill me-2 fs-5"></i> Lưu cấu hình & Sinh Dữ liệu
+    </button>
+</div>
+
+<div class="modal fade" id="autoLayoutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--primary-navy);"><i class="bi bi-magic me-2 text-warning"></i>Tạo Sơ đồ tự động</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-4">
+                <div class="mb-3 text-center">
+                    <p class="mb-1 text-muted small">Tàu bay đang chọn</p>
+                    <h5 class="fw-bold text-navy" id="modalPlaneName">Chưa chọn</h5>
+                    <div class="badge bg-primary-subtle text-primary border rounded-pill px-3 py-2 mt-2">
+                        TỔNG SỐ GHẾ: <strong id="modalTotalSeats" class="fs-6">0</strong>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-muted text-uppercase mb-3">Phân bổ số lượng ghế</label>
+                    <div id="allocationContainer" class="d-flex flex-column gap-3">
+                        @if(ViewBag.DanhSachHangGhe != null)
+                        {
+                            foreach(var hg in ViewBag.DanhSachHangGhe)
+                            {
+                                <div class="p-3 border rounded-3 bg-light allocation-item" data-class-id="@hg.MaHangGhe" data-class-name="@hg.TenHangGhe" data-color="@hg.MauSac">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="fw-bold d-flex align-items-center">
+                                            <div class="legend-box me-2" style="background-color: @hg.MauSac; border: 1px solid #ccc; width: 16px; height: 16px; border-radius: 4px;"></div>
+                                            @hg.TenHangGhe
+                                        </div>
+                                    </div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-5">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white">Số lượng</span>
+                                                <input type="number" class="form-control fw-bold seat-allocation-input" value="0" min="0" oninput="calculateTotalAllocation()">
+                                            </div>
+                                        </div>
+                                        <div class="col-7">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white">Bố trí</span>
+                                                <select class="form-select seat-layout-select">
+                                                    @{
+                                                        bool isPremium = !string.IsNullOrEmpty(hg.TenHangGhe) && (hg.TenHangGhe.Contains("Nhất") || hg.TenHangGhe.Contains("Thương gia"));
+                                                        if (isPremium)
+                                                        {
+                                                            <option value="2-2" selected>2 - 2 (4 ghế/hàng)</option>
+                                                            <option value="3-3">3 - 3 (6 ghế/hàng)</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="2-2">2 - 2 (4 ghế/hàng)</option>
+                                                            <option value="3-3" selected>3 - 3 (6 ghế/hàng)</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="small fw-bold text-muted">Đã phân bổ: <span id="allocatedSeatsCount" class="text-primary">0</span> / <span id="maxSeatsCount">0</span></span>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="autoFillRemaining()">Điền tự động ô cuối</button>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning small border-0 bg-warning-subtle text-dark">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Chú ý: Hành động này sẽ xóa sơ đồ hiện tại và tạo lại lưới mới hoàn toàn.
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn text-white rounded-pill px-4 fw-bold" style="background: var(--primary-navy);" onclick="generateAutoLayout()">Tạo Sơ đồ ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Alert Modal -->
+<div class="modal fade" id="customAlertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow text-center rounded-4">
+            <div class="modal-body p-4">
+                <i class="bi bi-info-circle text-primary mb-3" style="font-size: 3rem;" id="customAlertIcon"></i>
+                <h5 class="fw-bold mb-3" id="customAlertTitle">Thông báo</h5>
+                <p class="text-muted mb-4" id="customAlertMessage">Nội dung thông báo.</p>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirm Modal -->
+<div class="modal fade" id="customConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow text-center rounded-4">
+            <div class="modal-body p-4">
+                <i class="bi bi-question-circle text-warning mb-3" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold mb-3">Xác nhận</h5>
+                <p class="text-muted mb-4" id="customConfirmMessage">Bạn có chắc chắn?</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" id="customConfirmBtn">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/SoDoGhe.js" asp-append-version="true"></script>
+}

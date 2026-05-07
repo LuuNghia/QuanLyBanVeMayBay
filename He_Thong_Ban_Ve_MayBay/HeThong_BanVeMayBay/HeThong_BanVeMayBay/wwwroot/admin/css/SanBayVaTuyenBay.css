@@ -1,0 +1,119 @@
+﻿
+.card-stat {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border-left: 4px solid var(--primary-navy);
+}
+
+.custom-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+/* TABS & TABLE */
+.nav-tabs {
+    border: none;
+}
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        padding: 10px 25px;
+        margin-right: 10px;
+        position: relative;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-navy);
+            background: transparent;
+        }
+
+            .nav-tabs .nav-link.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: var(--secondary-gold);
+                border-radius: 3px;
+            }
+
+.table thead th {
+    background-color: #f8fafc;
+    border: none;
+    color: #888;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 15px;
+}
+
+.table tbody td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: none;
+    color: #475569;
+    transition: 0.2s;
+    margin-left: 5px;
+}
+
+    .btn-action:hover {
+        background: var(--primary-navy);
+        color: white;
+        transform: scale(1.1);
+    }
+
+.status-toggle .form-check-input:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.page-link {
+    border: none;
+    margin: 0 3px;
+    border-radius: 8px !important;
+    color: #64748b;
+    font-weight: 500;
+}
+
+    .page-link:hover {
+        background-color: #f1f5f9;
+        color: var(--primary-navy);
+    }
+
+.page-item.active .page-link {
+    background-color: var(--primary-navy);
+    color: white;
+}
+
+.modal-content {
+    border-radius: 20px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 20px 25px;
+}
+
+.modal-footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 15px 25px;
+}

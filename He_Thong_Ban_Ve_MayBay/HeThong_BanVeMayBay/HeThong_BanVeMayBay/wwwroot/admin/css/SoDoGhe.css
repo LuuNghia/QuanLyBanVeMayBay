@@ -1,0 +1,103 @@
+﻿/* =========================================
+   HIỆU ỨNG GHẾ & MULTI-SELECT
+   ========================================= */
+.seat-wrapper {
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s;
+}
+
+    /* Hiệu ứng khi được Click chọn nhiều ghế */
+    .seat-wrapper.selected .seat-shape {
+        border: 3px solid var(--secondary-gold, #feba02) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(254, 186, 2, 0.4);
+    }
+
+    .seat-wrapper.selected .seat-label {
+        color: var(--secondary-gold, #feba02);
+        font-weight: 900;
+    }
+
+/* =========================================
+   MÀU SẮC CÁC HẠNG GHẾ TRÊN ADMIN
+   ========================================= */
+.seat-type-business .seat-shape {
+    background: var(--bg-business, #fffbeb);
+    border-color: var(--text-business, #d97706);
+}
+
+.seat-type-premium .seat-shape {
+    background: var(--bg-premium, #f0fdf4);
+    border-color: var(--text-premium, #0f766e);
+}
+
+.seat-type-economy .seat-shape {
+    background: white;
+    border-color: #cbd5e1;
+}
+.seat-type-first .seat-shape {
+    background: #fff1f2;
+    border-color: #be123c;
+}
+
+.seat-status-maintenance .seat-shape {
+    background: #e2e8f0;
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+/* Cục màu chú thích */
+.legend-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    margin-right: 6px;
+}
+
+/* =========================================
+   TỐI ƯU NÚT CÔNG CỤ (BULK BUTTONS)
+   ========================================= */
+.btn-bulk {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 15px 5px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+    .btn-bulk:hover {
+        background: white;
+        border-color: var(--primary-navy, #003580);
+        color: var(--primary-navy, #003580);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+/* =========================================
+   TÙY CHỈNH THANH CUỘN CHO VÙNG SƠ ĐỒ
+   ========================================= */
+#seatMapContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+#seatMapContainer::-webkit-scrollbar-track {
+    background: transparent; /* Giữ nền trong suốt cho đẹp */
+}
+
+#seatMapContainer::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+    #seatMapContainer::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-navy, #003580);
+    }
+
+/* Đảm bảo cột bên phải (Thuộc tính) luôn dính chặt khi cuộn trang */
+.right-panel-sticky {
+    position: sticky;
+    top: 20px;
+}

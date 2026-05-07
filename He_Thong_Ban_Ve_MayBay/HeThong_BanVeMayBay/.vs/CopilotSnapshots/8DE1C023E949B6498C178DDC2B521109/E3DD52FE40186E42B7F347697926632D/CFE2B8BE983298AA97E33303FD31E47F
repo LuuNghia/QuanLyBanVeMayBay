@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Sân bay & Tuyến bay";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/SanBayVaTuyenBay.css" asp-append-version="true" />
+}
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Quản lý Hạ tầng bay</h3>
+            <p class="text-muted small">Cấu hình danh sách Sân bay và mạng lưới Tuyến bay khai thác.</p>
+        </div>
+        <button id="dynamicAddBtn" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="openAddModal()">
+            <i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới
+        </button>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="card-stat"><div class="text-muted small fw-bold text-uppercase">Sân bay đối tác</div><h3 class="fw-bold mt-1">22 <span class="fs-6 text-muted fw-normal">sân bay</span></h3></div></div>
+        <div class="col-md-4"><div class="card-stat" style="border-color: #0ea5e9;"><div class="text-muted small fw-bold text-uppercase">Tuyến bay đang khai thác</div><h3 class="fw-bold mt-1">45 <span class="fs-6 text-muted fw-normal">tuyến</span></h3></div></div>
+        <div class="col-md-4"><div class="card-stat" style="border-color: #f59e0b;"><div class="text-muted small fw-bold text-uppercase">Tuyến bay bảo trì</div><h3 class="fw-bold mt-1 text-warning">02 <span class="fs-6 text-muted fw-normal">tuyến</span></h3></div></div>
+    </div>
+
+    <div class="custom-container">
+        <ul class="nav nav-tabs mb-4" id="infraTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="airport-tab" data-bs-toggle="tab" data-bs-target="#airport-content" type="button" onclick="updateAddButton('airport')"><i class="bi bi-building me-2"></i>Danh sách Sân bay</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="route-tab" data-bs-toggle="tab" data-bs-target="#route-content" type="button" onclick="updateAddButton('route')"><i class="bi bi-geo-alt me-2"></i>Mạng lưới Tuyến bay</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="airport-content">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr><th>MÃ SÂN BAY</th><th>TÊN SÂN BAY</th><th>THÀNH PHỐ / QUỐC GIA</th><th class="text-end">THAO TÁC</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr id="sb-SGN">
+                                <td class="fw-bold text-primary">SGN</td>
+                                <td class="fw-bold">Cảng hàng không Quốc tế Tân Sơn Nhất</td>
+                                <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> TP. Hồ Chí Minh</td>
+                                <td class="text-end">
+                                    <button class="btn-action" title="Sửa" onclick="openEditAirport('SGN', 'Cảng hàng không Quốc tế Tân Sơn Nhất', 'TP. Hồ Chí Minh')"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay SGN', 'sb-SGN')"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr id="sb-HAN">
+                                <td class="fw-bold text-primary">HAN</td>
+                                <td class="fw-bold">Cảng hàng không Quốc tế Nội Bài</td>
+                                <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> Hà Nội</td>
+                                <td class="text-end">
+                                    <button class="btn-action" title="Sửa" onclick="openEditAirport('HAN', 'Cảng hàng không Quốc tế Nội Bài', 'Hà Nội')"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay HAN', 'sb-HAN')"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr id="sb-DAD">
+                                <td class="fw-bold text-primary">DAD</td>
+                                <td class="fw-bold">Cảng hàng không Quốc tế Đà Nẵng</td>
+                                <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> Đà Nẵng</td>
+                                <td class="text-end">
+                                    <button class="btn-action" title="Sửa" onclick="openEditAirport('DAD', 'Cảng hàng không Quốc tế Đà Nẵng', 'Đà Nẵng')"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay DAD', 'sb-DAD')"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="route-content">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr><th>MÃ TUYẾN</th><th>HÀNH TRÌNH</th><th>KHOẢNG CÁCH</th><th>TG DỰ KIẾN</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr id="tb-SGNHAN">
+                                <td class="fw-bold text-primary">SGN-HAN</td>
+                                <td><span class="fw-bold">SGN</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="fw-bold">HAN</span></td>
+                                <td>1,190 km</td>
+                                <td>125 phút</td>
+                                <td>
+                                    <div class="form-check form-switch status-toggle">
+                                        <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Cập nhật trạng thái tuyến bay')">
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn-action" title="Sửa" onclick="openEditRoute('SGN-HAN')"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Tuyến bay SGN-HAN', 'tb-SGNHAN')"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr id="tb-SGNDAD">
+                                <td class="fw-bold text-primary">SGN-DAD</td>
+                                <td><span class="fw-bold">SGN</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="fw-bold">DAD</span></td>
+                                <td>600 km</td>
+                                <td>80 phút</td>
+                                <td>
+                                    <div class="form-check form-switch status-toggle">
+                                        <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Cập nhật trạng thái tuyến bay')">
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn-action" title="Sửa" onclick="openEditRoute('SGN-DAD')"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Tuyến bay SGN-DAD', 'tb-SGNDAD')"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="small text-muted fst-italic">Hiển thị dữ liệu trang 1</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/SanBayVaTuyenBay.js" asp-append-version="true"></script>
+}

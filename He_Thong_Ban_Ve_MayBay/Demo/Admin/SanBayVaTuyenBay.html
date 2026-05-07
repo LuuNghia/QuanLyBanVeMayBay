@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sân bay & Tuyến bay - SkyBooking Admin</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580;
+            --navy-gradient: linear-gradient(90deg, #00265c 0%, #003580 100%);
+            --secondary-gold: #feba02;
+            --sidebar-width: 280px;
+            --bg-light: #f8faff;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); margin: 0; }
+
+        /* --- SIDEBAR --- */
+        #sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-navy); position: fixed; left: 0; top: 0; z-index: 1001; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; color: white; font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 25px; margin: 4px 15px; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { font-size: 1.2rem; margin-right: 15px; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.active { background: var(--secondary-gold) !important; color: var(--primary-navy) !important; font-weight: 600; }
+
+        /* --- TOPBAR --- */
+        .topbar { margin-left: var(--sidebar-width); background: var(--navy-gradient); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .search-box { background: var(--glass-white); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 8px 20px; width: 400px; backdrop-filter: blur(10px); }
+        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.5); }
+        .avatar-ad { width: 42px; height: 42px; background: var(--secondary-gold); color: var(--primary-navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { margin-left: var(--sidebar-width); padding: 35px; }
+        .card-stat { background: white; border-radius: 20px; padding: 25px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-left: 4px solid var(--primary-navy); }
+        
+        .custom-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+
+        /* TABS & TABLE */
+        .nav-tabs { border: none; }
+        .nav-tabs .nav-link { border: none; color: #64748b; font-weight: 600; padding: 10px 25px; margin-right: 10px; position: relative; }
+        .nav-tabs .nav-link.active { color: var(--primary-navy); background: transparent; }
+        .nav-tabs .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--secondary-gold); border-radius: 3px; }
+        
+        .table thead th { background-color: #f8fafc; border: none; color: #888; font-size: 11px; text-transform: uppercase; padding: 15px; }
+        .table tbody td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+        .btn-action { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; border: none; color: #475569; transition: 0.2s; margin-left: 5px;}
+        .btn-action:hover { background: var(--primary-navy); color: white; transform: scale(1.1);}
+        .status-toggle .form-check-input:checked { background-color: #10b981; border-color: #10b981; }
+        
+        .page-link { border: none; margin: 0 3px; border-radius: 8px !important; color: #64748b; font-weight: 500;}
+        .page-link:hover { background-color: #f1f5f9; color: var(--primary-navy); }
+        .page-item.active .page-link { background-color: var(--primary-navy); color: white; }
+
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: 1px solid #f1f5f9; padding: 20px 25px; }
+        .modal-footer { border-top: 1px solid #f1f5f9; padding: 15px 25px; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-airplane-engines-fill me-2 text-warning"></i>SkyBooking
+            <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">HỆ THỐNG QUẢN TRỊ</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="../Admin/DashBoard.html" class="nav-link"><i class="bi bi-grid-fill"></i> Tổng quan</a>
+            <a href="../Admin/SanBayVaTuyenBay.html" class="nav-link active"><i class="bi bi-geo-alt-fill"></i> Sân bay & Tuyến bay</a>
+            <a href="../Admin/QuanLyChuyenBay.html" class="nav-link"><i class="bi bi-airplane-fill"></i> Quản lý Chuyến bay</a>
+            <a href="../Admin/SoDoGhe.html" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Máy bay & Sơ đồ ghế</a>
+            <a href="../Admin/QuanLyDatVe.html" class="nav-link"><i class="bi bi-ticket-perforated-fill"></i> Quản lý Đặt vé</a>
+            <a href="../Admin/NhanVienVaKhachHang.html" class="nav-link"><i class="bi bi-people-fill"></i> Nhân viên & Khách hàng</a>
+            <a href="../Admin/CauHinhHeThong.html" class="nav-link"><i class="bi bi-gear-fill"></i> Cấu hình hệ thống</a>
+        </nav>
+    </div>
+
+    <div class="topbar">
+        <div class="search-box d-flex align-items-center">
+            <i class="bi bi-search text-white opacity-50 me-2"></i>
+            <input type="text" placeholder="Tìm kiếm sân bay, mã tuyến...">
+        </div>
+        <div class="d-flex align-items-center text-white">
+            <i class="bi bi-bell-fill me-4 fs-5 cursor-pointer"></i>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
+                    <div class="fw-bold small">Nguyễn Admin</div>
+                    <div class="opacity-75 small text-uppercase" style="font-size: 10px;">Manager</div>
+                </div>
+                <div class="avatar-ad shadow-sm">AD</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Quản lý Hạ tầng bay</h3>
+                <p class="text-muted small">Cấu hình danh sách Sân bay và mạng lưới Tuyến bay khai thác.</p>
+            </div>
+            <button id="dynamicAddBtn" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="openAddModal()">
+                <i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới
+            </button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4"><div class="card-stat"><div class="text-muted small fw-bold text-uppercase">Sân bay đối tác</div><h3 class="fw-bold mt-1">22 <span class="fs-6 text-muted fw-normal">sân bay</span></h3></div></div>
+            <div class="col-md-4"><div class="card-stat" style="border-color: #0ea5e9;"><div class="text-muted small fw-bold text-uppercase">Tuyến bay đang khai thác</div><h3 class="fw-bold mt-1">45 <span class="fs-6 text-muted fw-normal">tuyến</span></h3></div></div>
+            <div class="col-md-4"><div class="card-stat" style="border-color: #f59e0b;"><div class="text-muted small fw-bold text-uppercase">Tuyến bay bảo trì</div><h3 class="fw-bold mt-1 text-warning">02 <span class="fs-6 text-muted fw-normal">tuyến</span></h3></div></div>
+        </div>
+
+        <div class="custom-container">
+            <ul class="nav nav-tabs mb-4" id="infraTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="airport-tab" data-bs-toggle="tab" data-bs-target="#airport-content" type="button" onclick="updateAddButton('airport')"><i class="bi bi-building me-2"></i>Danh sách Sân bay</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="route-tab" data-bs-toggle="tab" data-bs-target="#route-content" type="button" onclick="updateAddButton('route')"><i class="bi bi-geo-alt me-2"></i>Mạng lưới Tuyến bay</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                
+                <div class="tab-pane fade show active" id="airport-content">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>MÃ SÂN BAY</th><th>TÊN SÂN BAY</th><th>THÀNH PHỐ / QUỐC GIA</th><th class="text-end">THAO TÁC</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr id="sb-SGN">
+                                    <td class="fw-bold text-primary">SGN</td>
+                                    <td class="fw-bold">Cảng hàng không Quốc tế Tân Sơn Nhất</td>
+                                    <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> TP. Hồ Chí Minh</td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditAirport('SGN', 'Cảng hàng không Quốc tế Tân Sơn Nhất', 'TP. Hồ Chí Minh')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay SGN', 'sb-SGN')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr id="sb-HAN">
+                                    <td class="fw-bold text-primary">HAN</td>
+                                    <td class="fw-bold">Cảng hàng không Quốc tế Nội Bài</td>
+                                    <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> Hà Nội</td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditAirport('HAN', 'Cảng hàng không Quốc tế Nội Bài', 'Hà Nội')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay HAN', 'sb-HAN')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr id="sb-DAD">
+                                    <td class="fw-bold text-primary">DAD</td>
+                                    <td class="fw-bold">Cảng hàng không Quốc tế Đà Nẵng</td>
+                                    <td><i class="bi bi-geo-alt-fill text-danger me-1"></i> Đà Nẵng</td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditAirport('DAD', 'Cảng hàng không Quốc tế Đà Nẵng', 'Đà Nẵng')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Sân bay DAD', 'sb-DAD')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="route-content">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>MÃ TUYẾN</th><th>HÀNH TRÌNH</th><th>KHOẢNG CÁCH</th><th>TG DỰ KIẾN</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr id="tb-SGNHAN">
+                                    <td class="fw-bold text-primary">SGN-HAN</td>
+                                    <td><span class="fw-bold">SGN</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="fw-bold">HAN</span></td>
+                                    <td>1,190 km</td>
+                                    <td>125 phút</td>
+                                    <td>
+                                        <div class="form-check form-switch status-toggle">
+                                            <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Cập nhật trạng thái tuyến bay')">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditRoute('SGN-HAN')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Tuyến bay SGN-HAN', 'tb-SGNHAN')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr id="tb-SGNDAD">
+                                    <td class="fw-bold text-primary">SGN-DAD</td>
+                                    <td><span class="fw-bold">SGN</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="fw-bold">DAD</span></td>
+                                    <td>600 km</td>
+                                    <td>80 phút</td>
+                                    <td>
+                                        <div class="form-check form-switch status-toggle">
+                                            <input class="form-check-input" type="checkbox" checked onchange="toastMessage('Cập nhật trạng thái tuyến bay')">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action" title="Sửa" onclick="openEditRoute('SGN-DAD')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action text-danger" title="Xóa" onclick="confirmDelete('Tuyến bay SGN-DAD', 'tb-SGNDAD')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="small text-muted fst-italic">Hiển thị dữ liệu trang 1</div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAirport" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0 text-navy" id="titleAirport"><i class="bi bi-building me-2"></i>Thêm Sân bay mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formAirport" onsubmit="submitForm(event, 'modalAirport')">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">MÃ SÂN BAY (3 KÝ TỰ)</label>
+                            <input type="text" class="form-control bg-light border-0 py-2 fw-bold text-uppercase" id="sbMa" placeholder="VD: SGN, HAN..." maxlength="3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">TÊN SÂN BAY</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="sbTen" placeholder="VD: Cảng hàng không Quốc tế Tân Sơn Nhất" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">THÀNH PHỐ / TỈNH</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="sbThanhPho" placeholder="VD: TP. Hồ Chí Minh" required>
+                        </div>
+                        <button type="submit" class="btn w-100 rounded-pill py-3 fw-bold text-white shadow-sm" style="background: var(--primary-navy);">LƯU THÔNG TIN</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalRoute" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0 text-navy" id="titleRoute"><i class="bi bi-geo-alt me-2"></i>Thêm Tuyến bay mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formRoute" onsubmit="submitForm(event, 'modalRoute')">
+                        <div class="row g-3 mb-3">
+                            <div class="col-5">
+                                <label class="form-label small fw-bold text-muted">ĐIỂM ĐI</label>
+                                <select class="form-select bg-light border-0 py-2 fw-bold" id="tbDi" required>
+                                    <option value="">Chọn...</option><option value="SGN">SGN - TP.HCM</option><option value="HAN">HAN - Hà Nội</option><option value="DAD">DAD - Đà Nẵng</option>
+                                </select>
+                            </div>
+                            <div class="col-2 d-flex align-items-end justify-content-center pb-2">
+                                <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label small fw-bold text-muted">ĐIỂM ĐẾN</label>
+                                <select class="form-select bg-light border-0 py-2 fw-bold" id="tbDen" required>
+                                    <option value="">Chọn...</option><option value="SGN">SGN - TP.HCM</option><option value="HAN">HAN - Hà Nội</option><option value="DAD">DAD - Đà Nẵng</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">KHOẢNG CÁCH (KM)</label>
+                                <input type="number" class="form-control bg-light border-0 py-2" placeholder="VD: 1190" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted">T/G BAY DỰ KIẾN (PHÚT)</label>
+                                <input type="number" class="form-control bg-light border-0 py-2" placeholder="VD: 125" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn w-100 rounded-pill py-3 fw-bold text-white shadow-sm" style="background: var(--primary-navy);">LƯU TUYẾN BAY</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDelete" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content shadow-lg text-center p-4" style="border-radius: 20px;">
+                <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+                <h5 class="fw-bold mb-2">Xác nhận xóa?</h5>
+                <p class="text-muted small mb-4">Bạn có chắc muốn xóa <strong id="delName" class="text-dark"></strong> không? Thao tác không thể phục hồi.</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light w-50 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger w-50 rounded-pill fw-bold" onclick="executeDelete()">Xóa bỏ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1060; margin-top: 20px;">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-4 py-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold fs-6 p-0" id="toastMessage">Thao tác thành công!</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const toastEl = document.getElementById('liveToast');
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+        let currentActiveTab = 'airport';
+        let rowToDelete = '';
+
+        function toastMessage(msg, colorClass = 'bg-success') {
+            document.getElementById('toastMessage').innerText = msg;
+            toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-4 py-3 ${colorClass}`;
+            bsToast.show();
+        }
+
+        // Thay đổi Nút Thêm Mới tùy theo Tab đang mở
+        function updateAddButton(tab) {
+            currentActiveTab = tab;
+            const btn = document.getElementById('dynamicAddBtn');
+            if(tab === 'airport') {
+                btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới';
+            } else {
+                btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Tuyến bay mới';
+            }
+        }
+
+        // Bấm nút Thêm Mới
+        function openAddModal() {
+            if(currentActiveTab === 'airport') {
+                document.getElementById('titleAirport').innerHTML = '<i class="bi bi-building me-2"></i>Thêm Sân bay mới';
+                document.getElementById('formAirport').reset();
+                document.getElementById('sbMa').disabled = false;
+                new bootstrap.Modal(document.getElementById('modalAirport')).show();
+            } else {
+                document.getElementById('titleRoute').innerHTML = '<i class="bi bi-geo-alt me-2"></i>Thêm Tuyến bay mới';
+                document.getElementById('formRoute').reset();
+                document.getElementById('tbDi').disabled = false;
+                document.getElementById('tbDen').disabled = false;
+                new bootstrap.Modal(document.getElementById('modalRoute')).show();
+            }
+        }
+
+        // Sửa Sân Bay
+        function openEditAirport(ma, ten, thanhpho) {
+            document.getElementById('titleAirport').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Sân bay';
+            document.getElementById('sbMa').value = ma;
+            document.getElementById('sbMa').disabled = true; // Không cho sửa khóa chính
+            document.getElementById('sbTen').value = ten;
+            document.getElementById('sbThanhPho').value = thanhpho;
+            new bootstrap.Modal(document.getElementById('modalAirport')).show();
+        }
+
+        // Sửa Tuyến Bay
+        function openEditRoute(maTuyen) {
+            document.getElementById('titleRoute').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Tuyến bay';
+            const parts = maTuyen.split('-');
+            document.getElementById('tbDi').value = parts[0];
+            document.getElementById('tbDen').value = parts[1];
+            document.getElementById('tbDi').disabled = true; 
+            document.getElementById('tbDen').disabled = true;
+            new bootstrap.Modal(document.getElementById('modalRoute')).show();
+        }
+
+        // Form Submit
+        function submitForm(e, modalId) {
+            e.preventDefault();
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            toastMessage('Lưu thông tin thành công!');
+        }
+
+        // Xác nhận xóa
+        function confirmDelete(name, rowId) {
+            document.getElementById('delName').innerText = name;
+            rowToDelete = rowId;
+            new bootstrap.Modal(document.getElementById('modalDelete')).show();
+        }
+
+        function executeDelete() {
+            bootstrap.Modal.getInstance(document.getElementById('modalDelete')).hide();
+            if(rowToDelete) {
+                const row = document.getElementById(rowToDelete);
+                if(row) {
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
+                }
+            }
+            toastMessage('Đã xóa dữ liệu thành công!', 'bg-danger');
+        }
+    </script>
+</body>
+</html>

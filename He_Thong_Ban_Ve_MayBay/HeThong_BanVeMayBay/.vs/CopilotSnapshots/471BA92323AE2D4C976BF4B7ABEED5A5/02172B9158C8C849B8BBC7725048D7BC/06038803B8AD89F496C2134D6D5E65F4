@@ -1,0 +1,61 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HeThong_BanVeMayBay.Models.EF;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class FlightController : Controller
+    {
+        private readonly QL_BanVeMayBayContext _context;
+
+        public FlightController(QL_BanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> QuanLyChuyenBay()
+        {
+            var flights = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .OrderByDescending(c => c.NgayGioBay)
+                .ToListAsync();
+
+            return View(flights);
+        }
+
+        public IActionResult QuanLyMayBay()
+        {
+            return View();
+        }
+
+        public IActionResult SoDoGhe()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> SanBayVaTuyenBay()
+        {
+            var airports = await _context.SanBays.ToListAsync();
+            
+            var routes = await _context.TuyenBays
+                .Include(t => t.MaSbdiNavigation)
+                .Include(t => t.MaSbdenNavigation)
+                .ToListAsync();
+
+            ViewBag.Airports = airports;
+            ViewBag.Routes = routes;
+
+            return View();
+        }
+
+        public IActionResult CauHinhHeThong()
+        {
+            return View();
+        }
+    }
+}

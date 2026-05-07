@@ -1,0 +1,157 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/user/css/ThongTinCaNhan.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .flatpickr-calendar { border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: none; }
+        .flatpickr-day.selected { background: #003580; border-color: #003580; }
+    </style>
+}
+
+<div class="profile-container py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-4 mb-4">
+                <div class="profile-sidebar">
+                    <div class="profile-header">
+                        <div class="profile-img-container">
+                            <img id="sideAvatar" src="https://ui-avatars.com/api/?name=User&background=feba02&color=003580&size=128" class="profile-img" alt="Avatar">
+                            <button class="btn-edit-avatar" onclick="document.getElementById('fileAvatar').click()">
+                                <i class="bi bi-camera-fill"></i>
+                            </button>
+                            <input type="file" id="fileAvatar" hidden accept="image/*">
+                        </div>
+                        <h5 id="sideFullName" class="fw-bold mb-1">...</h5>
+                        <p id="sideMembership" class="mb-0 opacity-75 small">...</p>
+                    </div>
+                    <div class="nav flex-column profile-nav py-3">
+                        <a class="nav-link active" href="javascript:void(0)"><i class="bi bi-person-circle me-3"></i>Hồ sơ cá nhân</a>
+                        <a class="nav-link" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#changePassModal"><i class="bi bi-shield-lock me-3"></i>Đổi mật khẩu</a>
+                        <a class="nav-link" asp-area="User" asp-controller="Booking" asp-action="LichSuDatVe"><i class="bi bi-clock-history me-3"></i>Lịch sử đặt vé</a>
+                        <a class="nav-link text-danger border-top mt-2 pt-3" asp-area="" asp-controller="Account" asp-action="Logout"><i class="bi bi-box-arrow-right me-3"></i>Đăng xuất</a>
+                    </div>
+                </div>
+
+                <div class="card mt-4 border-0 rounded-4 shadow-sm p-4 bg-white">
+                    <div class="d-flex align-items-center">
+                        <div class="p-3 bg-warning-subtle rounded-4 me-3">
+                            <i class="bi bi-star-fill text-warning fs-3"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Điểm tích lũy</small>
+                            <span id="sidePoints" class="fw-bold fs-4 text-primary">0 điểm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="card content-card border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="section-title mb-0">Hồ Sơ Cá Nhân</h4>
+                        <span class="badge-custom">Thông tin cơ bản</span>
+                    </div>
+
+                    <form id="profileForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" id="txtFullName" class="form-control" placeholder="Nhập họ và tên">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Giới tính</label>
+                                <select id="selGender" class="form-select">
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngày sinh</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                                    <input type="text" id="txtBirthDate" class="form-control border-start-0" placeholder="dd/mm/yyyy">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Số CCCD / Passport</label>
+                                <input type="text" id="txtCccd" class="form-control" placeholder="Nhập số CCCD/Passport">
+                            </div>
+                        </div>
+
+                        <h4 class="section-title mt-5">Thông Tin Liên Lạc</h4>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-phone"></i></span>
+                                    <input type="text" id="txtPhone" class="form-control border-start-0" placeholder="Nhập số điện thoại">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" id="txtEmail" class="form-control border-start-0" placeholder="Nhập địa chỉ email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Địa chỉ thường trú</label>
+                            <textarea id="txtAddress" class="form-control" rows="3" placeholder="Nhập địa chỉ của bạn"></textarea>
+                        </div>
+
+                        <div class="pt-4 border-top mt-5 d-flex justify-content-between align-items-center">
+                            <div class="d-none d-md-block">
+                                <p class="text-muted small mb-0"><i class="bi bi-shield-check text-success me-1"></i> Thông tin của bạn được bảo mật theo tiêu chuẩn quốc tế.</p>
+                            </div>
+                            <button type="button" id="btnUpdateProfile" class="btn btn-save px-5">CẬP NHẬT HỒ SƠ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đổi mật khẩu -->
+<div class="modal fade" id="changePassModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-key-fill me-2"></i>Đổi mật khẩu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePassForm">
+                    <div class="mb-4">
+                        <label class="form-label">Mật khẩu hiện tại</label>
+                        <input type="password" id="txtOldPass" class="form-control" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Mật khẩu mới</label>
+                        <input type="password" id="txtNewPass" class="form-control" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                        <input type="password" id="txtConfirmPass" class="form-control" required>
+                    </div>
+                    <button type="button" id="btnConfirmChangePass" class="btn btn-primary-gradient w-100 py-3 text-white">XÁC NHẬN ĐỔI MẬT KHẨU</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+<script src="~/user/js/ThongTinCaNhan.js" asp-append-version="true" defer></script>

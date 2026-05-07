@@ -1,0 +1,33 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace HeThong_BanVeMayBay.Areas.User.Controllers
+{
+    [Area("User")]
+    public class BookingController : Controller
+    {
+        public IActionResult TraCuuVe()
+        {
+            return View();
+        }
+
+        public IActionResult LichSuDatVe()
+        {
+            return View();
+        }
+
+        public IActionResult ChonCho()
+        {
+            return View();
+        }
+        
+        public IActionResult ThongTinKHDatVe()
+        {
+            return View();
+        }
+        
+        public IActionResult ThanhToan()
+        {
+            return View();
+        }
+    }
+}

@@ -1,0 +1,339 @@
+﻿@{
+    ViewData["Title"] = "Cấu hình Hệ thống";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/admin/css/Flight.CauHinhHeThong.css" />
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình Chính sách - SkyBooking Admin</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-navy: #003580;
+            --navy-gradient: linear-gradient(90deg, #00265c 0%, #003580 100%);
+            --secondary-gold: #feba02;
+            --sidebar-width: 280px;
+            --bg-light: #f4f7fe;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); margin: 0; }
+
+        /* --- SIDEBAR (DÙNG CHUNG) --- */
+        #sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-navy); position: fixed; left: 0; top: 0; z-index: 1001; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; color: white; font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 25px; margin: 4px 15px; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { font-size: 1.2rem; margin-right: 15px; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.active { background: var(--secondary-gold) !important; color: var(--primary-navy) !important; font-weight: 600; }
+
+        /* --- TOPBAR (DÙNG CHUNG) --- */
+        .topbar { margin-left: var(--sidebar-width); background: var(--navy-gradient); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .search-box { background: var(--glass-white); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 8px 20px; width: 400px; backdrop-filter: blur(10px); }
+        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.5); }
+        .avatar-ad { width: 42px; height: 42px; background: var(--secondary-gold); color: var(--primary-navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { margin-left: var(--sidebar-width); padding: 35px; }
+
+        /* CUSTOM CHÍNH SÁCH CARD */
+        .policy-card { background: white; border-radius: 20px; border: 2px solid transparent; transition: 0.3s; height: 100%; }
+        .policy-card:hover { border-color: var(--secondary-gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .feature-item { font-size: 14px; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; color: #475569; }
+        .feature-item:last-child { border-bottom: none; }
+        .cursor-pointer { cursor: pointer; transition: 0.2s;}
+        .cursor-pointer:hover { transform: scale(1.15); }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-airplane-engines-fill me-2 text-warning"></i>SkyBooking
+            <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">HỆ THỐNG QUẢN TRỊ</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="../Admin/DashBoard.html" class="nav-link"><i class="bi bi-grid-fill"></i> Tổng quan</a>
+            <a href="../Admin/SanBayVaTuyenBay.html" class="nav-link active"><i class="bi bi-geo-alt-fill"></i> Sân bay & Tuyến bay</a>
+            <a href="../Admin/QuanLyChuyenBay.html" class="nav-link"><i class="bi bi-airplane-fill"></i> Quản lý Chuyến bay</a>
+            <a href="../Admin/SoDoGhe.html" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Máy bay & Sơ đồ ghế</a>
+            <a href="../Admin/QuanLyDatVe.html" class="nav-link"><i class="bi bi-ticket-perforated-fill"></i> Quản lý Đặt vé</a>
+            <a href="../Admin/NhanVienVaKhachHang.html" class="nav-link"><i class="bi bi-people-fill"></i> Nhân viên & Khách hàng</a>
+            <a href="../Admin/CauHinhHeThong.html" class="nav-link"><i class="bi bi-gear-fill"></i> Cấu hình hệ thống</a>
+        </nav>
+        <div style="position: absolute; bottom: 20px; width: 100%;">
+            <a href="#" class="nav-link text-danger"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="topbar">
+        <div class="search-box d-flex align-items-center">
+            <i class="bi bi-search text-white opacity-50 me-2"></i>
+            <input type="text" placeholder="Tìm kiếm tham số cấu hình...">
+        </div>
+        <div class="d-flex align-items-center text-white">
+            <i class="bi bi-bell-fill me-4 fs-5 cursor-pointer"></i>
+            <div class="d-flex align-items-center text-end me-3">
+                <div class="fw-bold small">Nguyễn Admin</div>
+                <div class="opacity-75 small text-uppercase" style="font-size: 10px;">Manager</div>
+            </div>
+            <div class="avatar-ad shadow-sm">AD</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Chính sách Hạng ghế</h2>
+                <p class="text-muted small mb-0">Thiết lập hệ số giá, quyền lợi hành lý và dịch vụ đi kèm cho từng hạng vé.</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: var(--primary-navy); border:none;" onclick="openAddModal()">
+                <i class="bi bi-plus-lg me-2"></i>Thêm hạng vé mới
+            </button>
+        </div>
+
+        <div class="row g-4 mt-2" id="policyCardsContainer">
+            
+            <div class="col-md-4" id="card-hang-nhat">
+                <div class="policy-card p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">HẠNG NHẤT</span>
+                        <div>
+                            <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Hạng Nhất')"></i>
+                            <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Hạng Nhất')"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x3.0</div>
+                    <div class="text-muted small mb-4 fw-bold text-uppercase">Hệ số giá cơ bản</div>
+                    
+                    <div class="mt-4 border-top pt-3">
+                        <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">15kg</b></div>
+                        <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">40kg</b></div>
+                        <div class="feature-item"><i class="bi bi-check-circle-fill text-success me-3"></i> Hoàn tiền miễn phí</div>
+                        <div class="feature-item"><i class="bi bi-star-fill text-warning me-3"></i> Suất ăn 5 sao & VIP Lounge</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" id="card-thuong-gia">
+                <div class="policy-card p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">THƯƠNG GIA</span>
+                        <div>
+                            <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Thương Gia')"></i>
+                            <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Thương Gia')"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x2.0</div>
+                    <div class="text-muted small mb-4 fw-bold text-uppercase">Hệ số giá cơ bản</div>
+                    
+                    <div class="mt-4 border-top pt-3">
+                        <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">12kg</b></div>
+                        <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">32kg</b></div>
+                        <div class="feature-item"><i class="bi bi-check-circle-fill text-success me-3"></i> Hoàn phí 10%</div>
+                        <div class="feature-item"><i class="bi bi-cup-hot-fill text-danger me-3"></i> Suất ăn nóng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" id="card-pho-thong">
+                <div class="policy-card p-4 shadow-sm" style="opacity: 0.85;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge bg-secondary px-3 py-2 rounded-pill shadow-sm">PHỔ THÔNG</span>
+                        <div>
+                            <i class="bi bi-pencil-square text-primary fs-5 cursor-pointer me-2" title="Chỉnh sửa" onclick="openEditModal('Phổ Thông')"></i>
+                            <i class="bi bi-trash text-danger fs-5 cursor-pointer" title="Xóa" onclick="openDeleteModal('Phổ Thông')"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold mb-0" style="color: var(--primary-navy);">x1.0</div>
+                    <div class="text-muted small mb-4 fw-bold text-uppercase">Giá gốc (GiaVeCoBan)</div>
+                    
+                    <div class="mt-4 border-top pt-3">
+                        <div class="feature-item"><i class="bi bi-briefcase-fill text-muted me-3"></i> Xách tay: <b class="text-dark">7kg</b></div>
+                        <div class="feature-item"><i class="bi bi-luggage-fill text-muted me-3"></i> Ký gửi: <b class="text-dark">23kg</b></div>
+                        <div class="feature-item"><i class="bi bi-x-circle-fill text-danger me-3"></i> Không hỗ trợ hoàn vé</div>
+                        <div class="feature-item"><i class="bi bi-water text-info me-3"></i> Nước suối miễn phí</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPolicy" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0" id="modalPolicyTitle" style="color: var(--primary-navy);"><i class="bi bi-gear-wide-connected me-2"></i>Cập nhật Hạng vé</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="policyForm">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold text-muted">TÊN HẠNG VÉ</label>
+                                <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="pName" placeholder="VD: Phổ thông Đặc biệt" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">MÃ MÀU (BADGE)</label>
+                                <select class="form-select bg-light border-0 py-2" id="pColor">
+                                    <option value="danger">Đỏ (Danger)</option>
+                                    <option value="warning">Vàng (Warning)</option>
+                                    <option value="primary">Xanh đậm (Primary)</option>
+                                    <option value="secondary">Xám (Secondary)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">HỆ SỐ GIÁ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 fw-bold">x</span>
+                                    <input type="number" step="0.1" class="form-control bg-light border-0 py-2 fw-bold" id="pMultiplier" placeholder="1.5" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">HÀNH LÝ XÁCH TAY</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" id="pCarryOn" placeholder="VD: 10kg">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">HÀNH LÝ KÝ GỬI</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" id="pChecked" placeholder="VD: 23kg">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted">CHÍNH SÁCH HOÀN/ĐỔI VÉ</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" id="pRefund" placeholder="VD: Hoàn phí 10%, Đổi vé miễn phí">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted">TIỆN ÍCH ĐI KÈM (CÁCH NHAU BỞI DẤU PHẨY)</label>
+                                <textarea class="form-control bg-light border-0 py-2" rows="2" id="pAmenities" placeholder="VD: Suất ăn nóng, Wifi, Phòng chờ VIP..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn text-white rounded-pill px-5 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="savePolicy()">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDelete" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content shadow-lg text-center p-4" style="border-radius: 20px;">
+                <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+                <h5 class="fw-bold mb-2">Xác nhận xóa?</h5>
+                <p class="text-muted small mb-4">Bạn có chắc muốn xóa chính sách hạng vé <strong id="delPolicyName" class="text-dark"></strong> không? Các vé đã bán thuộc hạng này sẽ không bị ảnh hưởng.</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light w-50 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger w-50 rounded-pill fw-bold" onclick="confirmDelete()">Xóa bỏ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1055; margin-top: 20px;">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-3 py-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold fs-6" id="toastMessage">Thao tác thành công!</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const modalPolicy = new bootstrap.Modal(document.getElementById('modalPolicy'));
+        const modalDelete = new bootstrap.Modal(document.getElementById('modalDelete'));
+        const toastEl = document.getElementById('liveToast');
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+        
+        let currentPolicyId = ''; // Lưu tên thẻ đang được chọn để giả lập Xóa
+
+        // Hàm gọi Toast (Thông báo nổi)
+        function toastDemo(msg, colorClass = 'bg-success') {
+            document.getElementById('toastMessage').innerText = msg;
+            toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+            bsToast.show();
+        }
+
+        // Mở Modal Thêm mới
+        function openAddModal() {
+            document.getElementById('modalPolicyTitle').innerHTML = '<i class="bi bi-plus-circle me-2"></i>Thêm Hạng vé mới';
+            document.getElementById('policyForm').reset();
+            modalPolicy.show();
+        }
+
+        // Mở Modal Chỉnh sửa
+        function openEditModal(policyName) {
+            document.getElementById('modalPolicyTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Hạng vé';
+            document.getElementById('pName').value = policyName;
+            
+            // Giả lập đổ dữ liệu (Demo)
+            if(policyName === 'Hạng Nhất') {
+                document.getElementById('pMultiplier').value = '3.0';
+                document.getElementById('pCarryOn').value = '15kg';
+                document.getElementById('pChecked').value = '40kg';
+                document.getElementById('pRefund').value = 'Hoàn tiền miễn phí';
+                document.getElementById('pColor').value = 'danger';
+                document.getElementById('pAmenities').value = 'Suất ăn 5 sao, VIP Lounge';
+            } else {
+                document.getElementById('pMultiplier').value = '1.0';
+                document.getElementById('pCarryOn').value = '';
+                document.getElementById('pChecked').value = '';
+                document.getElementById('pRefund').value = '';
+            }
+            
+            modalPolicy.show();
+        }
+
+        // Lưu thông tin
+        function savePolicy() {
+            modalPolicy.hide();
+            toastDemo('Đã lưu cấu hình chính sách hạng vé thành công!', 'bg-success');
+        }
+
+        // Mở Modal Xác nhận xóa
+        function openDeleteModal(policyName) {
+            currentPolicyId = policyName;
+            document.getElementById('delPolicyName').innerText = policyName;
+            modalDelete.show();
+        }
+
+        // Xác nhận Xóa thực sự
+        function confirmDelete() {
+            modalDelete.hide();
+            
+            // Tìm Card tương ứng để ẩn đi (Demo UI)
+            let cardId = '';
+            if (currentPolicyId === 'Hạng Nhất') cardId = 'card-hang-nhat';
+            else if (currentPolicyId === 'Thương Gia') cardId = 'card-thuong-gia';
+            else if (currentPolicyId === 'Phổ Thông') cardId = 'card-pho-thong';
+
+            if(cardId) {
+                const card = document.getElementById(cardId);
+                card.style.opacity = '0';
+                setTimeout(() => card.style.display = 'none', 300);
+            }
+            
+            toastDemo(`Đã xóa hạng vé ${currentPolicyId}`, 'bg-danger');
+        }
+    </script>
+</body>
+</html>
+
+@section Scripts {
+    <script src="/admin/js/Flight.CauHinhHeThong.js"></script>
+}

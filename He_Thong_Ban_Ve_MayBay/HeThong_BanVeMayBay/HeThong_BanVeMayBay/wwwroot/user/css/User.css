@@ -1,0 +1,73 @@
+:root {
+    --primary-navy: #003580;
+    --secondary-gold: #feba02;
+    --bg-light: #f4f6f9;
+    --bg-business: #fffbeb;
+    --text-business: #d97706; /* Màu vàng/cam */
+
+    --bg-premium: #f0fdf4;
+    --text-premium: #0f766e; /* Màu xanh lá đậm / Xanh rêu */
+
+    --bg-economy: #eff6ff;
+    --text-economy: #0ea5e9; /* Màu xanh dương trong vắt */
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-light);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- NAVBAR --- */
+.navbar {
+    background-color: var(--primary-navy) !important;
+    padding: 12px 0;
+    border: none;
+}
+
+.navbar-brand {
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: white !important;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    font-size: 15px;
+    margin: 0 5px;
+    transition: 0.3s;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+    .nav-link:hover, .nav-link.active {
+        color: var(--secondary-gold) !important;
+    }
+
+
+/* Avatar Style NA */
+.user-avatar-circle {
+    width: 35px;
+    height: 35px;
+    background-color: var(--secondary-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--primary-navy);
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.user-avatar-img {
+    width: 35px !important;
+    height: 35px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    margin-left: 10px !important;
+    border: 2px solid var(--secondary-gold) !important;
+    display: inline-block !important;
+}

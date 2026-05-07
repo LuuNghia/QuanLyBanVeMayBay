@@ -1,0 +1,58 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+using System;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class BookingController : Controller
+    {
+        private readonly QL_BanVeMayBayContext _context;
+
+        public BookingController(QL_BanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> QuanLyDatVe()
+        {
+            // Lấy danh sách Đặt vé, nạp kèm luôn Vé, Chuyến bay, Tuyến bay và Khách hàng tương ứng
+            var danhSachDatVe = await _context.DatVes
+                .Include(dv => dv.Ves)
+                    .ThenInclude(v => v.MaCbNavigation)
+                        .ThenInclude(cb => cb.MaTuyenNavigation)
+                            .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(dv => dv.Ves)
+                    .ThenInclude(v => v.MaCbNavigation)
+                        .ThenInclude(cb => cb.MaTuyenNavigation)
+                            .ThenInclude(t => t.MaSbdenNavigation)
+                .Include(dv => dv.Ves)
+                    .ThenInclude(v => v.MaGheNavigation)
+                        .ThenInclude(g => g.MaHangGheNavigation)
+                .OrderByDescending(dv => dv.NgayDat)
+                .ToListAsync();
+
+            // Tính tổng doanh thu tháng này
+            var currentDate = DateTime.Now;
+            var currentMonthRevenue = danhSachDatVe
+                .Where(dv => dv.NgayDat?.Month == currentDate.Month && dv.NgayDat?.Year == currentDate.Year && (dv.TrangThaiThanhToan == "Đã thanh toán" || dv.TrangThaiThanhToan == "Thành công"))
+                .Sum(dv => dv.TongTien ?? 0);
+
+            // Fetch list cb for dropdown filter (Tạo thủ công dropdown chuyến bay lúc thêm vé)
+            var currentFlights = await _context.ChuyenBays
+                .Include(c => c.MaTuyenNavigation)
+                .Where(c => c.NgayGioBay >= DateTime.Now)
+                .OrderBy(c => c.NgayGioBay)
+                .ToListAsync();
+
+            ViewBag.DoanhThuThangNay = currentMonthRevenue;
+            ViewBag.TongSoDatVe = danhSachDatVe.Count;
+            ViewBag.ChuyenBays = currentFlights;
+
+            return View(danhSachDatVe);
+        }
+    }
+}

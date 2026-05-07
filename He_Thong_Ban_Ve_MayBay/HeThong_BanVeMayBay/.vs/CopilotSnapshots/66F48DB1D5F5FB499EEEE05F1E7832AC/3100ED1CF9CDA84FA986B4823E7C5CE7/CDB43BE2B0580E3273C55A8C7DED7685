@@ -1,0 +1,494 @@
+﻿// Kh?i t?o Toast
+const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash) {
+        const tabTrigger = document.querySelector(`button[data-bs-toggle="tab"][data-bs-target="${hash}"]`);
+        if (tabTrigger) {
+            const tab = new bootstrap.Tab(tabTrigger);
+            tab.show();
+        }
+    }
+
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tabTrigger => {
+        tabTrigger.addEventListener('shown.bs.tab', event => {
+            const target = event.target.getAttribute('data-bs-target');
+            if (target) {
+                history.replaceState(null, document.title, `${window.location.pathname}${window.location.search}${target}`);
+            }
+        });
+    });
+
+    registerModalFocusFix('modalHistory');
+    registerModalFocusFix('modalDetail');
+    registerModalFocusFix('modalAddUser');
+});
+
+function registerModalFocusFix(modalId) {
+    const modalEl = document.getElementById(modalId);
+    if (!modalEl) return;
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+    });
+}
+
+function showModal(modalId) {
+    const modalEl = document.getElementById(modalId);
+    if (!modalEl) return;
+
+    const openModal = document.querySelector('.modal.show');
+    if (openModal && openModal !== modalEl) {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+        bootstrap.Modal.getInstance(openModal)?.hide();
+        openModal.addEventListener('hidden.bs.modal', () => {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }, { once: true });
+        return;
+    }
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+const accountTypeSelect = document.getElementById('accountTypeSelect');
+if (accountTypeSelect) {
+    accountTypeSelect.addEventListener('change', toggleRoleField);
+}
+
+function toggleRoleField() {
+    const roleField = document.getElementById('roleField');
+    if (!roleField || !accountTypeSelect) return;
+
+    const normalize = accountTypeSelect.value.toLowerCase();
+    if (normalize.includes('khách')) {
+        roleField.classList.add('d-none');
+    } else {
+        roleField.classList.remove('d-none');
+    }
+}
+
+function toastMessage(msg, colorClass = 'bg-success') {
+    document.getElementById('toastMessage').innerText = msg;
+    toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+    bsToast.show();
+}
+
+let currentUserType = '';
+let currentUserId = '';
+
+function openAddUserModal() {
+    document.getElementById('modalAddUserTitle').innerHTML = '<i class="bi bi-person-circle me-2"></i>Thêm Người dùng mới';
+    document.getElementById('userForm').reset();
+    document.getElementById('accountTypeSelect').disabled = false;
+    document.getElementById('userType').value = '';
+    document.getElementById('userId').value = '';
+    document.getElementById('userAccountId').value = '';
+    document.getElementById('roleField').classList.remove('d-none');
+    currentUserType = '';
+    currentUserId = '';
+    showModal('modalAddUser');
+}
+
+async function openEditUserModal(type, id) {
+    currentUserType = type;
+    currentUserId = id;
+    document.getElementById('modalAddUserTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật tài khoản';
+    document.getElementById('accountTypeSelect').disabled = false;
+    document.getElementById('userType').value = type;
+    document.getElementById('userId').value = id;
+
+    try {
+        const url = type === 'staff'
+            ? `/Admin/Account/LayThongTinNhanVien?id=${id}`
+            : `/Admin/Account/LayThongTinKhachHang?id=${id}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            toastMessage('Không thể tải dữ liệu tài khoản!', 'bg-danger');
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('userFullName').value = data.hoTen || '';
+        document.getElementById('userPhone').value = data.soDienThoai || '';
+        document.getElementById('userEmail').value = data.email || '';
+        document.getElementById('userCccd').value = data.cccd || '';
+        document.getElementById('userGender').value = data.gioiTinh || '';
+        document.getElementById('userBirthDate').value = data.ngaySinh || '';
+        document.getElementById('userAddress').value = data.diaChi || '';
+        document.getElementById('userRole').value = data.chucVu || '';
+        document.getElementById('userPassword').value = '';
+        document.getElementById('userAccountId').value = data.maTk || '';
+        if (data.loaiTaiKhoan) {
+            document.getElementById('accountTypeSelect').value = data.loaiTaiKhoan;
+        }
+
+        toggleRoleField();
+
+        showModal('modalAddUser');
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+async function updateAccountStatus(maTk, status, tab = 'staff') {
+    if (!maTk) {
+        toastMessage('Không tìm thấy tài khoản để cập nhật.', 'bg-danger');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/Admin/Account/CapNhatTrangThaiTaiKhoan?maTk=${maTk}&status=${status}&tab=${tab}`, {
+            method: 'POST'
+        });
+        if (res.ok) {
+            const data = await res.json();
+            toastMessage(data.message || 'Đã cập nhật trạng thái tài khoản.');
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể cập nhật trạng thái!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+function openRoleModal(userName) {
+    document.getElementById('roleUserName').innerText = userName;
+    new bootstrap.Modal(document.getElementById('modalRole')).show();
+}
+
+async function openHistoryModal(customerId) {
+    try {
+        const res = await fetch(`/Admin/Account/LichSuKhachHang?id=${customerId}`);
+        if (!res.ok) {
+            toastMessage('Không thể tải lịch sử chuyến bay!', 'bg-danger');
+            return;
+        }
+
+        const data = await res.json();
+        document.getElementById('historyName').innerText = data.hoTen || '--';
+        document.getElementById('historyTotal').innerText = `Tổng số: ${data.total || 0} chuyến`;
+
+        const badge = document.getElementById('historyBadge');
+        const loai = (data.loaiThanhVien || 'Thường').toUpperCase();
+        badge.innerText = `Thành viên ${loai}`;
+        badge.className = `badge me-3 ${getMembershipBadgeClass(loai)}`;
+
+        const tbody = document.getElementById('historyTableBody');
+        if (!data.tickets || data.tickets.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Chưa có dữ liệu lịch sử.</td></tr>';
+        } else {
+            tbody.innerHTML = data.tickets.map(ticket => `
+                <tr>
+                    <td class="fw-bold text-primary">${ticket.maVe}</td>
+                    <td><span class="fw-bold">${ticket.sanBayDi}</span> <i class="bi bi-arrow-right opacity-50"></i> <span class="fw-bold">${ticket.sanBayDen}</span></td>
+                    <td>${ticket.ngayBay}</td>
+                    <td><span class="badge ${getStatusBadgeClass(ticket.trangThai)}">${ticket.trangThai}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        showModal('modalHistory');
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+let currentDetailType = '';
+let currentDetailId = '';
+let currentDetailEmail = '';
+
+async function openDetailModal(type, id) {
+    currentDetailType = type;
+    currentDetailId = id;
+    try {
+        const url = type === 'staff'
+            ? `/Admin/Account/LayThongTinNhanVien?id=${id}`
+            : `/Admin/Account/LayThongTinKhachHang?id=${id}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            toastMessage('Không thể tải thông tin chi tiết!', 'bg-danger');
+            return;
+        }
+
+        const data = await res.json();
+        const name = data.hoTen || '--';
+        document.getElementById('detailName').innerText = name;
+        document.getElementById('detailCode').innerText = type === 'staff' ? `Mã NV: ${data.maNv || '--'}` : `Mã KH: ${data.maKh || '--'}`;
+        document.getElementById('detailEmail').innerText = data.email || '--';
+        document.getElementById('detailPhone').innerText = data.soDienThoai || '--';
+        document.getElementById('detailCccd').innerText = data.cccd || '--';
+        document.getElementById('detailGender').innerText = data.gioiTinh || '--';
+        document.getElementById('detailBirthDate').innerText = data.ngaySinh || '--';
+        document.getElementById('detailAddress').innerText = data.diaChi || '--';
+        document.getElementById('detailJoined').innerText = data.ngayThamGia || '--';
+
+        currentDetailEmail = data.email || '';
+        document.getElementById('detailAvatar').innerText = getInitials(name);
+
+        const badge = document.getElementById('detailBadge');
+        const badgeText = type === 'staff'
+            ? (data.loaiTaiKhoan || data.chucVu || 'Nhân viên')
+            : (data.loaiThanhVien || 'Thường');
+        badge.innerText = badgeText;
+        badge.className = `badge rounded-pill mt-2 ${getAccountBadgeClass(type, badgeText)}`;
+
+        const roleWrapper = document.getElementById('detailRoleWrapper');
+        if (type === 'staff') {
+            document.getElementById('detailRole').innerText = data.chucVu || '--';
+            roleWrapper.classList.remove('d-none');
+        } else {
+            roleWrapper.classList.add('d-none');
+        }
+
+        showModal('modalDetail');
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+function copyDetailEmail() {
+    if (!currentDetailEmail) {
+        toastMessage('Không có email để sao chép.', 'bg-warning text-dark');
+        return;
+    }
+
+    navigator.clipboard.writeText(currentDetailEmail)
+        .then(() => toastMessage('Đã sao chép email.'))
+        .catch(() => toastMessage('Không thể sao chép email.', 'bg-danger'));
+}
+
+function editFromDetail() {
+    if (!currentDetailId || !currentDetailType) {
+        toastMessage('Không xác định tài khoản để sửa.', 'bg-warning text-dark');
+        return;
+    }
+    bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
+    openEditUserModal(currentDetailType, currentDetailId);
+}
+
+function getInitials(name) {
+    const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
+function getMembershipBadgeClass(type) {
+    if (type.includes('VÀNG') || type.includes('GOLD')) return 'bg-warning text-dark';
+    if (type.includes('BẠC') || type.includes('SILVER')) return 'bg-secondary text-white';
+    if (type.includes('KIM CƯƠNG') || type.includes('DIAMOND')) return 'bg-primary text-white';
+    return 'bg-light text-dark';
+}
+
+function getStatusBadgeClass(status) {
+    if (!status) return 'bg-secondary-subtle text-secondary';
+    const normalized = status.toLowerCase();
+    if (normalized.includes('hoàn') || normalized.includes('đã')) return 'bg-success-subtle text-success';
+    if (normalized.includes('hủy') || normalized.includes('huỷ')) return 'bg-danger-subtle text-danger';
+    return 'bg-warning-subtle text-warning';
+}
+
+function getAccountBadgeClass(type, text) {
+    if (type === 'staff') {
+        return text.toLowerCase().includes('admin') ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary';
+    }
+    return getMembershipBadgeClass(text.toUpperCase());
+}
+
+let confirmActionType = '';
+let confirmAccountId = 0;
+let confirmTab = 'staff';
+
+function confirmDeleteAccount(maTk, name, tab = 'staff') {
+    if (!maTk) {
+        toastMessage('Không tìm thấy tài khoản để xử lý!', 'bg-danger');
+        return;
+    }
+
+    confirmActionType = 'delete';
+    confirmAccountId = maTk;
+    confirmTab = tab;
+    document.getElementById('confirmText').innerText = `Bạn có chắc muốn xóa tài khoản ${name}?`;
+    const btn = document.getElementById('btnConfirmAction');
+    btn.innerText = 'Xóa';
+    btn.className = 'btn btn-danger w-50 fw-bold';
+    btn.onclick = executeConfirmAction;
+    new bootstrap.Modal(document.getElementById('modalConfirm')).show();
+}
+
+async function executeConfirmAction() {
+    if (confirmActionType !== 'delete' || !confirmAccountId) {
+        toastMessage('Không xác định thao tác.', 'bg-danger');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/Admin/Account/XoaTaiKhoan?maTk=${confirmAccountId}&tab=${confirmTab}`, { method: 'DELETE' });
+        bootstrap.Modal.getInstance(document.getElementById('modalConfirm')).hide();
+        if (res.ok) {
+            const data = await res.json();
+            toastMessage(data.message || 'Đã xóa tài khoản thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể xóa tài khoản!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+async function saveUser() {
+    const type = document.getElementById('userType').value;
+    const id = document.getElementById('userId').value;
+    const accountId = document.getElementById('userAccountId').value;
+    const accountType = document.getElementById('accountTypeSelect').value;
+
+    const payload = {
+        hoTen: document.getElementById('userFullName').value.trim(),
+        gioiTinh: document.getElementById('userGender').value,
+        ngaySinh: document.getElementById('userBirthDate').value || null,
+        soDienThoai: document.getElementById('userPhone').value.trim(),
+        email: document.getElementById('userEmail').value.trim(),
+        cccd: document.getElementById('userCccd').value.trim(),
+        diaChi: document.getElementById('userAddress').value.trim(),
+        chucVu: document.getElementById('userRole').value.trim(),
+        loaiTaiKhoan: accountType,
+        matKhau: document.getElementById('userPassword').value.trim()
+    };
+
+    if (!payload.hoTen || !payload.soDienThoai || !payload.email || !payload.cccd) {
+        toastMessage('Vui lòng nhập đầy đủ thông tin.', 'bg-warning text-dark');
+        return;
+    }
+
+    if (!payload.ngaySinh) {
+        toastMessage('Vui lòng chọn ngày sinh.', 'bg-warning text-dark');
+        return;
+    }
+
+    const birthDate = new Date(payload.ngaySinh);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+    }
+
+    if (birthDate > today) {
+        toastMessage('Ngày sinh không hợp lệ (lớn hơn ngày hiện tại).', 'bg-danger text-white');
+        return;
+    }
+
+    if (age < 18) {
+        toastMessage('Khách hàng phải từ 18 tuổi trở lên.', 'bg-warning text-dark');
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(payload.email)) {
+        toastMessage('Email không hợp lệ.', 'bg-warning text-dark');
+        return;
+    }
+
+    const sdtRegex = /^(03|05|07|08|09)\d{8}$/;
+    if (!sdtRegex.test(payload.soDienThoai)) {
+        toastMessage('Số điện thoại không hợp lệ.', 'bg-warning text-dark');
+        return;
+    }
+
+    const cccdRegex = /^\d{12}$/;
+    if (!cccdRegex.test(payload.cccd)) {
+        toastMessage('CCCD/PASSPORT không hợp lệ.', 'bg-warning text-dark');
+        return;
+    }
+
+    if (!payload.loaiTaiKhoan) {
+        toastMessage('Vui lòng chọn loại tài khoản.', 'bg-warning text-dark');
+        return;
+    }
+
+    const normalize = accountType.toLowerCase();
+    const resolvedType = normalize.includes('khách') ? 'customer' : 'staff';
+    if (resolvedType === 'staff' && !payload.chucVu) {
+        toastMessage('Vui lòng nhập chức vụ.', 'bg-warning text-dark');
+        return;
+    }
+
+    if (!id && !payload.matKhau) {
+        toastMessage('Vui lòng nhập mật khẩu.', 'bg-warning text-dark');
+        return;
+    }
+
+    if (payload.matKhau && payload.matKhau.length < 6) {
+        toastMessage('Mật khẩu phải có ít nhất 6 ký tự.', 'bg-warning text-dark');
+        return;
+    }
+
+    let url = '';
+    let entityType = type || resolvedType;
+
+    if (!id) {
+        url = entityType === 'staff' ? '/Admin/Account/ThemNhanVien' : '/Admin/Account/ThemKhachHang';
+    } else {
+        url = entityType === 'staff'
+            ? '/Admin/Account/CapNhatNhanVien'
+            : '/Admin/Account/CapNhatKhachHang';
+
+        if (entityType === 'staff') {
+            payload.maNv = id;
+        } else {
+            payload.maKh = id;
+        }
+        payload.maTk = accountId || null;
+    }
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('modalAddUser')).hide();
+            toastMessage('Đã cập nhật tài khoản thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể cập nhật tài khoản!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+async function updateAccountStatus(maTk, status) {
+    if (!maTk) {
+        toastMessage('Không tìm thấy tài khoản để cập nhật.', 'bg-danger');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/Admin/Account/CapNhatTrangThaiTaiKhoan?maTk=${maTk}&status=${status}`, {
+            method: 'POST'
+        });
+        if (res.ok) {
+            toastMessage('Đã cập nhật trạng thái tài khoản.');
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể cập nhật trạng thái!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}

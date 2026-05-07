@@ -1,0 +1,331 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\admin\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\admin\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\admin\\views\\booking\\quanlydatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\admin\\views\\booking\\quanlydatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\admin\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\admin\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\admin\\views\\shared\\_layoutadmin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\admin\\views\\shared\\_layoutadmin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\shared\\_layoutuser.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\shared\\_layoutuser.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\booking\\thongtinkhdatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\booking\\thongtinkhdatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\booking\\lichsudatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\booking\\lichsudatve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\admin\\views\\flight\\sodoghe.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\admin\\views\\flight\\sodoghe.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\booking\\choncho.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\booking\\choncho.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\booking\\tracuuve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\booking\\tracuuve.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\areas\\user\\views\\booking\\thanhtoan.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\areas\\user\\views\\booking\\thanhtoan.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|d:\\bai_tap_lon\\he_thong_ban_ve_maybay\\hethong_banvemaybay\\hethong_banvemaybay\\wwwroot\\user\\js\\thongtinkhdatve.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{DD1CE589-B519-4756-A8E4-33B65CF65CCE}|HeThong_BanVeMayBay\\HeThong_BanVeMayBay.csproj|solutionrelative:hethong_banvemaybay\\wwwroot\\user\\js\\thongtinkhdatve.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "QuanLyDatVe.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Booking\\QuanLyDatVe.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Booking\\QuanLyDatVe.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Booking\\QuanLyDatVe.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Booking\\QuanLyDatVe.cshtml",
+              "ViewState": "AgIAAHkAAAAAAAAAAAASwHAAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-07T14:14:37.658Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BookingController.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\BookingController.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\BookingController.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\BookingController.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\BookingController.cs",
+              "ViewState": "AgIAAHoCAAAAAAAAAAArwIICAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-07T13:18:32.568Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\AccountController.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\Admin\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAAAlwCkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-07T13:17:52.807Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_LayoutAdmin.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Shared\\_LayoutAdmin.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Shared\\_LayoutAdmin.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Shared\\_LayoutAdmin.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Shared\\_LayoutAdmin.cshtml",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAlwHIAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-07T08:10:50.142Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Controllers\\AccountController.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAIIAAAAAAAAAAAAewAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-07T08:10:08.666Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "_LayoutUser.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Shared\\_LayoutUser.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Shared\\_LayoutUser.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Shared\\_LayoutUser.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Shared\\_LayoutUser.cshtml",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-07T08:08:19.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ProfileController.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Controllers\\ProfileController.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Controllers\\ProfileController.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Controllers\\ProfileController.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Controllers\\ProfileController.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAhwGQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-07T07:23:01.802Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Views\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Views\\Account\\Register.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Views\\Account\\Register.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Views\\Account\\Register.cshtml",
+              "ViewState": "AgIAACwAAAAAAAAAAAAhwDwAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T15:36:37.661Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SoDoGhe.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Flight\\SoDoGhe.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Flight\\SoDoGhe.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Flight\\SoDoGhe.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\Admin\\Views\\Flight\\SoDoGhe.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T13:25:24.286Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Program.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Program.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Program.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Program.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAcwDYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T13:25:06.443Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "ThongTinKHDatve.js",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\wwwroot\\user\\js\\ThongTinKHDatve.js",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\wwwroot\\user\\js\\ThongTinKHDatve.js",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\wwwroot\\user\\js\\ThongTinKHDatve.js",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\wwwroot\\user\\js\\ThongTinKHDatve.js",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAAAAAAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-05-06T12:14:11.289Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BookingController.cs",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Controllers\\BookingController.cs",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Controllers\\BookingController.cs",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Controllers\\BookingController.cs",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Controllers\\BookingController.cs",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAWwFgBAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T12:11:03.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ThongTinKHDatVe.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThongTinKHDatVe.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThongTinKHDatVe.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThongTinKHDatVe.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThongTinKHDatVe.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T12:10:57.821Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "TraCuuVe.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\TraCuuVe.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\TraCuuVe.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\TraCuuVe.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\TraCuuVe.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T12:10:57.117Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "ThanhToan.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThanhToan.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThanhToan.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThanhToan.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ThanhToan.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T12:10:56.005Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "LichSuDatVe.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\LichSuDatVe.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\LichSuDatVe.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\LichSuDatVe.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\LichSuDatVe.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T12:10:54.946Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ChonCho.cshtml",
+              "DocumentMoniker": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ChonCho.cshtml",
+              "RelativeDocumentMoniker": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ChonCho.cshtml",
+              "ToolTip": "D:\\Bai_Tap_Lon\\He_Thong_Ban_Ve_MayBay\\HeThong_BanVeMayBay\\HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ChonCho.cshtml",
+              "RelativeToolTip": "HeThong_BanVeMayBay\\Areas\\User\\Views\\Booking\\ChonCho.cshtml",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAhwI4AAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-06T12:10:50.596Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 498,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

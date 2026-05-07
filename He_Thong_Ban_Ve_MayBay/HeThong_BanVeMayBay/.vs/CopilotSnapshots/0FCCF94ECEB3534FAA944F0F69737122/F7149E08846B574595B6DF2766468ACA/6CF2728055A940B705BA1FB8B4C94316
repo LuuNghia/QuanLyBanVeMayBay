@@ -1,0 +1,209 @@
+﻿@{
+    ViewData["Title"] = "Chọn chổ ngồi";
+}
+<link rel="stylesheet" type="text/css" href="~/user/css/ChonCho.css" />
+
+<div class="step-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a asp-area="User" asp-controller="Home" asp-action="Index" class="back-btn" onclick="history.back()"><i class="bi bi-arrow-left me-2"></i>Quay lại danh sách chuyến bay</a>
+        <div class="small fw-bold text-muted text-uppercase">BƯỚC 2/4: CHỌN CHỖ NGỒI</div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row g-4">
+
+        <div class="col-lg-7 col-xl-8">
+            <div class="card-custom">
+                <h3 class="title-main">Sơ đồ máy bay (Boeing 787)</h3>
+
+                <div class="d-flex justify-content-center align-items-center mb-3 text-muted fw-bold" style="font-size: 12px; gap: 15px;">
+                    <div style="width: 130px; letter-spacing: 12px;" class="text-center">ABC</div>
+                    <div class="aisle-space"></div>
+                    <div style="width: 130px; letter-spacing: 12px;" class="text-center">DEF</div>
+                    <div class="aisle-space"></div>
+                    <div style="width: 130px; letter-spacing: 12px;" class="text-center">GHK</div>
+                </div>
+
+                <div class="cabin-box cabin-business">
+                    <div class="cabin-title"><i class="bi bi-star-fill me-1"></i> Hạng Thương Gia (Business)</div>
+
+                    <div class="seat-row">
+                        <div class="seat-group left-window">
+                            <div class="seat" data-seat="1A" data-type="business" data-price="3500000">1A</div>
+                        </div>
+                        <div class="aisle-space">1</div>
+                        <div class="seat-group center-block">
+                            <div class="seat" data-seat="1D" data-type="business" data-price="3500000">1D</div>
+                            <div class="seat" data-seat="1E" data-type="business" data-price="3500000">1E</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group right-window">
+                            <div class="seat" data-seat="1K" data-type="business" data-price="3500000">1K</div>
+                        </div>
+                    </div>
+                    <div class="seat-row">
+                        <div class="seat-group left-window"><div class="seat booked" data-seat="2A">2A</div></div>
+                        <div class="aisle-space">2</div>
+                        <div class="seat-group center-block">
+                            <div class="seat" data-seat="2D" data-type="business" data-price="3500000">2D</div>
+                            <div class="seat booked" data-seat="2E">2E</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group right-window"><div class="seat" data-seat="2K" data-type="business" data-price="3500000">2K</div></div>
+                    </div>
+                    <div class="seat-row">
+                        <div class="seat-group left-window"><div class="seat" data-seat="3A" data-type="business" data-price="3500000">3A</div></div>
+                        <div class="aisle-space">3</div>
+                        <div class="seat-group center-block">
+                            <div class="seat" data-seat="3D" data-type="business" data-price="3500000">3D</div>
+                            <div class="seat" data-seat="3E" data-type="business" data-price="3500000">3E</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group right-window"><div class="seat" data-seat="3K" data-type="business" data-price="3500000">3K</div></div>
+                    </div>
+                </div>
+
+                <div class="cabin-box cabin-premium">
+                    <div class="cabin-title"><i class="bi bi-shield-check me-1"></i> Phổ Thông Đặc Biệt (Premium)</div>
+
+                    <div class="seat-row">
+                        <div class="seat-group">
+                            <div class="seat" data-seat="10A" data-type="premium" data-price="800000">10A</div>
+                            <div class="seat" data-seat="10B" data-type="premium" data-price="800000">10B</div>
+                            <div class="seat" data-seat="10C" data-type="premium" data-price="800000">10C</div>
+                        </div>
+                        <div class="aisle-space">10</div>
+                        <div class="seat-group">
+                            <div class="seat booked" data-seat="10D">10D</div>
+                            <div class="seat booked" data-seat="10E">10E</div>
+                            <div class="seat booked" data-seat="10F">10F</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="10G" data-type="premium" data-price="800000">10G</div>
+                            <div class="seat" data-seat="10H" data-type="premium" data-price="800000">10H</div>
+                            <div class="seat" data-seat="10K" data-type="premium" data-price="800000">10K</div>
+                        </div>
+                    </div>
+                    <div class="seat-row">
+                        <div class="seat-group">
+                            <div class="seat" data-seat="11A" data-type="premium" data-price="800000">11A</div>
+                            <div class="seat" data-seat="11B" data-type="premium" data-price="800000">11B</div>
+                            <div class="seat" data-seat="11C" data-type="premium" data-price="800000">11C</div>
+                        </div>
+                        <div class="aisle-space">11</div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="11D" data-type="premium" data-price="800000">11D</div>
+                            <div class="seat" data-seat="11E" data-type="premium" data-price="800000">11E</div>
+                            <div class="seat" data-seat="11F" data-type="premium" data-price="800000">11F</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="11G" data-type="premium" data-price="800000">11G</div>
+                            <div class="seat" data-seat="11H" data-type="premium" data-price="800000">11H</div>
+                            <div class="seat" data-seat="11K" data-type="premium" data-price="800000">11K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cabin-box cabin-economy mb-0">
+                    <div class="cabin-title"><i class="bi bi-people me-1"></i> Phổ Thông (Economy)</div>
+
+                    <div class="seat-row">
+                        <div class="seat-group">
+                            <div class="seat" data-seat="25A" data-type="economy" data-price="0">25A</div>
+                            <div class="seat" data-seat="25B" data-type="economy" data-price="0">25B</div>
+                            <div class="seat" data-seat="25C" data-type="economy" data-price="0">25C</div>
+                        </div>
+                        <div class="aisle-space">25</div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="25D" data-type="economy" data-price="0">25D</div>
+                            <div class="seat" data-seat="25E" data-type="economy" data-price="0">25E</div>
+                            <div class="seat" data-seat="25F" data-type="economy" data-price="0">25F</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="25G" data-type="economy" data-price="0">25G</div>
+                            <div class="seat" data-seat="25H" data-type="economy" data-price="0">25H</div>
+                            <div class="seat" data-seat="25K" data-type="economy" data-price="0">25K</div>
+                        </div>
+                    </div>
+                    <div class="seat-row">
+                        <div class="seat-group">
+                            <div class="seat" data-seat="26A" data-type="economy" data-price="0">26A</div>
+                            <div class="seat booked" data-seat="26B">26B</div>
+                            <div class="seat booked" data-seat="26C">26C</div>
+                        </div>
+                        <div class="aisle-space">26</div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="26D" data-type="economy" data-price="0">26D</div>
+                            <div class="seat" data-seat="26E" data-type="economy" data-price="0">26E</div>
+                            <div class="seat" data-seat="26F" data-type="economy" data-price="0">26F</div>
+                        </div>
+                        <div class="aisle-space"></div>
+                        <div class="seat-group">
+                            <div class="seat" data-seat="26G" data-type="economy" data-price="0">26G</div>
+                            <div class="seat" data-seat="26H" data-type="economy" data-price="0">26H</div>
+                            <div class="seat booked" data-seat="26K">26K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-xl-4">
+            <div class="card-custom position-sticky" style="top: 100px;">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold" style="color: var(--primary-navy);">Chuyến bay VN123</h4>
+                    <div class="text-muted small mt-1">SGN <i class="bi bi-arrow-right mx-1"></i> HAN | 15/06/2026</div>
+                    <div class="badge bg-primary mt-2 px-3 py-2 fs-6" id="badgeSeatId">Chưa chọn ghế</div>
+                </div>
+
+                <div class="section-title">QUYỀN LỢI & ĐIỀU KIỆN</div>
+                <ul class="info-list">
+                    <li>
+                        <div><i class="bi bi-briefcase me-3"></i><span class="fw-bold text-dark">Xách tay</span></div>
+                        <span class="text-muted fw-bold" id="cond-carryon">--</span>
+                    </li>
+                    <li>
+                        <div><i class="bi bi-luggage me-3"></i><span class="fw-bold text-dark">Ký gửi</span></div>
+                        <span class="text-muted fw-bold" id="cond-checked">--</span>
+                    </li>
+                    <li>
+                        <div><i class="bi bi-star-fill me-3"></i><span class="fw-bold text-dark">Dịch vụ</span></div>
+                        <span class="text-muted fw-bold" id="cond-amenities">--</span>
+                    </li>
+                </ul>
+
+                <div class="section-title mt-4">CHI TIẾT THANH TOÁN</div>
+                <div class="bill-summary">
+                    <div class="bill-row">
+                        <span>Giá vé cơ bản (1 Người lớn)</span>
+                        <span class="fw-bold">1,500,000 đ</span>
+                    </div>
+                    <div class="bill-row">
+                        <span>Thuế, phí sân bay</span>
+                        <span class="fw-bold">450,000 đ</span>
+                    </div>
+                    <div class="bill-row">
+                        <span id="billSeatClass">Phụ thu ghế (Chưa chọn)</span>
+                        <span class="fw-bold text-danger" id="billSeatPrice">0 đ</span>
+                    </div>
+                    <div class="bill-row">
+                        <span>TỔNG TIỀN TẠM TÍNH</span>
+                        <span id="billTotal">1,950,000 đ</span>
+                    </div>
+                </div>
+
+                <button class="btn-checkout" id="btnConfirm" disabled onclick="submitSelection()">
+                    <span>TIẾP TỤC ĐIỀN THÔNG TIN</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="~/user/js/ChonCho.js" asp-append-version="true" defer></script>

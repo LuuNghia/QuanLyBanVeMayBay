@@ -1,0 +1,40 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using HeThong_BanVeMayBay.Models.EF;
+using Microsoft.EntityFrameworkCore;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")] 
+    public class HomeController : Controller
+    {
+        private readonly QL_BanVeMayBayContext _context;
+
+        public HomeController(QL_BanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.TotalFlights = await _context.ChuyenBays.CountAsync();
+            ViewBag.TotalBookings = await _context.DatVes.CountAsync();
+            ViewBag.TotalCustomers = await _context.KhachHangs.CountAsync();
+            
+            // Lấy danh sách chuyến bay hôm nay (ví dụ: lấy 5 chuyến bay sắp tới)
+            var todayFlights = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .OrderByDescending(c => c.NgayGioBay)
+                .Take(5)
+                .ToListAsync();
+
+            ViewBag.TodayFlights = todayFlights;
+            ViewBag.TotalAirports = await _context.SanBays.CountAsync();
+
+            return View();
+        }
+    }
+}

@@ -1,0 +1,416 @@
+﻿using System;
+using System.Collections.Generic;
+using HeThong_BanVeMayBay.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace HeThong_BanVeMayBay.Models.EF;
+
+public partial class QlBanVeMayBayContext : DbContext
+{
+    public QlBanVeMayBayContext()
+    {
+    }
+
+    public QlBanVeMayBayContext(DbContextOptions<QlBanVeMayBayContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<ChuyenBay> ChuyenBays { get; set; }
+
+    public virtual DbSet<DanhMucGhe> DanhMucGhes { get; set; }
+
+    public virtual DbSet<DatVe> DatVes { get; set; }
+
+    public virtual DbSet<HangGhe> HangGhes { get; set; }
+
+    public virtual DbSet<HangHangKhong> HangHangKhongs { get; set; }
+
+    public virtual DbSet<KhachHang> KhachHangs { get; set; }
+
+    public virtual DbSet<LoaiMayBay> LoaiMayBays { get; set; }
+
+    public virtual DbSet<NhanVien> NhanViens { get; set; }
+
+    public virtual DbSet<SanBay> SanBays { get; set; }
+
+    public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
+
+    public virtual DbSet<TienIch> TienIches { get; set; }
+
+    public virtual DbSet<TuyenBay> TuyenBays { get; set; }
+
+    public virtual DbSet<Ve> Ves { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=LAPTOP-V9Q3E3QU\\SQLEXPRESS;Database=QL_BanVeMayBay;Trusted_Connection=True;TrustServerCertificate=True");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ChuyenBay>(entity =>
+        {
+            entity.HasKey(e => e.MaCb).HasName("PK__ChuyenBa__27258E1AC1FE40B4");
+
+            entity.ToTable("ChuyenBay");
+
+            entity.Property(e => e.MaCb)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("MaCB");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.GiaVeCoBan).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.MaHang)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.MaLoaiMb)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("MaLoaiMB");
+            entity.Property(e => e.MaTuyen)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.NgayGioBay).HasColumnType("datetime");
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(50)
+                .HasDefaultValue("Sắp khởi hành");
+
+            entity.HasOne(d => d.MaHangNavigation).WithMany(p => p.ChuyenBays)
+                .HasForeignKey(d => d.MaHang)
+                .HasConstraintName("FK__ChuyenBay__MaHan__59FA5E80");
+
+            entity.HasOne(d => d.MaLoaiMbNavigation).WithMany(p => p.ChuyenBays)
+                .HasForeignKey(d => d.MaLoaiMb)
+                .HasConstraintName("FK__ChuyenBay__MaLoa__59063A47");
+
+            entity.HasOne(d => d.MaTuyenNavigation).WithMany(p => p.ChuyenBays)
+                .HasForeignKey(d => d.MaTuyen)
+                .HasConstraintName("FK__ChuyenBay__MaTuy__5812160E");
+        });
+
+        modelBuilder.Entity<DanhMucGhe>(entity =>
+        {
+            entity.HasKey(e => e.MaGhe).HasName("PK__DanhMucG__3CD3C67B763B9B41");
+
+            entity.ToTable("DanhMucGhe");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.MaHangGhe)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.MaLoaiMb)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("MaLoaiMB");
+            entity.Property(e => e.PhuThu)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoGhe)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.TrangThai).HasDefaultValue(true);
+
+            entity.HasOne(d => d.MaHangGheNavigation).WithMany(p => p.DanhMucGhes)
+                .HasForeignKey(d => d.MaHangGhe)
+                .HasConstraintName("FK__DanhMucGh__MaHan__52593CB8");
+
+            entity.HasOne(d => d.MaLoaiMbNavigation).WithMany(p => p.DanhMucGhes)
+                .HasForeignKey(d => d.MaLoaiMb)
+                .HasConstraintName("FK__DanhMucGh__MaLoa__5165187F");
+        });
+
+        modelBuilder.Entity<DatVe>(entity =>
+        {
+            entity.HasKey(e => e.MaDatVe).HasName("PK__DatVe__6A32C59323D62CAB");
+
+            entity.ToTable("DatVe");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.MaTk).HasColumnName("MaTK");
+            entity.Property(e => e.NgayDat)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.TongTien)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.TrangThaiThanhToan)
+                .HasMaxLength(50)
+                .HasDefaultValue("Chờ thanh toán");
+
+            entity.HasOne(d => d.MaTkNavigation).WithMany(p => p.DatVes)
+                .HasForeignKey(d => d.MaTk)
+                .HasConstraintName("FK__DatVe__MaTK__72C60C4A");
+        });
+
+        modelBuilder.Entity<HangGhe>(entity =>
+        {
+            entity.HasKey(e => e.MaHangGhe).HasName("PK__HangGhe__9774DC5379D08C9D");
+
+            entity.ToTable("HangGhe");
+
+            entity.Property(e => e.MaHangGhe)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.DoiLich).HasMaxLength(100);
+            entity.Property(e => e.HanhLyKyGui).HasMaxLength(50);
+            entity.Property(e => e.HanhLyXachTay).HasMaxLength(50);
+            entity.Property(e => e.HeSoGia).HasDefaultValue(10.0);
+            entity.Property(e => e.HoanVe).HasMaxLength(100);
+            entity.Property(e => e.MauSac)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.TenHangGhe).HasMaxLength(50);
+
+            entity.HasMany(d => d.MaTienIches).WithMany(p => p.MaHangGhes)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ChiTietTienIch",
+                    r => r.HasOne<TienIch>().WithMany()
+                        .HasForeignKey("MaTienIch")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__ChiTietTi__MaTie__48CFD27E"),
+                    l => l.HasOne<HangGhe>().WithMany()
+                        .HasForeignKey("MaHangGhe")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__ChiTietTi__MaHan__47DBAE45"),
+                    j =>
+                    {
+                        j.HasKey("MaHangGhe", "MaTienIch").HasName("PK__ChiTietT__231DA1DD767E6C9F");
+                        j.ToTable("ChiTietTienIch");
+                        j.IndexerProperty<string>("MaHangGhe")
+                            .HasMaxLength(20)
+                            .IsUnicode(false);
+                    });
+        });
+
+        modelBuilder.Entity<HangHangKhong>(entity =>
+        {
+            entity.HasKey(e => e.MaHang).HasName("PK__HangHang__19C0DB1D31390540");
+
+            entity.ToTable("HangHangKhong");
+
+            entity.Property(e => e.MaHang)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.TenHang).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<KhachHang>(entity =>
+        {
+            entity.HasKey(e => e.MaKh).HasName("PK__KhachHan__2725CF1ECB3D72BA");
+
+            entity.ToTable("KhachHang");
+
+            entity.HasIndex(e => e.MaTk, "UQ__KhachHan__2725007194EDDB70").IsUnique();
+
+            entity.HasIndex(e => e.Cccd, "UQ__KhachHan__A955A0AAD2405211").IsUnique();
+
+            entity.Property(e => e.MaKh)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("MaKH");
+            entity.Property(e => e.AnhDaiDien).HasMaxLength(255);
+            entity.Property(e => e.Cccd)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("CCCD");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.DiaChi).HasMaxLength(200);
+            entity.Property(e => e.DiemTichLuy).HasDefaultValue(0);
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.GioiTinh).HasMaxLength(10);
+            entity.Property(e => e.HoTen).HasMaxLength(100);
+            entity.Property(e => e.LoaiThanhVien)
+                .HasMaxLength(20)
+                .HasDefaultValue("Thường");
+            entity.Property(e => e.MaTk).HasColumnName("MaTK");
+            entity.Property(e => e.SoDienThoai)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.MaTkNavigation).WithOne(p => p.KhachHang)
+                .HasForeignKey<KhachHang>(d => d.MaTk)
+                .HasConstraintName("FK__KhachHang__MaTK__66603565");
+        });
+
+        modelBuilder.Entity<LoaiMayBay>(entity =>
+        {
+            entity.HasKey(e => e.MaLoaiMb).HasName("PK__LoaiMayB__12253B3AC88183EA");
+
+            entity.ToTable("LoaiMayBay");
+
+            entity.Property(e => e.MaLoaiMb)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("MaLoaiMB");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.HangSanXuat).HasMaxLength(50);
+            entity.Property(e => e.TenLoaiMb)
+                .HasMaxLength(100)
+                .HasColumnName("TenLoaiMB");
+        });
+
+        modelBuilder.Entity<NhanVien>(entity =>
+        {
+            entity.HasKey(e => e.MaNv).HasName("PK__NhanVien__2725D70A5D6FDC7B");
+
+            entity.ToTable("NhanVien");
+
+            entity.HasIndex(e => e.MaTk, "UQ__NhanVien__272500713DD41EF1").IsUnique();
+
+            entity.HasIndex(e => e.Cccd, "UQ__NhanVien__A955A0AAE4C69B9E").IsUnique();
+
+            entity.Property(e => e.MaNv)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("MaNV");
+            entity.Property(e => e.AnhDaiDien).HasMaxLength(255);
+            entity.Property(e => e.Cccd)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("CCCD");
+            entity.Property(e => e.ChucVu).HasMaxLength(50);
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.DiaChi).HasMaxLength(200);
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.GioiTinh).HasMaxLength(10);
+            entity.Property(e => e.HoTen).HasMaxLength(100);
+            entity.Property(e => e.MaTk).HasColumnName("MaTK");
+            entity.Property(e => e.NgayVaoLam).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.SoDienThoai)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.MaTkNavigation).WithOne(p => p.NhanVien)
+                .HasForeignKey<NhanVien>(d => d.MaTk)
+                .HasConstraintName("FK__NhanVien__MaTK__6E01572D");
+        });
+
+        modelBuilder.Entity<SanBay>(entity =>
+        {
+            entity.HasKey(e => e.MaSb).HasName("PK__SanBay__2725080EA7FE4CEA");
+
+            entity.ToTable("SanBay");
+
+            entity.Property(e => e.MaSb)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("MaSB");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.TenSb)
+                .HasMaxLength(100)
+                .HasColumnName("TenSB");
+            entity.Property(e => e.ThanhPho).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TaiKhoan>(entity =>
+        {
+            entity.HasKey(e => e.MaTk).HasName("PK__TaiKhoan__272500707902BC40");
+
+            entity.ToTable("TaiKhoan");
+
+            entity.HasIndex(e => e.TenDangNhap, "UQ__TaiKhoan__55F68FC0DD296AD7").IsUnique();
+
+            entity.Property(e => e.MaTk).HasColumnName("MaTK");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.LoaiTaiKhoan).HasMaxLength(20);
+            entity.Property(e => e.MatKhau)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.TenDangNhap)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TrangThai).HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<TienIch>(entity =>
+        {
+            entity.HasKey(e => e.MaTienIch).HasName("PK__TienIch__4697D8EA2C3844F1");
+
+            entity.ToTable("TienIch");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.Icon)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TenTienIch).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TuyenBay>(entity =>
+        {
+            entity.HasKey(e => e.MaTuyen).HasName("PK__TuyenBay__B457602024B41916");
+
+            entity.ToTable("TuyenBay");
+
+            entity.Property(e => e.MaTuyen)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.MaSbden)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("MaSBDen");
+            entity.Property(e => e.MaSbdi)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("MaSBDi");
+            entity.Property(e => e.TrangThai).HasDefaultValue(true);
+
+            entity.HasOne(d => d.MaSbdenNavigation).WithMany(p => p.TuyenBayMaSbdenNavigations)
+                .HasForeignKey(d => d.MaSbden)
+                .HasConstraintName("FK__TuyenBay__MaSBDe__3B75D760");
+
+            entity.HasOne(d => d.MaSbdiNavigation).WithMany(p => p.TuyenBayMaSbdiNavigations)
+                .HasForeignKey(d => d.MaSbdi)
+                .HasConstraintName("FK__TuyenBay__MaSBDi__3A81B327");
+        });
+
+        modelBuilder.Entity<Ve>(entity =>
+        {
+            entity.HasKey(e => e.MaVe).HasName("PK__Ve__2725100F40DFB618");
+
+            entity.ToTable("Ve");
+
+            entity.HasIndex(e => new { e.MaCb, e.MaGhe }, "UQ_GheChuyenBay").IsUnique();
+
+            entity.Property(e => e.MaVe)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.CccdPassport)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Cccd");
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.GiaVeThucTe).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.LoaiHanhKhach)
+                .HasMaxLength(20)
+                .HasDefaultValue("Người lớn");
+            entity.Property(e => e.MaCb)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("MaCB");
+            entity.Property(e => e.TenHanhKhach).HasMaxLength(100);
+
+            entity.HasOne(d => d.MaCbNavigation).WithMany(p => p.Ves)
+                .HasForeignKey(d => d.MaCb)
+                .HasConstraintName("FK__Ve__MaCB__7B5B524B");
+
+            entity.HasOne(d => d.MaDatVeNavigation).WithMany(p => p.Ves)
+                .HasForeignKey(d => d.MaDatVe)
+                .HasConstraintName("FK__Ve__MaDatVe__7A672E12");
+
+            entity.HasOne(d => d.MaGheNavigation).WithMany(p => p.Ves)
+                .HasForeignKey(d => d.MaGhe)
+                .HasConstraintName("FK__Ve__MaGhe__7C4F7684");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}

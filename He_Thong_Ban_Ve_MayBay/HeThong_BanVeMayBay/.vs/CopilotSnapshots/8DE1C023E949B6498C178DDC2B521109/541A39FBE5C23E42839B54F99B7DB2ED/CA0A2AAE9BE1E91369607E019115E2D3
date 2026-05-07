@@ -1,0 +1,328 @@
+﻿@{
+    ViewData["Title"] = "Cấu hình Sơ đồ Ghế";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="fw-bold text-navy mb-1">Cấu hình Sơ đồ Ghế</h2>
+        <p class="text-muted small mb-0">Thiết kế vị trí, phân loại hạng ghế cho từng tàu bay.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card-custom d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary-subtle text-primary rounded-4 d-flex justify-content-center align-items-center me-4" style="width: 60px; height: 60px;">
+                    <i class="bi bi-airplane-fill fs-3" style="color: var(--primary-navy);"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1 fw-bold text-uppercase">Đang hiệu chỉnh máy bay</div>
+                    <h4 class="fw-bold mb-2" id="aircraftName">Boeing 787-9 Dreamliner</h4>
+                    <span class="badge bg-primary-subtle text-primary me-2 px-3 py-2 rounded-pill">BUSINESS CLASS</span>
+                    <span class="badge bg-light text-muted px-3 py-2 border rounded-pill" id="seatCountBadge">SỨC CHỨA: 290 GHẾ</span>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-light fw-bold px-4 py-2 border rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Thay đổi
+                </button>
+                <ul class="dropdown-menu shadow-lg border-0 mt-2 rounded-3">
+                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="changeAircraft('Boeing 787-9 Dreamliner', 290)">Boeing 787-9 Dreamliner</a></li>
+                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="changeAircraft('Airbus A350-900', 305)">Airbus A350-900</a></li>
+                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="changeAircraft('Airbus A321neo', 230)">Airbus A321neo</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item py-2 text-primary fw-bold" href="javascript:void(0)"><i class="bi bi-plus-circle me-2"></i>Thêm tàu bay mới</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-custom text-center py-5 position-relative">
+            <div class="d-flex justify-content-center align-items-center gap-4 text-muted fw-bold small mb-5 bg-light py-2 mx-5 rounded-pill">
+                <span><i class="bi bi-door-closed-fill me-2"></i>BUỒNG LÁI</span>
+                <span><i class="bi bi-cup-hot-fill mx-2"></i> BẾP & VỆ SINH <i class="bi bi-gender-ambiguous ms-1"></i></span>
+            </div>
+
+            <div class="d-flex justify-content-center gap-2 mb-4 fw-bold text-muted" style="font-size: 11px;">
+                <div style="width: 36px;">A</div><div style="width: 36px;">B</div><div style="width: 36px;">C</div>
+                <div class="aisle-number"></div>
+                <div style="width: 36px;">D</div><div style="width: 36px;">E</div><div style="width: 36px;">F</div>
+                <div class="aisle-number"></div>
+                <div style="width: 36px;">G</div><div style="width: 36px;">H</div><div style="width: 36px;">I</div>
+            </div>
+
+            <div id="seatMapContainer">
+                <div class="d-flex justify-content-center gap-2 mb-4 row-seats">
+                    <div class="seat-wrapper seat-vip" data-seat="1A"><div class="seat-shape"></div><div class="seat-label">1A</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1B"><div class="seat-shape"></div><div class="seat-label">1B</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1C"><div class="seat-shape"></div><div class="seat-label">1C</div></div>
+                    <div class="aisle-number">1</div>
+                    <div class="seat-wrapper seat-vip" data-seat="1D"><div class="seat-shape"></div><div class="seat-label">1D</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1E"><div class="seat-shape"></div><div class="seat-label">1E</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1F"><div class="seat-shape"></div><div class="seat-label">1F</div></div>
+                    <div class="aisle-number"></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1G"><div class="seat-shape"></div><div class="seat-label">1G</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1H"><div class="seat-shape"></div><div class="seat-label">1H</div></div>
+                    <div class="seat-wrapper seat-vip" data-seat="1I"><div class="seat-shape"></div><div class="seat-label">1I</div></div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mb-4 row-seats">
+                    <div class="seat-wrapper seat-available selected" data-seat="2A"><div class="seat-shape"></div><div class="seat-label">2A</div></div>
+                    <div class="seat-wrapper seat-booked" data-seat="2B"><div class="seat-shape"></div><div class="seat-label">2B</div></div>
+                    <div class="seat-wrapper seat-available" data-seat="2C"><div class="seat-shape"></div><div class="seat-label">2C</div></div>
+                    <div class="aisle-number">2</div>
+                    <div class="seat-wrapper seat-available" data-seat="2D"><div class="seat-shape"></div><div class="seat-label">2D</div></div>
+                    <div class="seat-wrapper seat-available" data-seat="2E"><div class="seat-shape"></div><div class="seat-label">2E</div></div>
+                    <div class="seat-wrapper seat-booked" data-seat="2F"><div class="seat-shape"></div><div class="seat-label">2F</div></div>
+                    <div class="aisle-number"></div>
+                    <div class="seat-wrapper seat-available" data-seat="2G"><div class="seat-shape"></div><div class="seat-label">2G</div></div>
+                    <div class="seat-wrapper seat-available" data-seat="2H"><div class="seat-shape"></div><div class="seat-label">2H</div></div>
+                    <div class="seat-wrapper seat-available" data-seat="2I"><div class="seat-shape"></div><div class="seat-label">2I</div></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-4 mt-5 pt-4 border-top" id="mapLegend">
+                <div class="d-flex align-items-center small fw-bold"><div style="width:12px; height:12px; background:var(--primary-navy); margin-right:8px; border-radius:3px;"></div> Đang trống</div>
+                <div class="d-flex align-items-center small fw-bold text-muted"><div style="width:12px; height:12px; background:var(--seat-gray); margin-right:8px; border-radius:3px;"></div> Đã bán/Khóa</div>
+                <div class="d-flex align-items-center small fw-bold"><div style="width:12px; height:12px; background:var(--secondary-gold); margin-right:8px; border-radius:3px;"></div> Thương gia (VIP)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card-custom">
+            <h6 class="fw-bold mb-4" id="panelTitle"><i class="bi bi-tag-fill me-2"></i>Thuộc tính Ghế 2A</h6>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Phân loại ghế</label>
+                <select class="form-select bg-light border-0 py-2 fw-bold text-dark" id="seatType">
+                    <option value="standard">Phổ thông (Standard)</option>
+                    <option value="business">Thương gia (Business)</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Trạng thái bảo trì</label>
+                <div class="d-flex bg-light p-1 rounded-3">
+                    <button type="button" class="btn w-50 py-2 fw-bold text-white shadow-sm" style="background: var(--primary-navy); font-size: 13px;" onclick="toastDemo('Đã mở khóa ghế!')">Hoạt động</button>
+                    <button type="button" class="btn w-50 py-2 fw-bold text-muted" style="font-size: 13px;" onclick="toastDemo('Ghế đã chuyển sang Bảo trì', 'bg-warning')">Khóa ghế</button>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted text-uppercase">Giá phụ thu</label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="seatPrice" value="150,000">
+                    <span class="input-group-text bg-light border-0 fw-bold text-muted">VND</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn flex-grow-1 text-white fw-bold py-2 rounded-3" style="background: var(--primary-navy);" onclick="updateSeat()">Cập nhật ghế</button>
+                <button class="btn bg-danger-subtle text-danger px-3 rounded-3" onclick="deleteSeat()"><i class="bi bi-trash-fill"></i></button>
+            </div>
+        </div>
+
+        <div class="card-custom">
+            <h6 class="fw-bold mb-3"><i class="bi bi-grid-1x2-fill me-2"></i>Thao tác hàng loạt</h6>
+            <div class="row g-2 mt-2">
+                <div class="col-6"><button class="btn-bulk" onclick="bulkAddRow()"><i class="bi bi-layer-forward"></i>THÊM HÀNG</button></div>
+                <div class="col-6"><button class="btn-bulk" onclick="bulkAddSeat()"><i class="bi bi-plus-square"></i>THÊM 1 GHẾ</button></div>
+                <div class="col-6"><button class="btn-bulk" onclick="bulkSplitAisle()"><i class="bi bi-distribute-horizontal"></i>CHIA LỐI ĐI</button></div>
+                <div class="col-6"><button class="btn-bulk" onclick="bulkAutoLayout()"><i class="bi bi-magic"></i>AUTO LAYOUT</button></div>
+                <div class="col-6"><button class="btn-bulk" onclick="bulkCopyRow()"><i class="bi bi-files"></i>SAO CHÉP HÀNG</button></div>
+                <div class="col-6"><button class="btn-bulk text-danger" onclick="toastDemo('Đã làm sạch khu vực chọn', 'bg-danger')"><i class="bi bi-eraser text-danger"></i>LÀM SẠCH</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="floating-action-bar">
+    <button class="btn bg-white border fw-bold px-4 py-3 rounded-pill shadow-sm d-flex align-items-center" onclick="toastDemo('Đã hoàn tác thay đổi cuối cùng!', 'bg-secondary')">
+        <i class="bi bi-arrow-counterclockwise me-2 fs-5"></i> Hoàn tác
+    </button>
+    <button class="btn text-white fw-bold px-5 py-3 rounded-pill shadow-lg d-flex align-items-center" style="background: var(--primary-navy);" onclick="toastDemo('Lưu cấu hình sơ đồ ghế thành công!', 'bg-success')">
+        <i class="bi bi-floppy-fill me-2 fs-5"></i> Lưu cấu hình
+    </button>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1055; margin-top: 20px;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-3 py-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-bold fs-6" id="toastMessage">Thao tác thành công!</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const toastEl = document.getElementById('liveToast');
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+        let currentSelectedSeat = document.querySelector('.seat-wrapper.selected');
+
+        // Hàm gọi Toast
+        function toastDemo(msg, colorClass = 'bg-success') {
+            document.getElementById('toastMessage').innerText = msg;
+            toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+            bsToast.show();
+        }
+
+        // ĐỔI MÁY BAY
+        function changeAircraft(name, seats) {
+            document.getElementById('aircraftName').innerText = name;
+            document.getElementById('seatCountBadge').innerText = `SỨC CHỨA: ${seats} GHẾ`;
+            toastDemo(`Đã load sơ đồ của ${name}!`);
+        }
+
+        // Xử lý click Ghế
+        function seatClickHandler(e) {
+            const seat = e.currentTarget;
+            if(seat.classList.contains('seat-booked')) {
+                toastDemo('Ghế này đã được bán, không thể chỉnh sửa!', 'bg-danger');
+                return;
+            }
+            if(currentSelectedSeat) currentSelectedSeat.classList.remove('selected');
+            seat.classList.add('selected');
+            currentSelectedSeat = seat;
+
+            const seatName = seat.getAttribute('data-seat');
+            document.getElementById('panelTitle').innerHTML = `<i class="bi bi-tag-fill me-2"></i>Thuộc tính Ghế ${seatName}`;
+            
+            if(seat.classList.contains('seat-vip')) {
+                document.getElementById('seatType').value = 'business';
+                document.getElementById('seatPrice').value = '500,000';
+            } else {
+                document.getElementById('seatType').value = 'standard';
+                document.getElementById('seatPrice').value = '150,000';
+            }
+        }
+
+        // Gắn sự kiện ban đầu
+        document.querySelectorAll('.seat-wrapper').forEach(seat => {
+            seat.addEventListener('click', seatClickHandler);
+        });
+
+        // Nút Cập nhật ghế
+        function updateSeat() {
+            if(!currentSelectedSeat) return;
+            const type = document.getElementById('seatType').value;
+            if(type === 'business') {
+                currentSelectedSeat.classList.remove('seat-available');
+                currentSelectedSeat.classList.add('seat-vip');
+            } else {
+                currentSelectedSeat.classList.remove('seat-vip');
+                currentSelectedSeat.classList.add('seat-available');
+            }
+            toastDemo('Cập nhật thuộc tính ghế thành công!');
+        }
+
+        // Nút Xóa ghế
+        function deleteSeat() {
+            if(currentSelectedSeat) {
+                currentSelectedSeat.style.visibility = 'hidden';
+                currentSelectedSeat.classList.remove('selected');
+                document.getElementById('panelTitle').innerHTML = `<i class="bi bi-tag-fill me-2"></i>Thuộc tính Ghế`;
+                toastDemo('Đã xóa bỏ vị trí ghế này khỏi sơ đồ!', 'bg-danger');
+                currentSelectedSeat = null;
+            }
+        }
+
+        /* --- THAO TÁC HÀNG LOẠT --- */
+        const container = document.getElementById('seatMapContainer');
+
+        // Thêm 1 Hàng
+        function bulkAddRow() {
+            const rows = container.querySelectorAll('.row-seats');
+            const lastRow = rows[rows.length - 1];
+            const newRowNum = rows.length + 1;
+            
+            const newRow = lastRow.cloneNode(true);
+            newRow.querySelectorAll('.seat-wrapper').forEach(wrapper => {
+                const letter = wrapper.getAttribute('data-seat').replace(/[0-9]/g, '');
+                wrapper.setAttribute('data-seat', newRowNum + letter);
+                wrapper.querySelector('.seat-label').innerText = newRowNum + letter;
+                
+                wrapper.classList.remove('selected', 'seat-booked', 'seat-vip');
+                wrapper.classList.add('seat-available');
+                wrapper.style.visibility = 'visible';
+                wrapper.addEventListener('click', seatClickHandler);
+            });
+
+            newRow.querySelectorAll('.aisle-number').forEach(aisle => {
+                if(aisle.innerText.trim() !== '') aisle.innerText = newRowNum;
+            });
+
+            container.appendChild(newRow);
+            toastDemo(`Đã tạo thêm Hàng ghế số ${newRowNum} thành công!`);
+        }
+
+        // Thêm 1 Ghế (Bên cạnh ghế đang chọn)
+        function bulkAddSeat() {
+            if(!currentSelectedSeat) {
+                toastDemo('Vui lòng chọn 1 ghế làm vị trí tham chiếu!', 'bg-warning');
+                return;
+            }
+            
+            const newSeat = currentSelectedSeat.cloneNode(true);
+            
+            // Xóa các class không cần thiết, đưa về trạng thái trống
+            newSeat.classList.remove('selected', 'seat-booked', 'seat-vip');
+            newSeat.classList.add('seat-available');
+            newSeat.style.visibility = 'visible';
+            
+            // Đặt tên tạm thời là dấu '+' 
+            const rowNum = currentSelectedSeat.querySelector('.seat-label').innerText.match(/\d+/)[0];
+            newSeat.setAttribute('data-seat', rowNum + '+');
+            newSeat.querySelector('.seat-label').innerText = '+';
+            
+            newSeat.addEventListener('click', seatClickHandler);
+            
+            // Chèn vào ngay sau ghế đang chọn
+            currentSelectedSeat.parentNode.insertBefore(newSeat, currentSelectedSeat.nextSibling);
+            toastDemo('Đã chèn thêm 1 ghế mới vào sơ đồ!');
+        }
+
+        // Chia lối đi
+        function bulkSplitAisle() {
+            if(!currentSelectedSeat) {
+                toastDemo('Vui lòng chọn 1 ghế để tạo lối đi bên cạnh!', 'bg-warning');
+                return;
+            }
+            const aisle = document.createElement('div');
+            aisle.className = 'aisle-number';
+            aisle.style.width = '30px';
+            currentSelectedSeat.parentNode.insertBefore(aisle, currentSelectedSeat.nextSibling);
+            toastDemo('Đã chèn lối đi vào sơ đồ thành công!');
+        }
+
+        // Auto Layout
+        function bulkAutoLayout() {
+            const rows = container.querySelectorAll('.row-seats');
+            rows.forEach(row => {
+                row.style.opacity = '0';
+                setTimeout(() => {
+                    row.style.transition = 'opacity 0.5s ease';
+                    row.style.opacity = '1';
+                }, 300);
+            });
+            toastDemo('Đã tự động căn chỉnh lại toàn bộ khoảng cách!');
+        }
+
+        // Sao chép hàng
+        function bulkCopyRow() {
+            if(!currentSelectedSeat) {
+                toastDemo('Vui lòng chọn 1 ghế trong hàng muốn sao chép!', 'bg-warning');
+                return;
+            }
+            const currentRow = currentSelectedSeat.closest('.row-seats');
+            const newRow = currentRow.cloneNode(true);
+            
+            newRow.querySelectorAll('.seat-wrapper').forEach(wrapper => {
+                wrapper.classList.remove('selected');
+                wrapper.addEventListener('click', seatClickHandler);
+            });
+
+            currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+            toastDemo('Đã nhân bản hàng ghế vừa chọn!');
+        }
+    </script>
+}

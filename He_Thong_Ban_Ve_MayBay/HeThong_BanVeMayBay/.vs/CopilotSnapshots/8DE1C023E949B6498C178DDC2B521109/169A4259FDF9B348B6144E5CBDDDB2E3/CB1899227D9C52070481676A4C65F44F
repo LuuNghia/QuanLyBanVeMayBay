@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Tra cứu vé";
+}
+
+<div class="lookup-hero">
+    <div class="container">
+        <h2 class="fw-bold">Tra Cứu Thông Tin Chuyến Bay</h2>
+        <p class="opacity-75">Nhập mã vé để kiểm tra hành trình và trạng thái thanh toán của bạn</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="lookup-card">
+                <form id="lookupForm" onsubmit="handleLookup(event)">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">MÃ VÉ (VD: SB12345)</label>
+                            <input type="text" class="form-control text-uppercase" id="lookupMaVe" placeholder="Nhập mã vé của bạn"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">SỐ ĐIỆN THOẠI / EMAIL</label>
+                            <input type="text" class="form-control" id="lookupContact" placeholder="Nhập thông tin liên hệ"
+                                required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-lookup w-100">
+                                <i class="bi bi-search me-2"></i>TÌM KIẾM THÔNG TIN VÉ
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="search-result">
+                    <hr class="my-5">
+                    <div class="ticket-result-card">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <span class="badge bg-success-subtle text-success status-badge mb-2">ĐÃ THANH TOÁN</span>
+                                <h4 class="fw-bold text-navy mb-0">VN123 - Airbus A321</h4>
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-muted">Mã vé (MaVe)</div>
+                                <div class="fw-bold text-primary fs-5">SB882910</div>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center text-center mb-4">
+                            <div class="col-4">
+                                <div class="airport-code">SGN</div>
+                                <div class="small fw-bold">Hồ Chí Minh</div>
+                                <div class="small text-muted">07/04/2026 • 20:30</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted mb-2">Trực tiếp</div>
+                                <i class="bi bi-airplane-fill fs-3 text-secondary"></i>
+                                <div class="small text-muted mt-2">2h 10m</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="airport-code">HAN</div>
+                                <div class="small fw-bold">Hà Nội</div>
+                                <div class="small text-muted">07/04/2026 • 22:40</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="row text-center">
+                                <div class="col-4 border-end">
+                                    <div class="small text-muted">Hành khách</div>
+                                    <div class="fw-bold">NGUYỄN VĂN A</div>
+                                </div>
+                                <div class="col-4 border-end">
+                                    <div class="small text-muted">Số ghế</div>
+                                    <div class="fw-bold">12A (Thương gia)</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="small text-muted">Hành lý</div>
+                                    <div class="fw-bold">12kg + 32kg</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-primary w-100 fw-bold py-2"><i class="bi bi-download me-2"></i>Tải vé PDF</button>
+                            <button class="btn btn-outline-navy w-100 fw-bold py-2"><i class="bi bi-printer me-2"></i>In vé</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function handleLookup(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang tìm kiếm...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('search-result').style.display = 'block';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                window.scrollTo({ top: document.getElementById('search-result').offsetTop - 100, behavior: 'smooth' });
+            }, 1000);
+        }
+    </script>
+}

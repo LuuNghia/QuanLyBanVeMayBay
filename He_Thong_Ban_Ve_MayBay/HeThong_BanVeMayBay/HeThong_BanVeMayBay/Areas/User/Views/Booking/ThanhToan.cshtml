@@ -1,0 +1,118 @@
+@using HeThong_BanVeMayBay.Models.EF
+@using HeThong_BanVeMayBay.Models.Entities
+@using static HeThong_BanVeMayBay.Areas.User.Controllers.BookingController
+@{
+    ViewData["Title"] = "Thanh toán";
+    var request = ViewBag.BookingRequest as BookingRequest;
+    var cb = ViewBag.ChuyenBay as ChuyenBay;
+}
+
+<link rel="stylesheet" href="~/user/css/ThanhToan.css">
+
+<div class="step-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="javascript:history.back()" class="back-link"><i class="bi bi-chevron-left"></i> Quay lại điền thông tin</a>
+        <div class="step-text text-uppercase">BƯỚC 4/4: THANH TOÁN</div>
+    </div>
+</div>
+
+<div class="container payment-container mt-5">
+    <div class="row g-4">
+        <!-- CỘT TRÁI: Phương thức & QR -->
+        <div class="col-lg-7">
+            <div class="card-payment">
+                <div class="card-header-custom">
+                    <i class="bi bi-credit-card-2-back"></i> Chọn phương thức thanh toán
+                </div>
+                <div class="p-4">
+                    <div class="method-item active" onclick="selectMethod(this)">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-3 text-primary"><i class="bi bi-qr-code-scan"></i></div>
+                            <div>
+                                <div class="fw-bold">Chuyển khoản VietQR</div>
+                                <div class="small text-muted">Mở ứng dụng ngân hàng để quét mã QR</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Khung QR Code -->
+            <div class="card-payment">
+                <div class="qr-box">
+                    <div class="timer-box">
+                        <i class="bi bi-clock-history"></i> Mã hết hạn sau: <span id="time">10:00</span>
+                    </div>
+                    <div class="fw-bold mb-3">Quét mã để thanh toán</div>
+                    
+                    <div class="qr-image-wrapper">
+                        @{
+                            string qrData = $"SKYBOOKING_{cb?.MaCb}_{request?.HoTen}";
+                            string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={qrData}";
+                        }
+                        <img src="@qrUrl" alt="VietQR Code">
+                    </div>
+
+                    <div class="content-box">
+                        Nội dung: SKYBOOKING PAY @(request?.TongTien.ToString("N0").Replace(",", "").Replace(".", ""))
+                    </div>
+                    
+                    <div class="small text-muted mt-2">
+                        Vui lòng không tắt trình duyệt cho đến khi nhận được thông báo thành công.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: Tóm tắt đơn hàng -->
+        <div class="col-lg-5">
+            <div class="card-payment">
+                <div class="p-4">
+                    <h5 class="fw-bold mb-4">Tóm tắt đơn hàng</h5>
+                    
+                    <div class="summary-item">
+                        <span class="summary-label">Mã chuyến bay:</span>
+                        <span class="summary-value">@cb?.MaCb</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Chặng bay:</span>
+                        <span class="summary-value">@(cb?.MaTuyenNavigation?.MaSbdiNavigation?.MaSb) <i class="bi bi-arrow-right"></i> @(cb?.MaTuyenNavigation?.MaSbdenNavigation?.MaSb)</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Hành khách:</span>
+                        <span class="summary-value text-uppercase">@request?.HoTen</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Số lượng:</span>
+                        <span class="summary-value">@request?.SeatIds.Split(',').Length ghế</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Vị trí ghế:</span>
+                        <span class="summary-value text-danger">@(ViewBag.SeatNos ?? "12A")</span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="total-label">TỔNG TIỀN:</span>
+                        <span class="total-value">@request?.TongTien.ToString("N0") đ</span>
+                    </div>
+
+                    <button class="btn-confirm-payment" id="btnConfirmPay">
+                        XÁC NHẬN ĐÃ CHUYỂN KHOẢN
+                    </button>
+
+                    <div class="security-tag">
+                        <i class="bi bi-shield-lock-fill"></i> Thanh toán bảo mật 256-bit SSL
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/user/js/ThanhToan.js"></script>
+}

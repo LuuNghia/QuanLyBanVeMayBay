@@ -1,0 +1,127 @@
+
+/* --- STEP HEADER --- */
+.step-header {
+    background: white;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 30px;
+}
+
+.back-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.step-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+/* --- CARDS & UI --- */
+.card-custom {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.card-header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-navy);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+    .card-header-title i {
+        margin-right: 10px;
+        color: var(--secondary-gold);
+    }
+
+.ticket-info-box {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.badge-class {
+    background-color: var(--secondary-gold);
+    color: var(--primary-navy);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.summary-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 85px;
+}
+
+.bill-total {
+    border-top: 2px solid #f1f5f9;
+    padding-top: 15px;
+    font-weight: 800;
+    color: var(--primary-navy);
+    font-size: 22px;
+}
+
+.btn-checkout {
+    background-color: var(--secondary-gold);
+    color: var(--primary-navy);
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    width: 100%;
+    font-weight: 800;
+    transition: 0.3s;
+}
+
+    .btn-checkout:hover {
+        background-color: #eab308;
+        transform: translateY(-1px);
+    }
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+}
+
+.pax-form-section {
+    border-bottom: 2px dashed #f1f5f9;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}
+.pax-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.seat-badge-info {
+    background: var(--primary-navy);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+}

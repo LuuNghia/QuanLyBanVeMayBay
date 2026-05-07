@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+
+
+<link rel="stylesheet" type="text/css" href="~/user/css/Index.css" />
+
+<section id="search-area" class="hero-section">
+    <div class="container text-center mb-5">
+        <h1 class="fw-bold display-5">Khám Phá Bầu Trời Mới <i class="bi bi-cloud-sun ms-2"></i></h1>
+        <p class="lead opacity-75">Săn vé giá tốt, tận hưởng hành trình 5 sao</p>
+    </div>
+    <div class="container">
+        <form method="get" action="/User/Home/Index" onsubmit="return validateSearch();">
+            <div class="card search-card p-4 p-md-5 text-dark">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i>Điểm đi</label>
+                        <select name="diemDi" id="diemDi" class="form-select">
+                            <option value="">Chọn điểm đi</option>
+                            @if (ViewBag.SanBays != null)
+                            {
+                                foreach (var sb in ViewBag.SanBays)
+                                {
+                                    <option value="@sb.MaSb" selected="@(ViewBag.DiemDi == sb.MaSb ? "selected" : null)">@sb.TenSb</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="bi bi-geo me-1"></i>Điểm đến</label>
+                        <select name="diemDen" id="diemDen" class="form-select">
+                            <option value="">Chọn điểm đến</option>
+                            @if (ViewBag.SanBays != null)
+                            {
+                                foreach (var sb in ViewBag.SanBays)
+                                {
+                                    <option value="@sb.MaSb" selected="@(ViewBag.DiemDen == sb.MaSb ? "selected" : null)">@sb.TenSb</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i>Ngày đi</label>
+                        <input name="ngayDi" type="date" class="form-control" value="@(ViewBag.NgayDi ?? DateTime.Now.ToString("yyyy-MM-dd"))">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i>Hạng vé</label>
+                        <select name="hangVe" class="form-select">
+                            <option value="">Tất cả các hạng</option>
+                            @if (ViewBag.HangGhes != null)
+                            {
+                                foreach (var hg in ViewBag.HangGhes)
+                                {
+                                    <option value="@hg.MaHangGhe" selected="@(ViewBag.HangVe == hg.MaHangGhe ? "selected" : null)">@hg.TenHangGhe</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-search w-100 py-3 fw-bold">TÌM KIẾM</button>
+                    </div>
+                </div>
+                <div id="search-error" class="text-danger mt-3 fw-bold" style="display: none;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Điểm đi và điểm đến không được trùng nhau!
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section id="flight-results-section" class="container">
+    <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-send-check me-2"></i>Lựa chọn chuyến bay tốt nhất</h4>
+    <div id="flight-list">
+        @{
+            var danhSach = ViewBag.ChuyenBays as IEnumerable<HeThong_BanVeMayBay.Models.Entities.ChuyenBay>;
+        }
+        @if (danhSach != null && danhSach.Any())
+        {
+            foreach (var cb in danhSach)
+            {
+                var thoiGianBay = cb.MaTuyenNavigation?.ThoiGianBayDuKien ?? 0;
+                var thoiGianDen = cb.NgayGioBay.AddMinutes(thoiGianBay);
+                <div class="card flight-card p-4 shadow-sm mb-3" onclick="selectFlight('@cb.MaCb', '@(cb.MaHangNavigation?.TenHang)')">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h5 class="fw-bold mb-0">@cb.MaCb | @(cb.MaHangNavigation?.TenHang ?? "Không rõ")</h5>
+                            <small class="text-muted">@(cb.MaLoaiMbNavigation?.TenLoaiMb ?? "Không rõ") • @(cb.MaTuyenNavigation?.MaSbdiNavigation?.TenSb) đến @(cb.MaTuyenNavigation?.MaSbdenNavigation?.TenSb)</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <span class="fs-4 fw-bold">@cb.NgayGioBay.ToString("HH:mm")</span> 
+                            <i class="bi bi-arrow-right mx-3"></i> 
+                            <span class="fs-4 fw-bold">@thoiGianDen.ToString("HH:mm")</span>
+                            <div class="small text-muted">@cb.NgayGioBay.ToString("dd/MM/yyyy")</div>
+                            <div class="small text-muted mt-1">Giờ bay dự kiến</div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <span class="fs-4 fw-bold text-danger">@String.Format("{0:N0}", cb.GiaVeCoBan)đ</span>
+                            <a class="btn btn-primary px-4 rounded-pill ms-2" href="/User/Booking/ChonCho?maCb=@cb.MaCb" onclick="event.stopPropagation();">
+                                Chọn chuyến
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill me-2"></i> Chưa có chuyến bay nào theo bộ lọc của bạn.
+            </div>
+        }
+    </div>
+</section>
+
+<script>
+    function validateSearch() {
+        var diemDi = document.getElementById("diemDi").value;
+        var diemDen = document.getElementById("diemDen").value;
+        var errDiv = document.getElementById("search-error");
+
+        if (diemDi && diemDen && diemDi === diemDen) {
+            errDiv.style.display = "block";
+            return false;
+        }
+        errDiv.style.display = "none";
+        return true;
+    }
+</script>
+<script src="~/user/js/Index.js" asp-append-version="true" defer></script>

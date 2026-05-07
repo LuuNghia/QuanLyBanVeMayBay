@@ -1,0 +1,178 @@
+﻿// Kh?i t?o Toast
+const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+function toastMessage(msg, colorClass = 'bg-success') {
+    document.getElementById('toastMessage').innerText = msg;
+    toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-3 py-2 ${colorClass}`;
+    bsToast.show();
+}
+
+let currentUserType = '';
+let currentUserId = '';
+
+function openAddUserModal() {
+    document.getElementById('modalAddUserTitle').innerHTML = '<i class="bi bi-person-circle me-2"></i>Thêm Người dùng mới';
+    document.getElementById('userForm').reset();
+    document.getElementById('userTypeSelect').disabled = false;
+    document.getElementById('userTypeSelect').value = 'staff';
+    document.getElementById('userType').value = '';
+    document.getElementById('userId').value = '';
+    currentUserType = '';
+    currentUserId = '';
+    new bootstrap.Modal(document.getElementById('modalAddUser')).show();
+}
+
+async function openEditUserModal(type, id) {
+    currentUserType = type;
+    currentUserId = id;
+    document.getElementById('modalAddUserTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật tài khoản';
+    document.getElementById('userTypeSelect').value = type;
+    document.getElementById('userTypeSelect').disabled = true;
+    document.getElementById('userType').value = type;
+    document.getElementById('userId').value = id;
+
+    try {
+        const url = type === 'staff'
+            ? `/Admin/Account/LayThongTinNhanVien?id=${id}`
+            : `/Admin/Account/LayThongTinKhachHang?id=${id}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            toastMessage('Không thể tải dữ liệu tài khoản!', 'bg-danger');
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('userFullName').value = data.hoTen || '';
+        document.getElementById('userPhone').value = data.soDienThoai || '';
+        document.getElementById('userEmail').value = data.email || '';
+        document.getElementById('userCccd').value = data.cccd || '';
+
+        new bootstrap.Modal(document.getElementById('modalAddUser')).show();
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+// M? Modal Phân quy?n
+function openRoleModal(userName) {
+    document.getElementById('roleUserName').innerText = userName;
+    new bootstrap.Modal(document.getElementById('modalRole')).show();
+}
+
+// M? Modal L?ch s?
+function openHistoryModal() {
+    new bootstrap.Modal(document.getElementById('modalHistory')).show();
+}
+
+let confirmActionType = '';
+let confirmAccountId = 0;
+
+function confirmDeleteAccount(maTk, name) {
+    if (!maTk) {
+        toastMessage('Không tìm thấy tài khoản để xử lý!', 'bg-danger');
+        return;
+    }
+
+    confirmActionType = 'delete';
+    confirmAccountId = maTk;
+    document.getElementById('confirmText').innerText = `Bạn có chắc muốn xóa tài khoản ${name}?`;
+    const btn = document.getElementById('btnConfirmAction');
+    btn.innerText = 'Xóa';
+    btn.className = 'btn btn-danger w-50 fw-bold';
+    btn.onclick = executeConfirmAction;
+    new bootstrap.Modal(document.getElementById('modalConfirm')).show();
+}
+
+async function executeConfirmAction() {
+    if (confirmActionType !== 'delete' || !confirmAccountId) {
+        toastMessage('Không xác định thao tác.', 'bg-danger');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/Admin/Account/XoaTaiKhoan?maTk=${confirmAccountId}`, { method: 'DELETE' });
+        bootstrap.Modal.getInstance(document.getElementById('modalConfirm')).hide();
+        if (res.ok) {
+            const message = await res.text();
+            toastMessage(message || 'Đã xóa tài khoản thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể xóa tài khoản!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+async function saveUser() {
+    const type = document.getElementById('userType').value;
+    const id = document.getElementById('userId').value;
+
+    if (!type || !id) {
+        toastMessage('Chức năng thêm tài khoản đang được hoàn thiện.', 'bg-warning text-dark');
+        return;
+    }
+
+    const payload = {
+        hoTen: document.getElementById('userFullName').value.trim(),
+        soDienThoai: document.getElementById('userPhone').value.trim(),
+        email: document.getElementById('userEmail').value.trim(),
+        cccd: document.getElementById('userCccd').value.trim()
+    };
+
+    if (!payload.hoTen || !payload.soDienThoai || !payload.email || !payload.cccd) {
+        toastMessage('Vui lòng nhập đầy đủ thông tin.', 'bg-warning text-dark');
+        return;
+    }
+
+    const url = type === 'staff'
+        ? '/Admin/Account/CapNhatNhanVien'
+        : '/Admin/Account/CapNhatKhachHang';
+
+    if (type === 'staff') {
+        payload.maNv = id;
+    } else {
+        payload.maKh = id;
+    }
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('modalAddUser')).hide();
+            toastMessage('Đã cập nhật tài khoản thành công!');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể cập nhật tài khoản!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}
+
+async function updateAccountStatus(maTk, status) {
+    if (!maTk) {
+        toastMessage('Không tìm thấy tài khoản để cập nhật.', 'bg-danger');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/Admin/Account/CapNhatTrangThaiTaiKhoan?maTk=${maTk}&status=${status}`, {
+            method: 'POST'
+        });
+        if (res.ok) {
+            toastMessage('Đã cập nhật trạng thái tài khoản.');
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể cập nhật trạng thái!', 'bg-danger');
+        }
+    } catch (err) {
+        toastMessage('Lỗi kết nối máy chủ!', 'bg-danger');
+    }
+}

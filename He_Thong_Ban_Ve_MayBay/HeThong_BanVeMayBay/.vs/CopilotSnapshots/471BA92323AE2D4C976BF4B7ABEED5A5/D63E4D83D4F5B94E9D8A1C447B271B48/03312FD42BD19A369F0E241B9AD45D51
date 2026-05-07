@@ -1,0 +1,196 @@
+﻿@model IEnumerable<HeThong_BanVeMayBay.Models.Entities.LoaiMayBay>
+@{
+    ViewData["Title"] = "Quản lý Đội bay";
+
+    var totalPlanes = Model?.Count() ?? 0;
+}
+
+<link rel="stylesheet" href="~/admin/css/QuanLyMayBay.css" asp-append-version="true" />
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Quản lý Đội bay</h2>
+        <p class="text-muted small mb-0">Danh sách các loại máy bay và hãng hàng không đang khai thác.</p>
+    </div>
+    <button type="button" class="btn text-white rounded-pill px-4 fw-bold" style="background: var(--primary-navy);" data-bs-toggle="modal" data-bs-target="#addModal">
+        <i class="bi bi-plus-lg me-2"></i>Thêm máy bay mới
+    </button>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stats-box p-4 bg-white rounded-4 shadow-sm">
+            <div class="text-muted small fw-bold">TỔNG ĐỘI BAY</div>
+            <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">@totalPlanes <small class="fs-6 fw-normal text-muted">chiếc</small></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-box p-4 bg-white rounded-4 shadow-sm" style="border-left: 4px solid var(--secondary-gold);">
+            <div class="text-muted small fw-bold">HÃNG ĐANG HỢP TÁC</div>
+            <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">05 <small class="fs-6 fw-normal text-muted">hãng</small></h3>
+        </div>
+    </div>
+</div>
+
+<div class="table-container bg-white p-4 rounded-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="search-box-table position-relative" style="width: 300px;">
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input type="text" class="form-control border-0 bg-light ps-5 rounded-pill py-2" placeholder="Tìm mã, tên máy bay...">
+        </div>
+        <div class="d-flex gap-2">
+            <select class="form-select border-0 bg-light rounded-pill fw-bold py-2 px-4">
+                <option>Tất cả Hãng</option>
+                <option>Vietnam Airlines</option>
+                <option>Vietjet Air</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="py-3">MÃ LOẠI</th>
+                    <th>TÊN MÁY BAY</th>
+                    <th>HÃNG SẢN XUẤT</th>
+                    <th class="text-center">SỨC CHỨA</th>
+                    <th class="text-end">THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var plane in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">@plane.MaLoaiMb</td>
+                            <td class="fw-bold">@plane.TenLoaiMb</td>
+                            <td>@plane.HangSanXuat</td>
+                            <td class="text-center fw-bold">@plane.SoLuongGhe</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-light text-primary me-1 rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal" title="Sửa"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-light text-danger rounded-circle" title="Xóa" onclick="confirmDelete('@plane.MaLoaiMb')" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Chưa có dữ liệu máy bay.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--primary-navy);"><i class="bi bi-airplane-engines-fill me-2 text-warning"></i>Thêm máy bay mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAddPlane" onsubmit="event.preventDefault(); alert('Thêm thành công!'); $('#addModal').modal('hide');">
+                <div class="modal-body pt-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Mã máy bay <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0 py-2 fw-bold text-uppercase" placeholder="VD: B787-9" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tên gọi đầy đủ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0 py-2" placeholder="VD: Boeing 787-9 Dreamliner" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hãng sản xuất <span class="text-danger">*</span></label>
+                            <select class="form-select bg-light border-0 py-2" required>
+                                <option value="" disabled selected>Chọn hãng sản xuất...</option>
+                                <option value="Boeing">Boeing</option>
+                                <option value="Airbus">Airbus</option>
+                                <option value="Embraer">Embraer</option>
+                                <option value="ATR">ATR</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Sức chứa dự kiến (Tổng số ghế)</label>
+                            <input type="number" class="form-control bg-light border-0 py-2" placeholder="VD: 290" min="1" required>
+                            <div class="form-text small mt-1"><i class="bi bi-info-circle me-1"></i>Sẽ được chốt sau khi xếp Sơ đồ ghế.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 mt-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold" style="background: var(--primary-navy);">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--primary-navy);"><i class="bi bi-pencil-square me-2 text-warning"></i>Cập nhật thông tin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditPlane" onsubmit="event.preventDefault(); alert('Cập nhật thành công!'); $('#editModal').modal('hide');">
+                <div class="modal-body pt-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Mã máy bay <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0 py-2 fw-bold text-uppercase" id="editMaMb" value="" readonly>
+                            <div class="form-text small mt-1 text-danger">Mã loại không được phép sửa.</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tên gọi đầy đủ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="editTenMb" value="" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hãng sản xuất <span class="text-danger">*</span></label>
+                            <select class="form-select bg-light border-0 py-2" id="editHangSx" required>
+                                <option value="Boeing">Boeing</option>
+                                <option value="Airbus">Airbus</option>
+                                <option value="Embraer">Embraer</option>
+                                <option value="ATR">ATR</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Sức chứa dự kiến</label>
+                            <input type="number" class="form-control bg-light border-0 py-2" id="editSoGhe" value="" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 mt-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold" style="background: var(--primary-navy);">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg p-4 text-center rounded-4">
+            <i class="bi bi-exclamation-octagon-fill text-danger display-4 mb-3"></i>
+            <h5 class="fw-bold">Xác nhận xóa?</h5>
+            <p class="text-muted small">Dữ liệu máy bay <strong id="deleteTarget" class="text-primary"></strong> sẽ bị gỡ khỏi hệ thống.</p>
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-light w-100 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button class="btn btn-danger w-100 rounded-pill fw-bold" onclick="executeDelete()">Xóa ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/admin/js/QuanLyMayBay.js" asp-append-version="true" defer></script>
+<script>
+    function confirmDelete(id) {
+        document.getElementById('deleteTarget').innerText = id;
+    }
+</script>
+

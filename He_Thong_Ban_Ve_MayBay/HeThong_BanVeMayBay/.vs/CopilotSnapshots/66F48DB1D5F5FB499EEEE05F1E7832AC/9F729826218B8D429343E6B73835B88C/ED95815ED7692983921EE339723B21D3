@@ -1,0 +1,346 @@
+﻿@model IEnumerable<HeThong_BanVeMayBay.Models.Entities.HangGhe>
+@{
+    ViewData["Title"] = "Danh mục hạng ghế";
+    var dsTienIch = ViewBag.DsTienIch as IEnumerable<HeThong_BanVeMayBay.Models.Entities.TienIch>;
+}
+
+<link rel="stylesheet" href="~/admin/css/DanhMucHangGhe.css" asp-append-version="true" />
+
+<!-- Thanh điều hướng Tab - Đã sửa lỗi mờ chữ -->
+<ul class="nav nav-pills mb-4 bg-light p-2 rounded-pill shadow-sm" id="pills-tab" role="tablist" style="width: fit-content; border: 1px solid #e2e8f0;">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill fw-bold px-4" id="pills-hangghe-tab" data-bs-toggle="pill" data-bs-target="#pills-hangghe" type="button" role="tab">
+            Hạng Ghế
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold px-4 text-dark" id="pills-tienich-tab" data-bs-toggle="pill" data-bs-target="#pills-tienich" type="button" role="tab">
+            Quản lý Tiện ích
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+    <!-- TAB 1: DANH SÁCH HẠNG GHẾ -->
+    <div class="tab-pane fade show active" id="pills-hangghe" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-navy mb-1" style="color: #003366;">Chính sách Hạng ghế</h2>
+                <p class="text-muted small mb-0">Thiết lập hệ số giá, quyền lợi hành lý và dịch vụ đi kèm cho từng hạng vé.</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: #003366; border:none;" onclick="openAddModal()">
+                <i class="bi bi-plus-lg me-2"></i>Thêm hạng vé mới
+            </button>
+        </div>
+
+        <div class="row g-4 mt-2" id="policyCardsContainer">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var hangGhe in Model)
+                {
+                    var tenHang = hangGhe.TenHangGhe?.Trim() ?? "";
+                    var badgeColor = "secondary";
+                    if (tenHang.Contains("Thương Gia", StringComparison.OrdinalIgnoreCase)) badgeColor = "warning";
+                    else if (tenHang.Contains("Nhất", StringComparison.OrdinalIgnoreCase)) badgeColor = "danger";
+                    else if (tenHang.Contains("Đặc Biệt", StringComparison.OrdinalIgnoreCase)) badgeColor = "primary";
+
+                    if (!string.IsNullOrEmpty(hangGhe.MauSac)) badgeColor = hangGhe.MauSac.Trim().ToLower();
+                    var tenHienThi = tenHang.ToUpper();
+                    var borderStyle = tenHienThi.Contains("THƯƠNG GIA") ? "border: 2px solid #ffc107;" : "";
+
+                    <div class="col-md-4" id="card-@hangGhe.MaHangGhe">
+                        <!-- THẺ CARD CHÍNH -->
+                        <div class="policy-card p-4 d-flex flex-column bg-white shadow-sm" style="@borderStyle; border-radius: 20px;">
+
+                            <!-- PHẦN HEADER: ĐÃ ĐƯA VÀO TRONG CARD ĐỂ KHÔNG BỊ CHE -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex align-items-center">
+                                    <!-- Thay đổi class badge để ép màu chữ và nền tương phản -->
+                                    <span class="badge px-4 py-2 rounded-pill shadow-sm text-uppercase"
+                                         style="font-size: 13px;          
+                                         font-weight: 800;         
+                                         letter-spacing: 0.8px;   
+                                         min-width: 140px;        
+                                         display: inline-block;
+                                         background-color: #f8fafc; 
+                                         color: #003366;          
+                                         border: 1px solid #e2e8f0;
+                                         line-height: 1.5;">
+                                        @tenHienThi
+                                    </span>
+                                </div>
+
+                                <div class="d-flex gap-3 align-items-center bg-light p-1 px-2 rounded-pill shadow-xs">
+                                    <i class="bi bi-pencil-square text-primary cursor-pointer fs-5" title="Sửa" onclick="openEditModal('@hangGhe.MaHangGhe')"></i>
+                                    <i class="bi bi-trash text-danger cursor-pointer fs-5" title="Xóa" onclick="openDeleteModal('@hangGhe.MaHangGhe')"></i>
+                                </div>
+                            </div>
+
+                            <!-- PHẦN GIỮA: HỆ SỐ GIÁ -->
+                            <div class="multiplier-text fw-bold mb-1 mt-2" style="color: #003366;">
+                                x@(hangGhe.HeSoGia?.ToString("0.0").Replace(".", ",") ?? "1,0")
+                            </div>
+                            <div class="text-muted small fw-bold text-uppercase mb-4">
+                                @(hangGhe.HeSoGia == 1.0 ? "GIÁ GỐC (GIAVECOBAN)" : "HỆ SỐ GIÁ CƠ BẢN")
+                            </div>
+
+                            <!-- PHẦN DƯỚI: TIỆN ÍCH DÒNG KẺ ĐỨT -->
+                            <div class="mt-2 border-top pt-1">
+                                <div class="feature-item">
+                                    <div class="icon-box"><i class="bi bi-briefcase-fill text-secondary fs-5"></i></div>
+                                    <span>Xách tay: <b class="text-dark">@(hangGhe.HanhLyXachTay ?? "7kg")</b></span>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="icon-box"><i class="bi bi-luggage-fill text-secondary fs-5"></i></div>
+                                    <span>Ký gửi: <b class="text-dark">@(hangGhe.HanhLyKyGui ?? "Không bao gồm")</b></span>
+                                </div>
+
+                                @{
+                                    bool canRefund = !string.IsNullOrEmpty(hangGhe.HoanVe) && !hangGhe.HoanVe.Contains("Không", StringComparison.OrdinalIgnoreCase);
+                                    var refundIcon = canRefund ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger";
+                                }
+                                <div class="feature-item">
+                                    <div class="icon-box"><i class="bi @refundIcon fs-5"></i></div>
+                                    <span>Hoàn vé: @(hangGhe.HoanVe ?? "Không hỗ trợ")</span>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="icon-box"><i class="bi bi-arrow-repeat text-info fs-5"></i></div>
+                                    <span>Đổi lịch: @(hangGhe.DoiLich ?? "Phí theo quy định")</span>
+                                </div>
+
+                                @if (hangGhe.MaTienIches != null)
+                                {
+                                    foreach (var ti in hangGhe.MaTienIches)
+                                    {
+                                        <div class="feature-item">
+                                            <div class="icon-box"><i class="bi bi-star-fill text-warning fs-5"></i></div>
+                                            <span>@ti.TenTienIch</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <!-- TAB 2: QUẢN LÝ TIỆN ÍCH -->
+    <div class="tab-pane fade" id="pills-tienich" role="tabpanel">
+        <div class="bg-white p-4 rounded-4 shadow-sm border-0">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1" style="color: #003366; font-size: 2rem;">Danh mục Tiện ích</h2>
+                    <p class="text-muted small mb-0">Quản lý danh sách các dịch vụ và tiện ích đi kèm cho các hạng ghế trên hệ thống.</p>
+                </div>
+                <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
+                        style="background: #003366; border:none;"
+                        onclick="openAddTienIchModal()">
+                    <i class="bi bi-plus-lg me-2"></i>Thêm tiện ích mới
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle border-0">
+                    <thead>
+                        <tr class="text-muted small" style="border-bottom: 2px solid #f8fafc;">
+                            <th class="py-3">MÃ TIỆN ÍCH</th>
+                            <th class="py-3">TÊN TIỆN ÍCH</th>
+                            <th class="py-3">BIỂU TƯỢNG (ICON)</th>
+                            <th class="py-3 text-end">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tienIchTableBody" class="border-0">
+                        @if (dsTienIch != null && dsTienIch.Any())
+                        {
+                            foreach (var ti in dsTienIch)
+                            {
+                                <tr id="tr-ti-@ti.MaTienIch" style="border-bottom: 1px solid #f1f5f9;">
+                                    <td class="py-3 fw-bold text-primary">TI-@ti.MaTienIch.ToString("D3")</td>
+                                    <td class="py-3 fw-bold" style="color: #003366;">@ti.TenTienIch</td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                                                <i class="bi @ti.Icon text-warning fs-5"></i>
+                                            </div>
+                                            <span class="small text-muted">@ti.Icon</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-end">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <div class="bg-light p-2 rounded-pill shadow-xs d-flex gap-3 px-3">
+                                                <i class="bi bi-pencil-square text-primary cursor-pointer fs-5" title="Sửa" onclick="openEditTienIchModal(@ti.MaTienIch, '@ti.TenTienIch', '@ti.Icon')"></i>
+                                                <i class="bi bi-trash text-danger cursor-pointer fs-5" title="Xóa" onclick="deleteTienIch(@ti.MaTienIch)"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <span class="text-muted small italic">Hiển thị trang 1 / 1</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 gap-1">
+                        <li class="page-item disabled"><a class="page-link border-0 rounded-circle" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link border-0 rounded-circle fw-bold" href="#" style="background: #003366;">1</a></li>
+                        <li class="page-item disabled"><a class="page-link border-0 rounded-circle" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL HẠNG GHẾ -->
+<div class="modal fade" id="modalPolicy" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4 position-relative">
+                <h5 class="fw-bold mb-0 text-center w-100" id="modalPolicyTitle" style="color: var(--primary-navy);">Cập nhật Hạng vé</h5>
+                <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" style="right: 1.5rem;"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="policyForm">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tên hạng vé</label>
+                            <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="pName" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Màu hiển thị</label>
+                            <select class="form-select bg-light border-0 py-2" id="pColor">
+                                <option value="warning">Vàng (Thương gia)</option>
+                                <option value="secondary">Xám (Phổ thông)</option>
+                                <option value="primary">Xanh dương (Đặc biệt)</option>
+                                <option value="danger">Đỏ (Hạng nhất)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hệ số giá (X)</label>
+                            <input type="number" step="0.1" class="form-control bg-light border-0 py-2 fw-bold" id="pMultiplier" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hành lý xách tay</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pCarryOn">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hành lý ký gửi</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pChecked">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Chính sách hoàn vé</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pRefund">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Chính sách đổi lịch</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="pReschedule">
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tiện ích đi kèm</label>
+                            <div class="p-3 bg-light rounded-4 d-flex flex-wrap gap-3" id="amenitiesCheckboxes">
+                                @if (dsTienIch != null)
+                                {
+                                    foreach (var ti in dsTienIch)
+                                    {
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="checkbox" name="tienIchIds" value="@ti.MaTienIch" id="chk-@ti.MaTienIch">
+                                            <label class="form-check-label small fw-bold" for="chk-@ti.MaTienIch">@ti.TenTienIch</label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn text-white rounded-pill px-5 fw-bold shadow-sm" style="background: var(--primary-navy);" onclick="savePolicy()">Lưu hạng ghế</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL THÊM/SỬA TIỆN ÍCH -->
+<div class="modal fade" id="modalTienIch" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pt-4 px-4 position-relative">
+                <h5 class="fw-bold mb-0 text-center w-100" id="tienIchModalTitle" style="color: #003366;">Thêm tiện ích hệ thống</h5>
+                <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" style="right: 1.5rem;"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="tienIchForm">
+                    <input type="hidden" id="tiId" value="0">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Tên tiện ích</label>
+                        <input type="text" class="form-control bg-light border-0 py-2 fw-bold" id="tiName" placeholder="Ví dụ: Suất ăn nóng" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Biểu tượng (Bootstrap Icon)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i id="iconPreview" class="bi bi-star-fill text-warning"></i></span>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="tiIcon" placeholder="bi-star-fill" oninput="updateIconPreview(this.value)">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn text-white rounded-pill px-5 fw-bold shadow-sm" style="background: #003366;" onclick="saveTienIch()">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XÁC NHẬN XÓA TIỆN ÍCH -->
+<div class="modal fade" id="modalDeleteTienIch" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 text-center p-4" style="border-radius: 24px;">
+            <div class="modal-body">
+                <div class="mb-3"><i class="bi bi-exclamation-octagon-fill text-danger" style="font-size: 4rem;"></i></div>
+                <h4 class="fw-bold mb-2">Xác nhận xóa?</h4>
+                <p class="text-muted small mb-4">Bạn có chắc muốn xóa tiện ích này?</p>
+                <input type="hidden" id="deleteTienIchId">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light w-50 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger w-50 rounded-pill fw-bold shadow-sm" onclick="executeDeleteTienIch()">Xóa bỏ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XÓA HẠNG GHẾ -->
+<div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content shadow-lg text-center p-4" style="border-radius: 20px;">
+            <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+            <h5 class="fw-bold mb-2">Xác nhận xóa?</h5>
+            <p class="text-muted small mb-4">Dữ liệu xóa sẽ không thể khôi phục.</p>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-light w-50 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger w-50 rounded-pill fw-bold" onclick="confirmDelete()">Xóa bỏ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1055; margin-top: 20px;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-3 py-2" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold fs-6" id="toastMessage">Thành công!</div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/admin/js/DanhMucHangGhe.js" asp-append-version="true" defer></script>

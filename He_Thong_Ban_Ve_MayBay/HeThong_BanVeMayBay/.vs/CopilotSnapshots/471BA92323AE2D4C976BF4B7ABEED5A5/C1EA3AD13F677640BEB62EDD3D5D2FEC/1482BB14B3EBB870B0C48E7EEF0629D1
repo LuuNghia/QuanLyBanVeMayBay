@@ -1,0 +1,174 @@
+﻿const toastEl = document.getElementById('liveToast');
+const bsToast = new bootstrap.Toast(toastEl, { delay: 2500 });
+let currentActiveTab = 'airport';
+let rowToDelete = '';
+let isEditMode = false;
+
+function toastMessage(msg, colorClass = 'bg-success') {
+    document.getElementById('toastMessage').innerText = msg;
+    toastEl.className = `toast align-items-center text-white border-0 shadow-lg rounded-pill px-4 py-3 ${colorClass}`;
+    bsToast.show();
+}
+
+// Thay đổi Nút Thêm Mới tùy theo Tab đang mở
+function updateAddButton(tab) {
+    currentActiveTab = tab;
+    const btn = document.getElementById('dynamicAddBtn');
+    if (tab === 'airport') {
+        btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Sân bay mới';
+    } else {
+        btn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Thêm Tuyến bay mới';
+    }
+}
+
+// Bấm nút Thêm Mới
+function openAddModal() {
+    isEditMode = false;
+    if (currentActiveTab === 'airport') {
+        document.getElementById('titleAirport').innerHTML = '<i class="bi bi-building me-2"></i>Thêm Sân bay mới';
+        document.getElementById('formAirport').reset();
+        document.getElementById('sbMa').disabled = false;
+        new bootstrap.Modal(document.getElementById('modalAirport')).show();
+    } else {
+        document.getElementById('titleRoute').innerHTML = '<i class="bi bi-geo-alt me-2"></i>Thêm Tuyến bay mới';
+        document.getElementById('formRoute').reset();
+        document.getElementById('tbMaTuyenRoot').value = "";
+        document.getElementById('tbDi').disabled = false;
+        document.getElementById('tbDen').disabled = false;
+        new bootstrap.Modal(document.getElementById('modalRoute')).show();
+    }
+}
+
+// Sửa Sân Bay
+function openEditAirport(ma, ten, thanhpho) {
+    isEditMode = true;
+    document.getElementById('titleAirport').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Sân bay';
+    document.getElementById('sbMa').value = ma;
+    document.getElementById('sbMa').disabled = true; // Không cho sửa khóa chính
+    document.getElementById('sbTen').value = ten;
+    document.getElementById('sbThanhPho').value = thanhpho;
+    new bootstrap.Modal(document.getElementById('modalAirport')).show();
+}
+
+// Sửa Tuyến Bay
+function openEditRoute(maTuyen) {
+    isEditMode = true;
+    document.getElementById('titleRoute').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Cập nhật Tuyến bay';
+    const parts = maTuyen.split('-');
+    document.getElementById('tbMaTuyenRoot').value = maTuyen;
+    document.getElementById('tbDi').value = parts[0];
+    document.getElementById('tbDen').value = parts[1];
+    
+    // Khoảng cách lấy từ bảng td
+    var row = document.getElementById('tb-' + maTuyen);
+    if(row) {
+        var kh = row.cells[3].innerText.replace(" km", "").trim();
+        document.getElementById('tbKhoangCach').value = kh;
+    }
+
+    document.getElementById('tbDi').disabled = true;
+    document.getElementById('tbDen').disabled = true;
+    new bootstrap.Modal(document.getElementById('modalRoute')).show();
+}
+
+async function handleUpdateRouteStatus(id) {
+    const el = document.querySelector(`#tb-${id} .form-check-input`);
+    if(!el) return;
+    
+    const isChecked = el.checked;
+
+    try {
+        const res = await fetch(`/Admin/Flight/CapNhatTrangThaiTuyenBay?id=${id}&status=${isChecked}`, { method: 'POST' });
+        if (res.ok) {
+            toastMessage(isPlayingStatus ? 'Tuyến bay đang mở.' : 'Đã tạm đóng tuyến bay này!', isChecked ? 'bg-success' : 'bg-warning text-dark');
+        } else toastMessage('Lỗi hệ thống', 'bg-danger');
+    } catch(e) { toastMessage('Lỗi kết nối Server!', 'bg-danger'); }
+}
+
+// Form Submit
+async function submitForm(e, modalId) {
+    e.preventDefault();
+    
+    let url = "";
+    let data = {};
+
+    if (modalId === 'modalAirport') {
+        const ma = document.getElementById('sbMa').value.trim().toUpperCase();
+        data = {
+            MaSb: ma,
+            TenSb: document.getElementById('sbTen').value.trim(),
+            ThanhPho: document.getElementById('sbThanhPho').value.trim()
+        };
+        url = isEditMode ? '/Admin/Flight/SuaSanBay' : '/Admin/Flight/ThemSanBay';
+    } else {
+        const di = document.getElementById('tbDi').value;
+        const den = document.getElementById('tbDen').value;
+        const kh = parseFloat(document.getElementById('tbKhoangCach').value);
+        if(di === den) {
+            alert('Sân bay đi và đến không thể giống nhau!');
+            return;
+        }
+        data = {
+            MaTuyen: isEditMode ? document.getElementById('tbMaTuyenRoot').value : `${di}-${den}`,
+            MaSbdi: di,
+            MaSbden: den,
+            KhoangCach: kh
+        };
+        url = isEditMode ? '/Admin/Flight/SuaTuyenBay' : '/Admin/Flight/ThemTuyenBay';
+    }
+
+    try {
+        const req = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (req.ok) {
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            toastMessage(isEditMode ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            const err = await req.text();
+            alert(err || "Có lỗi xảy ra phía máy chủ.");
+        }
+    } catch(err) {
+        alert("Lỗi kết nối. " + err);
+    }
+}
+
+// Xác nhận xóa
+function confirmDelete(name, elementId) {
+    document.getElementById('delName').innerText = name;
+    rowToDelete = elementId;
+    document.getElementById('delContextId').value = elementId.split('-').slice(1).join('-');
+    document.getElementById('delContextType').value = elementId.split('-')[0]; //sb hoặc tb
+    new bootstrap.Modal(document.getElementById('modalDelete')).show();
+}
+
+async function executeDelete() {
+    const id = document.getElementById('delContextId').value;
+    const type = document.getElementById('delContextType').value;
+    const url = type === 'sb' ? `/Admin/Flight/XoaSanBay?id=${id}` : `/Admin/Flight/XoaTuyenBay?id=${id}`;
+
+    try {
+        const res = await fetch(url, { method: 'DELETE' });
+        bootstrap.Modal.getInstance(document.getElementById('modalDelete')).hide();
+
+        if (res.ok) {
+            if (rowToDelete) {
+                const row = document.getElementById(rowToDelete);
+                if (row) {
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
+                }
+            }
+            toastMessage('Đã bỏ thành công!', 'bg-success');
+        } else {
+            const err = await res.text();
+            toastMessage(err || 'Không thể xóa (Đang có dữ liệu liên kết)!', 'bg-danger');
+        }
+    } catch (e) {
+        toastMessage('Lỗi hệ thống!', 'bg-danger');
+    }
+}

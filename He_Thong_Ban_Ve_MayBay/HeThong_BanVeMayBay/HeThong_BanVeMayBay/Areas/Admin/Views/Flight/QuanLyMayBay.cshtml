@@ -1,0 +1,283 @@
+@{
+    ViewData["Title"] = "Quản lý Đội bay & Hãng hàng không";
+
+    // Lấy dữ liệu từ ViewBag (Controller truyền sang)
+    var hhks = ViewBag.HangHangKhongs as IEnumerable<HeThong_BanVeMayBay.Models.Entities.HangHangKhong>;
+    var mbs = ViewBag.LoaiMayBays as IEnumerable<HeThong_BanVeMayBay.Models.Entities.LoaiMayBay>;
+
+    var totalPlanes = ViewBag.TotalMb ?? 0;
+    var totalAirlines = ViewBag.TotalHhk ?? 0;
+}
+
+<link rel="stylesheet" href="~/admin/css/QuanLyMayBay.css" asp-append-version="true" />
+
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <div>
+        <h2 class="fw-bold text-navy mb-1" style="color: var(--primary-navy);">Quản lý Đội bay & Hãng</h2>
+        <p class="text-muted small mb-0">Danh sách các loại máy bay và hãng hàng không đang khai thác.</p>
+    </div>
+    <button type="button" id="dynamicAddBtn" onclick="openAddModal()" class="btn text-white rounded-pill px-4 fw-bold" style="background: var(--primary-navy);">
+        <i class="bi bi-plus-lg me-2"></i>Thêm Hãng bay
+    </button>
+</div>
+
+<!-- KHỐI THỐNG KÊ (Giữ nguyên của bạn) -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stats-box p-4 bg-white rounded-4 shadow-sm">
+            <div class="text-muted small fw-bold">TỔNG ĐỘI BAY</div>
+            <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">@totalPlanes <small class="fs-6 fw-normal text-muted">chiếc</small></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-box p-4 bg-white rounded-4 shadow-sm" style="border-left: 4px solid var(--secondary-gold, #ffb703);">
+            <div class="text-muted small fw-bold">HÃNG ĐANG HỢP TÁC</div>
+            <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">@totalAirlines <small class="fs-6 fw-normal text-muted">hãng</small></h3>
+        </div>
+    </div>
+</div>
+
+<div class="table-container bg-white p-4 rounded-4 shadow-sm">
+
+    <!-- 2 TABS MÀU VÀNG CHUYỂN ĐỔI -->
+    <div class="nav custom-tabs-wrapper" role="tablist">
+        <button class="custom-tab-btn active" id="hhk-tab" data-bs-toggle="tab" data-bs-target="#tab-hhk" type="button" role="tab" onclick="updateAddBtn('hhk')">
+            <i class="bi bi-building"></i> Danh sách hãng bay
+        </button>
+        <button class="custom-tab-btn" id="mb-tab" data-bs-toggle="tab" data-bs-target="#tab-mb" type="button" role="tab" onclick="updateAddBtn('mb')">
+            <i class="bi bi-airplane"></i> Danh sách máy bay
+        </button>
+    </div>
+
+    <!-- NỘI DUNG TABS -->
+    <div class="tab-content" id="dataTabsContent">
+
+        <!-- TAB 1: HÃNG HÀNG KHÔNG -->
+        <div class="tab-pane fade show active" id="tab-hhk" role="tabpanel">
+           
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3">MÃ HÃNG</th>
+                            <th>TÊN HÃNG BAY</th>
+                            <th class="text-end">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (hhks != null && hhks.Any())
+                        {
+                            foreach (var item in hhks)
+                            {
+                                <tr id="hhk-@item.MaHang">
+                                    <td class="fw-bold text-primary">@item.MaHang</td>
+                                    <td class="fw-bold text-dark">@item.TenHang</td>
+                                    <td class="text-end">
+                                        <button class="btn-action-sm btn-edit mx-1" title="Sửa" onclick="openEditHhk('@item.MaHang', '@item.TenHang')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action-sm btn-delete mx-1" title="Xóa" onclick="openDeleteModal('hhk', '@item.MaHang')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-4">Chưa có dữ liệu hãng bay.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Phân trang Hãng -->
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <span class="small text-muted fst-italic">Hiển thị trang @ViewBag.CurrentPageHhk / @ViewBag.TotalPagesHhk</span>
+                <ul class="pagination pagination-sm mb-0 gap-1 border-0">
+                    @if (ViewBag.CurrentPageHhk > 1)
+                    {
+                        <li class="page-item"><a class="page-link border-0 text-muted page-link-circle" href="?pageHhk=@(ViewBag.CurrentPageHhk - 1)&searchHhk=@ViewBag.SearchHhk&pageMb=@ViewBag.CurrentPageMb&searchMb=@ViewBag.SearchMb"><i class="bi bi-chevron-left"></i></a></li>
+                    }
+                    @for (int i = 1; i <= ViewBag.TotalPagesHhk; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPageHhk ? "active" : "")">
+                            <a class="page-link border-0 page-link-circle" href="?pageHhk=@i&searchHhk=@ViewBag.SearchHhk&pageMb=@ViewBag.CurrentPageMb&searchMb=@ViewBag.SearchMb">@i</a>
+                        </li>
+                    }
+                    @if (ViewBag.CurrentPageHhk < ViewBag.TotalPagesHhk)
+                    {
+                        <li class="page-item"><a class="page-link border-0 text-muted page-link-circle" href="?pageHhk=@(ViewBag.CurrentPageHhk + 1)&searchHhk=@ViewBag.SearchHhk&pageMb=@ViewBag.CurrentPageMb&searchMb=@ViewBag.SearchMb"><i class="bi bi-chevron-right"></i></a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- TAB 2: TÀU BAY -->
+        <div class="tab-pane fade" id="tab-mb" role="tabpanel">
+          
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3">MÃ LOẠI</th>
+                            <th>TÊN MÁY BAY</th>
+                            <th>HÃNG HÀNG KHÔNG</th>
+                            <th>SỐ LƯỢNG GHẾ</th>
+                            <th class="text-end">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (mbs != null && mbs.Any())
+                        {
+                            foreach (var mb in mbs)
+                            {
+                                <tr id="mb-@mb.MaLoaiMb">
+                                    <td class="fw-bold text-primary">@mb.MaLoaiMb</td>
+                                    <td class="fw-bold">@mb.TenLoaiMb</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge badge-airline me-2">@mb.MaHang</span>
+                                            <span class="small fw-bold">@(mb.MaHangNavigation?.TenHang ?? "N/A")</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info border border-info border-opacity-25 px-3">@mb.SoLuongGhe ghế</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn-action-sm btn-edit mx-1" title="Sửa" onclick="openEditMb('@mb.MaLoaiMb', '@mb.TenLoaiMb', '@mb.MaHang', '@mb.SoLuongGhe')"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action-sm btn-delete mx-1" title="Xóa" onclick="openDeleteModal('mb', '@mb.MaLoaiMb')"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có dữ liệu máy bay.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Phân trang Tàu bay -->
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <span class="small text-muted fst-italic">Hiển thị trang @ViewBag.CurrentPageMb / @ViewBag.TotalPagesMb</span>
+                <ul class="pagination pagination-sm mb-0 gap-1 border-0">
+                    @if (ViewBag.CurrentPageMb > 1)
+                    {
+                        <li class="page-item"><a class="page-link border-0 text-muted page-link-circle" href="?pageMb=@(ViewBag.CurrentPageMb - 1)&searchMb=@ViewBag.SearchMb&pageHhk=@ViewBag.CurrentPageHhk&searchHhk=@ViewBag.SearchHhk#tab-mb"><i class="bi bi-chevron-left"></i></a></li>
+                    }
+                    @for (int i = 1; i <= ViewBag.TotalPagesMb; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPageMb ? "active" : "")">
+                            <a class="page-link border-0 page-link-circle" href="?pageMb=@i&searchMb=@ViewBag.SearchMb&pageHhk=@ViewBag.CurrentPageHhk&searchHhk=@ViewBag.SearchHhk#tab-mb">@i</a>
+                        </li>
+                    }
+                    @if (ViewBag.CurrentPageMb < ViewBag.TotalPagesMb)
+                    {
+                        <li class="page-item"><a class="page-link border-0 text-muted page-link-circle" href="?pageMb=@(ViewBag.CurrentPageMb + 1)&searchMb=@ViewBag.SearchMb&pageHhk=@ViewBag.CurrentPageHhk&searchHhk=@ViewBag.SearchHhk#tab-mb"><i class="bi bi-chevron-right"></i></a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================
+     MODALS (Được chuẩn hóa ăn khớp với Javascript)
+=============================================== -->
+<!-- Modal Hãng Bay -->
+<div class="modal fade" id="modalHhk" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--primary-navy);" id="titleHhk"><i class="bi bi-building me-2 text-warning"></i>Thêm Hãng Bay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formHhk" onsubmit="submitHhk(event)" novalidate>
+                <div class="modal-body pt-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Mã hãng <span class="text-danger">*</span></label>
+                            <input type="text" id="hMa" class="form-control bg-light border-0 py-2 fw-bold text-uppercase" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tên hãng bay <span class="text-danger">*</span></label>
+                            <input type="text" id="hTen" class="form-control bg-light border-0 py-2" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 mt-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold" style="background: var(--primary-navy);">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Máy Bay -->
+<div class="modal fade" id="modalMb" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--primary-navy);" id="titleMb"><i class="bi bi-airplane-engines-fill me-2 text-warning"></i>Thêm Máy Bay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formMb" onsubmit="submitMb(event)" novalidate>
+                <div class="modal-body pt-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Mã loại máy bay <span class="text-danger">*</span></label>
+                            <input type="text" id="mMa" class="form-control bg-light border-0 py-2 fw-bold text-uppercase" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Tên gọi <span class="text-danger">*</span></label>
+                            <input type="text" id="mTen" class="form-control bg-light border-0 py-2" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Hãng hàng không sở hữu <span class="text-danger">*</span></label>
+                            <select class="form-select bg-light border-0 py-2 fw-bold" id="mHang" required>
+                                <option value="" disabled selected>-- Chọn hãng hàng không --</option>
+                                @if (ViewBag.HangHangKhongs != null)
+                                {
+                                    foreach (var hhk in ViewBag.HangHangKhongs)
+                                    {
+                                        <option value="@hhk.MaHang">@hhk.TenHang</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Số lượng ghế <span class="text-danger">*</span></label>
+                            <input type="number" id="mGhe" class="form-control bg-light border-0 py-2" required min="1" value="180">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 mt-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold" style="background: var(--primary-navy);">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa -->
+<div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg p-4 text-center rounded-4">
+            <i class="bi bi-exclamation-octagon-fill text-danger display-4 mb-3"></i>
+            <h5 class="fw-bold">Xác nhận xóa?</h5>
+            <p class="text-muted small">Dữ liệu <strong id="delId" class="text-primary"></strong> sẽ bị gỡ khỏi hệ thống.</p>
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-light w-100 rounded-pill fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button class="btn btn-danger w-100 rounded-pill fw-bold" onclick="executeDelete()">Xóa ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Thông báo -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999; margin-top: 20px;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-pill px-4 py-3">
+        <div class="d-flex"><div class="toast-body fw-bold fs-6 p-0" id="toastMsg"></div></div>
+    </div>
+</div>
+
+<script src="~/admin/js/QuanLyMayBay.js" asp-append-version="true" defer></script>

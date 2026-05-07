@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Tra cứu vé";
+}
+
+<link rel="stylesheet" type="text/css" href="~/user/css/TraCuuVe.css" />
+
+<div class="lookup-hero">
+    <div class="container">
+        <h2 class="fw-bold display-5 mb-3">Tra Cứu Thông Tin Chuyến Bay</h2>
+        <p class="opacity-75 fs-5">Nhập mã vé hoặc thông tin cá nhân để kiểm tra hành trình của bạn</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="lookup-card">
+                <form id="lookupForm" onsubmit="executeTicketLookup(); return false;">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="label-custom">Mã vé</label>
+                            <input type="text" class="form-control input-custom text-uppercase" id="lookupMaVe" placeholder="NHẬP MÃ VÉ">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="label-custom">Số điện thoại / CCCD</label>
+                            <input type="text" class="form-control input-custom" id="lookupContact" placeholder="Nhập SĐT hoặc CCCD">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-lookup w-100" id="btnSearch" onclick="executeTicketLookup()">
+                                <i class="bi bi-search fs-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="search-result" style="display:none;">
+                    <hr class="my-5">
+                    <div id="result-container">
+                        <!-- Kết quả sẽ được render ở đây -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.lookupConfig = {
+        apiUrl: '@Url.Action("TraCuuVeAPI", "Booking", new { area = "User" })'
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="~/user/js/TraCuuVe.js" asp-append-version="true"></script>

@@ -1,0 +1,171 @@
+:root {
+    --primary-navy: #003580;
+    --navy-gradient: linear-gradient(90deg, #00265c 0%, #003580 100%);
+    --secondary-gold: #feba02;
+    --sidebar-width: 280px;
+    --bg-light: #f8faff;
+    --glass-white: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-light);
+    margin: 0;
+}
+
+/* --- SIDEBAR (PH?N DÙNG CHUNG) --- */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--primary-navy);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1001;
+    padding: 20px 0;
+}
+
+.sidebar-brand {
+    padding: 0 25px 30px;
+    color: white;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 12px 25px;
+    margin: 4px 15px;
+    border-radius: 12px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+    .nav-link i {
+        font-size: 1.2rem;
+        margin-right: 15px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        color: white;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .nav-link.active {
+        background: var(--secondary-gold) !important;
+        color: var(--primary-navy) !important;
+        font-weight: 600;
+    }
+
+/* --- TOPBAR GRADIENT (PH?N DÙNG CHUNG) --- */
+.topbar {
+    margin-left: var(--sidebar-width);
+    background: var(--navy-gradient);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.search-box {
+    background: var(--glass-white);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    padding: 8px 20px;
+    width: 400px;
+    backdrop-filter: blur(10px);
+}
+
+    .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+    }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+/* =========================================
+   PH?N M?I THÊM: AVATAR & DROPDOWN ADMIN
+   ========================================= */
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--secondary-gold); /* Vi?n màu vàng gi?ng thi?t k? */
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Xóa vi?n ch?m ??t nét (outline) b? l?i khi click chu?t */
+.topbar .nav-link:focus,
+.topbar .nav-link:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Làm cho ch? "Nguy?n V?n A" có màu tr?ng sáng */
+.topbar .nav-link span {
+    color: white;
+    font-weight: 500;
+}
+
+/* ??nh d?ng cho cái Menu x? xu?ng */
+.topbar .dropdown-menu {
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 15px; /* ??y menu xu?ng cách xa thanh topbar m?t chút */
+}
+
+.topbar .dropdown-item {
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-weight: 500;
+    color: #475569;
+    transition: 0.2s;
+}
+
+    .topbar .dropdown-item:hover {
+        background-color: #f8fafc;
+        color: var(--primary-navy);
+    }
+
+/* --- MAIN CONTENT --- */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 35px;
+}
+
+.card-custom {
+    background: white;
+    border-radius: 20px;
+    border: none;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Chart & Fleet styles */
+.fleet-card {
+    background: #001a3d;
+    color: white;
+}

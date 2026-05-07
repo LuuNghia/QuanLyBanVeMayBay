@@ -1,0 +1,125 @@
+﻿/* Card thống kê nhanh */
+.stats-box {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 5px solid var(--primary-navy);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+}
+
+/* Tùy chỉnh bảng */
+.table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px;
+    border: none;
+}
+
+.table tbody td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+/* Badge hãng hàng không */
+.badge-airline {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 11px;
+    background: rgba(0, 53, 128, 0.1);
+    color: var(--primary-navy);
+}
+
+.btn-action-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-edit {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+    .btn-edit:hover {
+        background: #4338ca;
+        color: white;
+    }
+
+.btn-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+    .btn-delete:hover {
+        background: #b91c1c;
+        color: white;
+    }
+/* Bổ sung CSS Tab màu vàng giống ảnh */
+.custom-tabs-wrapper {
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.custom-tab-btn {
+    background: transparent;
+    border: none;
+    padding: 12px 25px;
+    font-weight: bold;
+    color: #64748b;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    transition: 0.3s;
+}
+
+    .custom-tab-btn.active {
+        background-color: #ffb703; /* Màu vàng */
+        color: #003580; /* Màu navy */
+    }
+
+        .custom-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 25px;
+            border-width: 8px 8px 0;
+            border-style: solid;
+            border-color: #ffb703 transparent transparent transparent;
+        }
+
+.page-link-circle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    color: #64748b;
+    font-weight: bold;
+}
+
+.page-item.active .page-link-circle {
+    background-color: var(--primary-navy, #003580);
+    color: white;
+}

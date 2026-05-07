@@ -1,0 +1,6 @@
+﻿namespace HeThong_BanVeMayBay.Areas.Admin.Views
+{
+    public class _ViewStart
+    {
+    }
+}

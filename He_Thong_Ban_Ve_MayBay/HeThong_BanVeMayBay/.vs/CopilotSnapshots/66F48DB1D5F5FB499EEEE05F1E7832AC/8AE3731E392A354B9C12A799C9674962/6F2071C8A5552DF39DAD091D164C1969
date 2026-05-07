@@ -1,0 +1,759 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using HeThong_BanVeMayBay.Models.EF;
+using HeThong_BanVeMayBay.Models.Entities;
+
+namespace HeThong_BanVeMayBay.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class FlightController : Controller
+    {
+        private readonly QlBanVeMayBayContext _context;
+
+        public FlightController(QlBanVeMayBayContext context)
+        {
+            _context = context;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> QuanLyMayBay(string searchHhk = "", string searchMb = "", int pageHhk = 1, int pageMb = 1)
+        {
+            int pageSize = 5;
+
+            // --- 1. XỬ LÝ HÃNG HÀNG KHÔNG ---
+            var queryHhk = _context.HangHangKhongs.Where(h => h.DaXoa == false || h.DaXoa == null).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(searchHhk))
+            {
+                searchHhk = searchHhk.Trim().ToLower();
+                queryHhk = queryHhk.Where(h => h.MaHang.ToLower().Contains(searchHhk) || h.TenHang.ToLower().Contains(searchHhk));
+                ViewBag.SearchHhk = searchHhk;
+            }
+            int totalHhk = await queryHhk.CountAsync();
+            int totalPagesHhk = (int)System.Math.Ceiling((double)totalHhk / pageSize);
+            if (totalPagesHhk == 0) totalPagesHhk = 1;
+            if (pageHhk < 1) pageHhk = 1;
+            if (pageHhk > totalPagesHhk) pageHhk = totalPagesHhk;
+            var listHhk = await queryHhk.OrderBy(h => h.MaHang).Skip((pageHhk - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // --- 2. XỬ LÝ LOẠI MÁY BAY ---
+            var queryMb = _context.LoaiMayBays.Where(m => m.DaXoa == false || m.DaXoa == null).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(searchMb))
+            {
+                searchMb = searchMb.Trim().ToLower();
+                queryMb = queryMb.Where(m => m.MaLoaiMb.ToLower().Contains(searchMb)
+                                          || m.TenLoaiMb.ToLower().Contains(searchMb)
+                                          || m.MaHang.ToLower().Contains(searchMb));
+                ViewBag.SearchMb = searchMb;
+            }
+            int totalMb = await queryMb.CountAsync();
+            int totalPagesMb = (int)System.Math.Ceiling((double)totalMb / pageSize);
+            if (totalPagesMb == 0) totalPagesMb = 1;
+            if (pageMb < 1) pageMb = 1;
+            if (pageMb > totalPagesMb) pageMb = totalPagesMb;
+            var listMb = await queryMb.OrderBy(m => m.MaLoaiMb).Skip((pageMb - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // --- 3. ĐẨY DATA RA VIEW ---
+            ViewBag.TotalHhk = totalHhk; ViewBag.CurrentPageHhk = pageHhk; ViewBag.TotalPagesHhk = totalPagesHhk;
+            ViewBag.TotalMb = totalMb; ViewBag.CurrentPageMb = pageMb; ViewBag.TotalPagesMb = totalPagesMb;
+
+            ViewBag.HangHangKhongs = listHhk;
+            ViewBag.LoaiMayBays = listMb;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemHangHangKhong([FromBody] HangHangKhong hhk)
+        {
+            if (hhk == null || string.IsNullOrWhiteSpace(hhk.MaHang)) return BadRequest("Dữ liệu không hợp lệ.");
+            if (await _context.HangHangKhongs.AnyAsync(h => h.MaHang == hhk.MaHang)) return BadRequest("Mã Hãng đã tồn tại.");
+
+            hhk.DaXoa = false;
+            _context.HangHangKhongs.Add(hhk);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Thêm Hãng hàng không thành công!" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaHangHangKhong([FromBody] HangHangKhong hhk) // Dùng luôn Entity cho nhanh
+        {
+            if (string.IsNullOrWhiteSpace(hhk.MaHang)) return BadRequest("Dữ liệu không hợp lệ.");
+            var existing = await _context.HangHangKhongs.FirstOrDefaultAsync(h => h.MaHang == hhk.MaHang);
+            if (existing == null) return NotFound("Không tìm thấy Hãng hàng không.");
+
+            existing.TenHang = hhk.TenHang;
+            _context.HangHangKhongs.Update(existing);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Cập nhật thành công!" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaHangHangKhong(string id)
+        {
+            var existing = await _context.HangHangKhongs.FirstOrDefaultAsync(h => h.MaHang == id);
+            if (existing == null) return NotFound("Không tìm thấy Hãng hàng không.");
+
+            var isUsed = await _context.ChuyenBays.AnyAsync(c => c.MaHang == id);
+            if (isUsed)
+            {
+                existing.DaXoa = true;
+                _context.HangHangKhongs.Update(existing);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true, message = "Xóa mềm thành công do đã có chuyến bay thuộc hãng này." });
+            }
+            _context.HangHangKhongs.Remove(existing);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Xóa thành công!" });
+        }
+
+ 
+
+        [HttpPost]
+        public async Task<IActionResult> ThemMayBay([FromBody] LoaiMayBay mb)
+        {
+            if (mb == null || string.IsNullOrWhiteSpace(mb.MaLoaiMb)) return BadRequest("Dữ liệu không hợp lệ.");
+            if (await _context.LoaiMayBays.AnyAsync(m => m.MaLoaiMb == mb.MaLoaiMb)) return BadRequest("Mã Máy bay đã tồn tại.");
+
+            mb.DaXoa = false;
+            _context.LoaiMayBays.Add(mb);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Thêm Loại máy bay thành công!" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaMayBay([FromBody] SuaMayBayRequest data)
+        {
+            if (string.IsNullOrWhiteSpace(data.MaLoaiMb)) return BadRequest("Dữ liệu không hợp lệ.");
+            var existing = await _context.LoaiMayBays.FirstOrDefaultAsync(m => m.MaLoaiMb == data.MaLoaiMb);
+            if (existing == null) return NotFound("Không tìm thấy Loại máy bay.");
+
+            existing.TenLoaiMb = data.TenLoaiMb;
+            existing.MaHang = data.MaHang;
+            _context.LoaiMayBays.Update(existing);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Cập nhật thành công!" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaMayBay(string id)
+        {
+            var existing = await _context.LoaiMayBays.FirstOrDefaultAsync(m => m.MaLoaiMb == id);
+            if (existing == null) return NotFound("Không tìm thấy Loại máy bay.");
+
+            var isUsed = await _context.ChuyenBays.AnyAsync(c => c.MaLoaiMb == id) || await _context.DanhMucGhes.AnyAsync(g => g.MaLoaiMb == id);
+            if (isUsed)
+            {
+                existing.DaXoa = true;
+                _context.LoaiMayBays.Update(existing);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true, message = "Xóa mềm thành công do máy bay đang được sử dụng." });
+            }
+            _context.LoaiMayBays.Remove(existing);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Xóa thành công!" });
+        }
+
+        public IActionResult SoDoGhe()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> QuanLyChuyenBay(int page = 1)
+        {
+            int pageSize = 5; // Hoặc số dòng tùy bạn chọn
+
+            // Đếm tổng số chuyến bay chưa bị xóa mềm
+            int totalFlights = await _context.ChuyenBays.Where(c => c.DaXoa == false || c.DaXoa == null).CountAsync();
+
+            int totalPages = (int)System.Math.Ceiling((double)totalFlights / pageSize);
+            if (totalPages == 0) totalPages = 1;
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            var flights = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .Where(c => c.DaXoa == false || c.DaXoa == null)
+                .OrderByDescending(c => c.NgayGioBay)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            // Load thêm data cho dropdown ở Modal Thêm/Sửa
+            ViewBag.DanhSachMayBay = await _context.LoaiMayBays.ToListAsync();
+            ViewBag.DanhSachTuyenBay = await _context.TuyenBays.Where(t => (t.DaXoa == false || t.DaXoa == null) && t.TrangThai == true).ToListAsync();
+
+            return View(flights);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ChiTietChuyenBay(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest("Mã chuyến bay không hợp lệ.");
+
+            var flight = await _context.ChuyenBays
+                .Include(c => c.MaLoaiMbNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdiNavigation)
+                .Include(c => c.MaTuyenNavigation)
+                    .ThenInclude(t => t.MaSbdenNavigation)
+                .FirstOrDefaultAsync(c => c.MaCb == id && (c.DaXoa == false || c.DaXoa == null));
+
+            if (flight == null) return NotFound("Chuyến bay không tồn tại.");
+
+            return Ok(BuildChuyenBayPayload(flight));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemChuyenBay([FromBody] ChuyenBay chuyenBay)
+        {
+            if (chuyenBay == null || string.IsNullOrWhiteSpace(chuyenBay.MaCb))
+                return BadRequest("Dữ liệu không hợp lệ.");
+
+            var exists = await _context.ChuyenBays.AnyAsync(c => c.MaCb == chuyenBay.MaCb);
+            if (exists) return BadRequest("Mã chuyến bay đã tồn tại trong hệ thống.");
+
+            chuyenBay.DaXoa = false;
+
+            // Đảm bảo lấy trạng thái từ giao diện, nếu rỗng thì gán mặc định
+            if (string.IsNullOrWhiteSpace(chuyenBay.TrangThai))
+            {
+                chuyenBay.TrangThai = "Sắp bay";
+            }
+
+            // Xử lý giá vé mặc định nếu rỗng hoặc âm
+            if (chuyenBay.GiaVeCoBan == null || chuyenBay.GiaVeCoBan < 0)
+            {
+                chuyenBay.GiaVeCoBan = 0;
+            }
+
+            _context.ChuyenBays.Add(chuyenBay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm chuyến bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaChuyenBay([FromBody] SuaChuyenBayRequest data)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(data.MaCb))
+                    return BadRequest("Dữ liệu không hợp lệ.");
+
+                var existingCb = await _context.ChuyenBays.FirstOrDefaultAsync(c => c.MaCb == data.MaCb);
+                if (existingCb == null)
+                    return NotFound("Chuyến bay không tồn tại.");
+
+                existingCb.MaLoaiMb = data.MaLoaiMb;
+                existingCb.MaTuyen = data.MaTuyen;
+                existingCb.NgayGioBay = data.NgayGioBay;
+                existingCb.TrangThai = data.TrangThai;
+
+                // Thêm dòng này để cập nhật giá vé cơ bản
+                existingCb.GiaVeCoBan = data.GiaVeCoBan;
+
+                _context.ChuyenBays.Update(existingCb);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Cập nhật chuyến bay thành công" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest("Đã xảy ra lỗi hệ thống: " + ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaChuyenBay(string id)
+        {
+            var existingCb = await _context.ChuyenBays.FirstOrDefaultAsync(c => c.MaCb == id);
+            if (existingCb == null) return NotFound("Chuyến bay không tồn tại.");
+
+            var isUsedInVe = await _context.Ves.AnyAsync(v => v.MaCb == id);
+
+            if (isUsedInVe)
+            {
+                existingCb.DaXoa = true;
+
+                _context.ChuyenBays.Update(existingCb);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true, message = "Xóa mềm chuyến bay thành công do đã có vé được đặt." });
+            }
+
+            // Nếu chuyến bay trống trơn (chưa ai đặt vé), cho phép xóa cứng
+            _context.ChuyenBays.Remove(existingCb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa chuyến bay thành công." });
+        }
+        private object BuildChuyenBayPayload(ChuyenBay flight)
+        {
+            var tuyenBay = flight.MaTuyenNavigation;
+            var sbDi = tuyenBay?.MaSbdiNavigation;
+            var sbDen = tuyenBay?.MaSbdenNavigation;
+
+            return new
+            {
+                success = true,
+                data = new
+                {
+                    maCb = flight.MaCb,
+                    maLoaiMb = flight.MaLoaiMb,
+                    maTuyen = flight.MaTuyen,
+
+                    // Giá trị chuẩn cho input type="datetime-local" ở form Sửa
+                    ngayGioBay = flight.NgayGioBay.ToString("yyyy-MM-ddTHH:mm"),
+
+                    // Format ngày giờ đẹp để hiển thị trên Modal Xem Chi Tiết
+                    ngayGioBayDisplay = flight.NgayGioBay.ToString("HH:mm - dd/MM/yyyy"),
+
+                    trangThai = flight.TrangThai ?? "Sắp bay",
+
+                    // Giá vé nguyên bản để đổ vào form Sửa (input type number)
+                    giaVeGoc = flight.GiaVeCoBan,
+
+                    // Format giá vé để hiển thị trên Modal Xem Chi Tiết
+                    giaVeCoBanDisplay = flight.GiaVeCoBan != null ? string.Format("{0:N0} VNĐ", flight.GiaVeCoBan) : "Chưa cập nhật",
+
+                    // Thông tin máy bay
+                    tenMayBay = flight.MaLoaiMbNavigation?.TenLoaiMb ?? "N/A",
+                    hangSanXuat = flight.MaLoaiMbNavigation?.MaHang ?? "N/A",
+
+                    // Thông tin Sân bay Đi
+                    maSbDi = sbDi?.MaSb ?? "N/A",
+                    thanhPhoDi = sbDi?.ThanhPho ?? "N/A",
+                    tenSbDi = sbDi?.TenSb ?? "N/A",
+
+                    // Thông tin Sân bay Đến
+                    maSbDen = sbDen?.MaSb ?? "N/A",
+                    thanhPhoDen = sbDen?.ThanhPho ?? "N/A",
+                    tenSbDen = sbDen?.TenSb ?? "N/A"
+                }
+            };
+        }
+        public async Task<IActionResult> SanBayVaTuyenBay(int pageSb = 1, int pageTb = 1)
+        {
+            int pageSize = 2;
+
+            int totalAirports = await _context.SanBays.Where(sb => sb.DaXoa == false || sb.DaXoa == null).CountAsync();
+
+            int activeRoutes = await _context.TuyenBays.Where(t => (t.DaXoa == false || t.DaXoa == null) && t.TrangThai == true).CountAsync();
+
+            int maintenanceRoutes = await _context.TuyenBays.Where(t => (t.DaXoa == false || t.DaXoa == null) && t.TrangThai == false).CountAsync();
+
+            ViewBag.TotalAirports = totalAirports;
+            ViewBag.ActiveRoutes = activeRoutes;
+            ViewBag.MaintenanceRoutes = maintenanceRoutes;
+
+            int totalPagesSb = (int)System.Math.Ceiling((double)totalAirports / pageSize);
+            if (totalPagesSb == 0) totalPagesSb = 1;
+            if (pageSb < 1) pageSb = 1;
+            if (pageSb > totalPagesSb) pageSb = totalPagesSb;
+
+            var airports = await _context.SanBays
+                .Where(sb => sb.DaXoa == false || sb.DaXoa == null)
+                .OrderBy(sb => sb.MaSb)
+                .Skip((pageSb - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            int totalRoutes = activeRoutes + maintenanceRoutes;
+            int totalPagesTb = (int)System.Math.Ceiling((double)totalRoutes / pageSize);
+
+            if (totalPagesTb == 0) totalPagesTb = 1;
+            if (pageTb < 1) pageTb = 1;
+            if (pageTb > totalPagesTb) pageTb = totalPagesTb;
+
+            var routes = await _context.TuyenBays
+                .Include(t => t.MaSbdiNavigation)
+                .Include(t => t.MaSbdenNavigation)
+                .Where(t => t.DaXoa == false || t.DaXoa == null)
+                .OrderBy(t => t.MaTuyen)
+                .Skip((pageTb - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // === 3. GỬI DỮ LIỆU DANH SÁCH RA VIEW ===
+            ViewBag.Airports = airports;
+            ViewBag.Routes = routes;
+
+            ViewBag.CurrentPageSb = pageSb;
+            ViewBag.TotalPagesSb = totalPagesSb;
+
+            ViewBag.CurrentPageTb = pageTb;
+            ViewBag.TotalPagesTb = totalPagesTb;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemSanBay([FromBody] HeThong_BanVeMayBay.Models.Entities.SanBay sanBay)
+        {
+            if (sanBay == null || string.IsNullOrWhiteSpace(sanBay.MaSb)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var exists = await _context.SanBays.AnyAsync(s => s.MaSb == sanBay.MaSb);
+            if (exists) return BadRequest("Sân bay đã tồn tại trong hệ thống.");
+
+            sanBay.DaXoa = false;
+            _context.SanBays.Add(sanBay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm sân bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaSanBay([FromBody] SuaSanBayRequest data)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(data.OldMaSb))
+                    return BadRequest("Dữ liệu không hợp lệ.");
+
+                // 1. Tìm sân bay trong Database
+                var existingSb = await _context.SanBays.FirstOrDefaultAsync(s => s.MaSb == data.OldMaSb);
+                if (existingSb == null)
+                    return NotFound("Sân bay không tồn tại.");
+
+                // 2. Chặn đứng hành vi sửa Mã Sân Bay (Khóa chính) để bảo vệ toàn vẹn dữ liệu
+                if (data.OldMaSb != data.MaSb)
+                {
+                    return BadRequest("Hệ thống không cho phép thay đổi Mã sân bay vì có liên kết với Tuyến bay. Vui lòng chỉ sửa Tên và Thành phố.");
+                }
+
+                // 3. Chỉ cập nhật các thông tin được phép
+                existingSb.TenSb = data.TenSb;
+                existingSb.ThanhPho = data.ThanhPho;
+
+                // 4. Lưu thay đổi
+                _context.SanBays.Update(existingSb);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Cập nhật sân bay thành công" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest("Đã xảy ra lỗi hệ thống: " + ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaSanBay(string id)
+        {
+            var existingSb = await _context.SanBays.FirstOrDefaultAsync(s => s.MaSb == id);
+            if (existingSb == null) return NotFound("Sân bay không tồn tại.");
+
+            var isUsedInRoute = await _context.TuyenBays.AnyAsync(t => t.MaSbdi == id || t.MaSbden == id);
+            if (isUsedInRoute)
+            {
+                existingSb.DaXoa = true; // Xóa mềm
+                _context.SanBays.Update(existingSb);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true, message = "Xóa mềm sân bay thành công do có dữ liệu liên kết." });
+            }
+
+            _context.SanBays.Remove(existingSb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa sân bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemTuyenBay([FromBody] HeThong_BanVeMayBay.Models.Entities.TuyenBay tuyenBay)
+        {
+            if (tuyenBay == null || string.IsNullOrWhiteSpace(tuyenBay.MaSbdi) || string.IsNullOrWhiteSpace(tuyenBay.MaSbden)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            if (tuyenBay.MaSbdi == tuyenBay.MaSbden) return BadRequest("Điểm đi và điểm đến không được trùng nhau.");
+
+            var maTuyen = $"{tuyenBay.MaSbdi}-{tuyenBay.MaSbden}";
+            var exists = await _context.TuyenBays.AnyAsync(t => t.MaTuyen == maTuyen);
+
+            if (exists) return BadRequest("Tuyến bay này đã tồn tại.");
+
+            tuyenBay.MaTuyen = maTuyen;
+            tuyenBay.TrangThai = true;
+            tuyenBay.DaXoa = false;
+
+            _context.TuyenBays.Add(tuyenBay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Thêm tuyến bay thành công" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SuaTuyenBay([FromBody] HeThong_BanVeMayBay.Models.Entities.TuyenBay tuyenBay)
+        {
+            if (tuyenBay == null || string.IsNullOrWhiteSpace(tuyenBay.MaTuyen)) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == tuyenBay.MaTuyen);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            existingTb.KhoangCach = tuyenBay.KhoangCach;
+
+            _context.TuyenBays.Update(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật tuyến bay thành công" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> XoaTuyenBay(string id)
+        {
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == id);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            // Kiểm tra xem tuyến bay có đang được sử dụng trong chuyến bay nào không
+            var isUsedInFlight = await _context.ChuyenBays.AnyAsync(c => c.MaTuyen == id);
+
+            if (isUsedInFlight)
+            {
+                existingTb.DaXoa = true;      // Xóa mềm
+                existingTb.TrangThai = false; 
+
+                _context.TuyenBays.Update(existingTb);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Xóa mềm tuyến bay thành công do có dữ liệu liên kết." });
+            }
+
+            _context.TuyenBays.Remove(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Xóa tuyến bay thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CapNhatTrangThaiTuyenBay(string id, bool status)
+        {
+            var existingTb = await _context.TuyenBays.FirstOrDefaultAsync(t => t.MaTuyen == id);
+            if (existingTb == null) return NotFound("Tuyến bay không tồn tại.");
+
+            existingTb.TrangThai = status;
+
+            _context.TuyenBays.Update(existingTb);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Cập nhật trạng thái thành công" });
+        }
+
+        public async Task<IActionResult> DanhMucHangGhe()
+        {
+            var danhMucHangGhe = await _context.HangGhes
+                .Include(hg => hg.MaTienIches)
+                .OrderByDescending(hg => hg.HeSoGia)
+                .ToListAsync();
+            ViewBag.DsTienIch = await _context.TienIches
+                .Where(t => t.DaXoa == false || t.DaXoa == null)
+                .ToListAsync();
+
+            return View(danhMucHangGhe);
+        }
+
+        // --- 1. GET: Lấy thông tin để đổ vào Modal (Sửa) ---
+        [HttpGet]
+        public async Task<IActionResult> LayThongTinHangGhe(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest("Mã không hợp lệ");
+
+            var hg = await _context.HangGhes
+                .Include(h => h.MaTienIches)
+                .FirstOrDefaultAsync(h => h.MaHangGhe == id && (h.DaXoa == false || h.DaXoa == null));
+
+            if (hg == null) return NotFound("Không tìm thấy hạng ghế.");
+
+            return Ok(new
+            {
+                maHangGhe = hg.MaHangGhe,
+                tenHangGhe = hg.TenHangGhe,
+                heSoGia = hg.HeSoGia,
+                hanhLyXachTay = hg.HanhLyXachTay,
+                hanhLyKyGui = hg.HanhLyKyGui,
+                hoanVe = hg.HoanVe,
+                doiLich = hg.DoiLich,
+                mauSac = hg.MauSac,
+                maTienIchIds = hg.MaTienIches.Select(t => t.MaTienIch).ToList()
+            });
+        }
+
+        // --- 2. POST: Xử lý THÊM MỚI ---
+        [HttpPost]
+        public async Task<IActionResult> ThemHangGhe([FromBody] LuuHangGheRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.TenHangGhe))
+                return BadRequest("Tên hạng ghế không được để trống.");
+
+            // Tự sinh mã mới HG + chuỗi thời gian
+            string newId = "HG" + System.DateTime.Now.Ticks.ToString().Substring(10);
+            var hg = new HangGhe { MaHangGhe = newId, DaXoa = false };
+
+            await MappingVaLuu(hg, req); // Gọi hàm phụ bên dưới
+
+            return Ok(new { success = true, message = "Thêm mới hạng ghế thành công!" });
+        }
+
+        // --- 3. POST: Xử lý CẬP NHẬT (SỬA) ---
+        [HttpPost]
+        public async Task<IActionResult> CapNhatHangGhe([FromBody] LuuHangGheRequest req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.MaHangGhe))
+                return BadRequest("Dữ liệu không hợp lệ.");
+
+            var hg = await _context.HangGhes
+                .Include(h => h.MaTienIches)
+                .FirstOrDefaultAsync(h => h.MaHangGhe == req.MaHangGhe);
+
+            if (hg == null) return NotFound("Hạng ghế không tồn tại.");
+
+            await MappingVaLuu(hg, req);
+
+            return Ok(new { success = true, message = "Cập nhật thành công!" });
+        }
+
+        // --- HÀM PHỤ GÁN DỮ LIỆU ĐỂ DÙNG CHUNG ---
+        private async Task MappingVaLuu(HangGhe hg, LuuHangGheRequest req)
+        {
+            hg.TenHangGhe = req.TenHangGhe;
+            hg.HeSoGia = req.HeSoGia;
+            hg.HanhLyXachTay = req.HanhLyXachTay;
+            hg.HanhLyKyGui = req.HanhLyKyGui;
+            hg.HoanVe = req.HoanVe;
+            hg.DoiLich = req.DoiLich;
+            hg.MauSac = req.MauSac;
+
+            // Xử lý tiện ích (Amenities)
+            hg.MaTienIches.Clear();
+            if (req.MaTienIchIds != null && req.MaTienIchIds.Any())
+            {
+                var tienIchList = await _context.TienIches
+                    .Where(t => req.MaTienIchIds.Contains(t.MaTienIch))
+                    .ToListAsync();
+
+                foreach (var tienIch in tienIchList)
+                {
+                    hg.MaTienIches.Add(tienIch);
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(req.Amenities))
+            {
+                var listTen = req.Amenities.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).Distinct();
+                foreach (var ten in listTen)
+                {
+                    var tienIch = await _context.TienIches.FirstOrDefaultAsync(t => t.TenTienIch.ToLower() == ten.ToLower())
+                                  ?? new TienIch { TenTienIch = ten, DaXoa = false };
+                    hg.MaTienIches.Add(tienIch);
+                }
+            }
+
+            if (_context.Entry(hg).State == EntityState.Detached) _context.HangGhes.Add(hg);
+            else _context.HangGhes.Update(hg);
+
+            await _context.SaveChangesAsync();
+        }
+
+        // --- 4. DELETE: XỬ LÝ XÓA ---
+        [HttpDelete]
+        public async Task<IActionResult> XoaHangGhe(string id)
+        {
+            var hg = await _context.HangGhes.FirstOrDefaultAsync(h => h.MaHangGhe == id);
+            if (hg == null) return NotFound("Không tìm thấy hạng ghế.");
+
+            var isUsed = await _context.Ves.AnyAsync(v => v.MaGheNavigation.MaHangGhe == id);
+
+            if (isUsed)
+            {
+                hg.DaXoa = true; // Xóa mềm
+                _context.HangGhes.Update(hg);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true, message = "Đã xóa mềm do hạng ghế đang có vé sử dụng." });
+            }
+
+            _context.HangGhes.Remove(hg);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, message = "Xóa hạng ghế thành công." });
+        }
+        // 1. API Lưu Tiện ích (Dùng chung cho cả Thêm và Sửa)
+        [HttpPost]
+        public async Task<IActionResult> LuuTienIch([FromBody] TienIch req)
+        {
+            if (req == null || string.IsNullOrWhiteSpace(req.TenTienIch))
+                return BadRequest("Dữ liệu không hợp lệ.");
+
+            if (req.MaTienIch == 0) // Trường hợp Thêm mới
+            {
+                req.DaXoa = false;
+                _context.TienIches.Add(req);
+            }
+            else // Trường hợp Cập nhật
+            {
+                var ti = await _context.TienIches.FindAsync(req.MaTienIch);
+                if (ti == null) return NotFound();
+
+                ti.TenTienIch = req.TenTienIch;
+                ti.Icon = req.Icon;
+                _context.TienIches.Update(ti);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true });
+        }
+
+        // 2. API Xóa Tiện ích
+        [HttpDelete]
+        public async Task<IActionResult> XoaTienIch(int id)
+        {
+            var ti = await _context.TienIches.FindAsync(id);
+            if (ti == null) return NotFound();
+
+            _context.TienIches.Remove(ti);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true });
+        }
+        public class SuaSanBayRequest
+        {
+            public string OldMaSb { get; set; }
+            public string MaSb { get; set; }
+            public string TenSb { get; set; }
+            public string ThanhPho { get; set; }
+        }
+
+        public class SuaChuyenBayRequest
+        {
+            public string MaCb { get; set; }
+            public string MaLoaiMb { get; set; }
+            public string MaTuyen { get; set; }
+            public DateTime NgayGioBay { get; set; }
+            public string TrangThai { get; set; }
+            public decimal GiaVeCoBan { get; set; }
+        }
+        public class SuaMayBayRequest
+        {
+            public string MaLoaiMb { get; set; }
+            public string TenLoaiMb { get; set; }
+            public string MaHang { get; set; }
+        }
+        public class LuuHangGheRequest
+        {
+            public string MaHangGhe { get; set; }
+            public string TenHangGhe { get; set; }
+            public double HeSoGia { get; set; }
+            public string HanhLyXachTay { get; set; }
+            public string HanhLyKyGui { get; set; }
+            public string HoanVe { get; set; }
+            public string DoiLich { get; set; }
+            public string MauSac { get; set; }
+            public string Amenities { get; set; }
+            public List<int> MaTienIchIds { get; set; }
+        }
+    }
+}
