@@ -12,6 +12,7 @@ wwwroot\admin\js\DanhMucHangGhe.js
 wwwroot\admin\js\Dashboad.js
 wwwroot\admin\js\NhanVienKhachHang.js
 wwwroot\admin\js\QuanLyChuyenBay.js
+wwwroot\admin\js\QuanLyDatVe.js
 wwwroot\admin\js\QuanLyMayBay.js
 wwwroot\admin\js\SanBayVaTuyenBay.js
 wwwroot\admin\js\SoDoGhe.js
@@ -103,4 +104,3 @@ wwwroot\user\js\ThanhToan.js
 wwwroot\user\js\ThongTinCaNhan.js
 wwwroot\user\js\ThongTinKHDatve.js
 wwwroot\user\js\TraCuuVe.js
-wwwroot\admin\js\QuanLyDatVe.js
